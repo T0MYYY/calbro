@@ -16,7 +16,7 @@ CalBro/Resources/Models/
 
 - **Quickest — Hugging Face:** [`T0MYYY/dpf-nutrition`](https://huggingface.co/T0MYYY/dpf-nutrition) hosts both Core ML packages under `coreml/` (`DPFNutritionRGBDepth.mlpackage`, `DepthAnythingV2SmallF16P6.mlpackage`).
 - **DPF-Nutrition** is trained in the research repo
-  [T0MYYY/nutrition5k-calorie-estimation-adsp31018](https://github.com/T0MYYY/nutrition5k-calorie-estimation-adsp31018) and converted to Core ML with
+  [T0MYYY/nutrition5k-calorie-estimation](https://github.com/T0MYYY/nutrition5k-calorie-estimation) and converted to Core ML with
   `tools/convert_dpf_nutrition_coreml.py` (run from the `nutrition5k` conda environment).
 - **Depth Anything V2 (Small)** Core ML package is converted from the official
   [Depth-Anything-V2](https://github.com/DepthAnything/Depth-Anything-V2) Small checkpoint
