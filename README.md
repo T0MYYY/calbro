@@ -174,4 +174,6 @@ Depth backbone: [Depth Anything V2](https://github.com/DepthAnything/Depth-Anyth
 
 ## License / disclaimer
 
+Licensed under the [MIT License](LICENSE).
+
 Research/educational prototype. Nutrition outputs are **not** validated and must not inform health decisions.
