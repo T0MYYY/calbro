@@ -2,11 +2,12 @@ import SwiftUI
 
 struct RootView: View {
     @State private var onboarding = OnboardingViewModel()
+    private let profileStore = ProfileStore.shared
 
     var body: some View {
         Group {
-            if onboarding.isComplete {
-                MainTabView(profile: onboarding.profile)
+            if profileStore.onboardingComplete {
+                MainTabView()
             } else {
                 OnboardingFlowView(viewModel: onboarding)
             }

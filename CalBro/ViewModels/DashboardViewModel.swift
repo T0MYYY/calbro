@@ -1,105 +1,100 @@
 import Foundation
 
+struct WeekDay: Identifiable, Equatable {
+    let date: Date
+    let symbol: String
+    let dayNumber: Int
+    let status: DayStatus
+    let isFuture: Bool
+    let isToday: Bool
+
+    var id: Date { date }
+}
+
 @MainActor
 @Observable
 final class DashboardViewModel {
-    var selectedWeekdayIndex: Int
+    private(set) var selectedDate: Date
 
     private let mealStore: MealLogStore
+    private let profileStore: ProfileStore
+    private let integrations: IntegrationViewModel
+    private let calendar = Calendar.current
 
-    init(mealStore: MealLogStore = .shared) {
+    init(mealStore: MealLogStore = .shared, profileStore: ProfileStore = .shared,
+         integrations: IntegrationViewModel = .shared) {
         self.mealStore = mealStore
-        let weekday = Calendar.current.component(.weekday, from: Date())
-        self.selectedWeekdayIndex = (weekday + 5) % 7
+        self.profileStore = profileStore
+        self.integrations = integrations
+        self.selectedDate = Calendar.current.startOfDay(for: Date())
     }
 
-    // Read live from UserDefaults so profile edits reflect without restart
-    private var savedProfile: UserProfile {
-        guard let data = UserDefaults.standard.data(forKey: "calBuddy.appState.v1"),
-              let snap = try? JSONDecoder().decode(AppStateSnapshot.self, from: data)
-        else { return UserProfile() }
-        return snap.profile
-    }
+    var isShowingToday: Bool { calendar.isDateInToday(selectedDate) }
 
-    // MARK: - Daily nutrition
+    // MARK: - Selected day
+
+    var calorieTarget: Int { integrations.calorieTarget(on: selectedDate) }
 
     var nutrition: DailyNutrition {
-        let t = mealStore.totalsForToday()
-        let p = savedProfile
+        let p = profileStore.profile
         return DailyNutrition(
-            caloriesConsumed: t.calories,
-            calorieTarget: p.calorieTarget,
-            macros: [
-                Macro(id: "protein", label: "Protein",
-                      value: "\(t.protein)g",
-                      progress: Double(t.protein) / Double(max(1, p.proteinTargetG)),
-                      colorKey: .plum),
-                Macro(id: "carbs", label: "Carbs",
-                      value: "\(t.carbs)g",
-                      progress: Double(t.carbs) / Double(max(1, p.carbTargetG)),
-                      colorKey: .ocean),
-                Macro(id: "fat", label: "Fat",
-                      value: "\(t.fat)g",
-                      progress: Double(t.fat) / Double(max(1, p.fatTargetG)),
-                      colorKey: .gold)
-            ],
-            micronutrients: []
+            totals: mealStore.totals(on: selectedDate),
+            calorieTarget: calorieTarget,
+            proteinTarget: p.proteinTargetG, carbTarget: p.carbTargetG, fatTarget: p.fatTargetG
         )
     }
 
-    var meals: [Meal] {
-        mealStore.mealsForToday().map {
-            Meal(id: $0.id.uuidString, name: $0.name,
-                 time: $0.timeLabel, calories: $0.adjustedCalories, isLogged: true)
-        }
+    var meals: [LoggedMeal] { mealStore.meals(on: selectedDate) }
+
+    /// Extra budget from Apple Health active energy, when that's in use today.
+    var activeEnergyBonus: Int? {
+        guard isShowingToday else { return nil }
+        let delta = calorieTarget - profileStore.profile.calorieTarget
+        return delta != 0 ? integrations.todayActiveEnergy : nil
     }
 
-    var hasNoMeals: Bool { mealStore.mealsForToday().isEmpty }
+    var selectedDayTitle: String {
+        if isShowingToday { return String(localized: "Today") }
+        if calendar.isDateInYesterday(selectedDate) { return String(localized: "Yesterday") }
+        return selectedDate.formatted(.dateTime.weekday(.wide).month(.abbreviated).day())
+    }
 
     // MARK: - Week strip
 
     var monthLabel: String {
-        let f = DateFormatter(); f.dateFormat = "MMMM yyyy"
-        return f.string(from: Date())
+        selectedDate.formatted(.dateTime.month(.wide).year())
     }
 
     var streakLabel: String {
-        let s = streak
-        return s > 1 ? "\(s)-day streak 🔥" : s == 1 ? "Started today 🌱" : "Log today!"
+        let s = mealStore.streak()
+        if s == 0 { return String(localized: "Log a meal to start a streak") }
+        return String(localized: "\(s)-day streak")
     }
 
-    var days: [String]  { ["M","T","W","T","F","S","S"] }
-
-    var dates: [Int] {
-        let cal = Calendar.current, today = cal.startOfDay(for: Date())
-        let offset = (cal.component(.weekday, from: today) + 5) % 7
-        return (0..<7).map { i in cal.component(.day, from: cal.date(byAdding: .day, value: i - offset, to: today)!) }
-    }
-
-    var dayStatuses: [NutritionColorKey] {
-        let cal = Calendar.current, today = cal.startOfDay(for: Date())
-        let offset = (cal.component(.weekday, from: today) + 5) % 7
-        let target = savedProfile.calorieTarget
+    /// The calendar week containing the selected day, starting on the locale's first weekday.
+    var week: [WeekDay] {
+        let today = calendar.startOfDay(for: Date())
+        let start = calendar.dateInterval(of: .weekOfYear, for: selectedDate)?.start ?? selectedDate
+        let symbols = calendar.veryShortStandaloneWeekdaySymbols
+        let target = profileStore.profile.calorieTarget
         return (0..<7).map { i in
-            let d = cal.date(byAdding: .day, value: i - offset, to: today)!
-            if d > today { return .ink }
-            let consumed = mealStore.meals
-                .filter { cal.isDate($0.timestamp, inSameDayAs: d) }
-                .reduce(0) { $0 + $1.adjustedCalories }
-            if consumed == 0 { return .ink }
-            return consumed >= Int(Double(target) * 0.80) ? .sage : .terra
+            let d = start.adding(days: i, calendar: calendar)
+            return WeekDay(
+                date: d,
+                symbol: symbols[(calendar.component(.weekday, from: d) - 1) % symbols.count],
+                dayNumber: calendar.component(.day, from: d),
+                status: mealStore.status(on: d, target: calendar.isDateInToday(d) ? calorieTarget : target),
+                isFuture: d > today,
+                isToday: calendar.isDate(d, inSameDayAs: today)
+            )
         }
     }
 
-    func selectWeekday(_ idx: Int) { selectedWeekdayIndex = idx }
-
-    private var streak: Int {
-        let cal = Calendar.current
-        var day = cal.startOfDay(for: Date()), count = 0
-        while mealStore.meals.contains(where: { cal.isDate($0.timestamp, inSameDayAs: day) }) {
-            count += 1
-            day = cal.date(byAdding: .day, value: -1, to: day)!
-        }
-        return count
+    func select(_ date: Date) {
+        let day = calendar.startOfDay(for: date)
+        guard day <= calendar.startOfDay(for: Date()) else { return }
+        selectedDate = day
     }
+
+    func selectToday() { selectedDate = calendar.startOfDay(for: Date()) }
 }

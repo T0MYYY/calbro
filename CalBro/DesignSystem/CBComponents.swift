@@ -15,12 +15,17 @@ struct CBCard<Content: View>: View {
 }
 
 struct PrimaryButton: View {
-    let title: String
+    let title: Text
     let action: () -> Void
+
+    init(_ title: LocalizedStringKey, action: @escaping () -> Void) {
+        self.title = Text(title)
+        self.action = action
+    }
 
     var body: some View {
         Button(action: action) {
-            Text(title)
+            title
                 .font(CBTypography.body(18, weight: .semibold))
                 .foregroundStyle(CBColors.controlOnFill)
                 .frame(maxWidth: .infinity)
@@ -29,6 +34,7 @@ struct PrimaryButton: View {
                 .clipShape(RoundedRectangle(cornerRadius: CBSpacing.buttonRadius, style: .continuous))
         }
         .buttonStyle(.plain)
+        .accessibilityIdentifier("primaryButton")
     }
 }
 
@@ -89,7 +95,7 @@ struct RingShape: Shape {
 struct CalorieRing: View {
     let progress: Double
     let label: String
-    let subtitle: String
+    var subtitle: String = ""
     var size: CGFloat = 148
     var stroke: CGFloat = 12
     var color = CBColors.terra
@@ -106,16 +112,19 @@ struct CalorieRing: View {
                     .font(display ? CBTypography.display(size * 0.19) : CBTypography.body(size * 0.17, weight: .bold))
                     .foregroundStyle(CBColors.ink)
                     .lineLimit(1)
-                    .minimumScaleFactor(0.65)
+                    .minimumScaleFactor(0.5)
                 if !subtitle.isEmpty {
                     Text(subtitle)
                         .font(CBTypography.body(size * 0.13))
                         .foregroundStyle(CBColors.inkMid)
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.6)
                 }
             }
             .padding(stroke + 2)
         }
         .frame(width: size, height: size)
+        .accessibilityElement(children: .combine)
     }
 }
 
@@ -128,23 +137,39 @@ struct MacroRing: View {
         CalorieRing(
             progress: macro.progress,
             label: macro.value,
-            subtitle: "",
             size: size,
             stroke: stroke,
             color: CBColors.nutrition(macro.colorKey),
             display: false
         )
+        .accessibilityLabel(Text(macro.label))
+        .accessibilityValue(Text(macro.value))
     }
 }
 
 struct PillTag: View {
-    let text: String
+    let text: Text
     var color = CBColors.terra
     var filled = false
 
+    init(_ key: LocalizedStringKey, color: Color = CBColors.terra, filled: Bool = false) {
+        self.text = Text(key)
+        self.color = color
+        self.filled = filled
+    }
+
+    @_disfavoredOverload
+    init<S: StringProtocol>(_ string: S, color: Color = CBColors.terra, filled: Bool = false) {
+        self.text = Text(string)
+        self.color = color
+        self.filled = filled
+    }
+
     var body: some View {
-        Text(text)
+        text
             .font(CBTypography.body(13, weight: .semibold))
+            .lineLimit(1)
+            .minimumScaleFactor(0.7)
             .foregroundStyle(filled ? .white : color)
             .padding(.horizontal, 12)
             .padding(.vertical, 4)
@@ -156,8 +181,14 @@ struct PillTag: View {
 
 struct MetricCard: View {
     let value: String
-    let label: String
+    let label: Text
     var color = CBColors.ink
+
+    init(value: String, label: LocalizedStringKey, color: Color = CBColors.ink) {
+        self.value = value
+        self.label = Text(label)
+        self.color = color
+    }
 
     var body: some View {
         VStack(spacing: 3) {
@@ -166,38 +197,15 @@ struct MetricCard: View {
                 .foregroundStyle(color)
                 .lineLimit(1)
                 .minimumScaleFactor(0.7)
-            Text(label)
+            label
                 .font(CBTypography.body(12))
                 .foregroundStyle(CBColors.inkMid)
+                .lineLimit(2)
+                .multilineTextAlignment(.center)
+                .minimumScaleFactor(0.8)
         }
         .frame(maxWidth: .infinity)
-    }
-}
-
-struct HatchPlaceholder: View {
-    var label: String = ""
-    var dark = false
-
-    var body: some View {
-        ZStack {
-            Canvas { context, size in
-                let color = dark ? Color.white.opacity(0.08) : CBColors.inkFaint
-                for offset in stride(from: -size.height, through: size.width, by: 10) {
-                    var path = Path()
-                    path.move(to: CGPoint(x: offset, y: size.height))
-                    path.addLine(to: CGPoint(x: offset + size.height, y: 0))
-                    context.stroke(path, with: .color(color), lineWidth: 1)
-                }
-            }
-            if !label.isEmpty {
-                Text(label)
-                    .font(CBTypography.body(13))
-                    .foregroundStyle(dark ? Color.white.opacity(0.22) : CBColors.inkMid)
-            }
-        }
-        .background(dark ? Color.white.opacity(0.02) : CBColors.bgSoft)
-        .overlay(RoundedRectangle(cornerRadius: 10).stroke(dark ? Color.white.opacity(0.08) : CBColors.inkFaint, lineWidth: 1.5))
-        .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
+        .accessibilityElement(children: .combine)
     }
 }
 

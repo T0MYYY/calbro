@@ -49,6 +49,7 @@ struct CameraFlowView: View {
             }
         }
         .animation(.spring(duration: 0.35), value: viewModel.phase)
+        .environment(\.colorScheme, .dark)
         .task {
             camera.start()
             await viewModel.run(camera: camera)
@@ -77,26 +78,36 @@ struct CameraFlowView: View {
                     Image(systemName: "xmark")
                         .font(.system(size: 17, weight: .semibold))
                         .foregroundStyle(.white)
-                        .frame(width: 40, height: 40)
+                        .frame(width: 44, height: 44)
                         .background(Color.black.opacity(0.5), in: Circle())
                 }
                 .buttonStyle(.plain)
+                .accessibilityLabel(Text("Close"))
+                .accessibilityIdentifier("closeCamera")
                 Spacer()
-                AngleBubble(tiltDegrees: viewModel.tiltDegrees)
+                AngleBubble(tiltDegrees: viewModel.hasTiltReading ? viewModel.tiltDegrees : nil)
             }
             .padding(.horizontal, 20)
             .padding(.top, 12)
 
             // Height guidance — universal distance bar (no units), shown during scan/aim
-            if viewModel.phase == .scanning || viewModel.phase == .aiming {
+            if (viewModel.phase == .scanning || viewModel.phase == .aiming), camera.status.canCapture,
+               viewModel.heightCm != nil {
                 HeightGuidanceBar(heightCm: viewModel.heightCm,
-                                  range: CameraFlowViewModel.heightRange)
+                                  range: CaptureGuidance.heightRange)
                     .padding(.top, 12)
                     .padding(.horizontal, 40)
                     .transition(.opacity.combined(with: .move(edge: .top)))
             }
 
             Spacer()
+
+            if let error = viewModel.errorMessage, viewModel.phase == .scanning {
+                ErrorBanner(message: error, onDismiss: viewModel.dismissError)
+                    .padding(.horizontal, 16)
+                    .padding(.bottom, 10)
+                    .transition(.move(edge: .bottom).combined(with: .opacity))
+            }
 
             if viewModel.phase != .result {
                 bottomHUD
@@ -127,10 +138,11 @@ struct CameraFlowView: View {
                         }
                     }
                     .frame(height: 4)
+                    .accessibilityHidden(true)
                 } else {
                     Text(guidanceSubtitle)
                         .font(CBTypography.body(13))
-                        .foregroundStyle(.white.opacity(0.55))
+                        .foregroundStyle(.white.opacity(0.65))
                 }
             }
 
@@ -145,6 +157,8 @@ struct CameraFlowView: View {
                     }
                 }
                 .buttonStyle(.plain)
+                .accessibilityLabel(Text("Take photo"))
+                .accessibilityIdentifier("shutter")
             }
         }
         .padding(.horizontal, 18)
@@ -163,16 +177,18 @@ struct CameraFlowView: View {
     private var guidanceTitle: String {
         switch viewModel.phase {
         case .scanning:
-            if viewModel.tiltDegrees >= 28 { return "Point straight down" }
-            if let h = viewModel.heightCm {
-                if h < CameraFlowViewModel.heightRange.lowerBound { return "Raise the phone a little" }
-                if h > CameraFlowViewModel.heightRange.upperBound { return "Lower the phone a little" }
+            if let message = camera.status.message { return message }
+            let g = viewModel.guidance
+            if !viewModel.hasTiltReading || !g.isOverhead { return String(localized: "Point straight down") }
+            if let h = g.heightCm {
+                if h < CaptureGuidance.heightRange.lowerBound { return String(localized: "Raise the phone a little") }
+                if h > CaptureGuidance.heightRange.upperBound { return String(localized: "Lower the phone a little") }
             }
-            return "Point straight down"
-        case .aiming:             return "Hold steady…"
-        case .countdown(let n):   return "\(n)"
-        case .processing:         return "Analysing…"
-        case .result:             return ""
+            return String(localized: "Hold steady")
+        case .aiming:           return String(localized: "Hold steady…")
+        case .countdown(let n): return n.formatted()
+        case .processing:       return String(localized: "Analyzing…")
+        case .result:           return ""
         }
     }
 
@@ -180,9 +196,8 @@ struct CameraFlowView: View {
         switch viewModel.phase {
         case .aiming, .countdown: return CBColors.sage
         case .scanning:
-            if let h = viewModel.heightCm, !CameraFlowViewModel.heightRange.contains(h) {
-                return CBColors.gold
-            }
+            if camera.status.message != nil { return CBColors.gold }
+            if !viewModel.guidance.isHeightInRange { return CBColors.gold }
             return .white
         default: return .white
         }
@@ -191,17 +206,50 @@ struct CameraFlowView: View {
     private var guidanceSubtitle: String {
         switch viewModel.phase {
         case .scanning:
-            let anglePart = "\(Int(viewModel.tiltDegrees))° from overhead"
-            return "\(anglePart) · auto-captures when aligned"
-        case .aiming:
-            return "Locking…"
-        case .countdown:
-            return "Keep still"
-        case .processing:
-            return "Running DPF + Depth Anything V2"
-        case .result:
-            return ""
+            if !camera.status.canCapture {
+                return String(localized: "You can still tap the shutter to try.")
+            }
+            guard viewModel.hasTiltReading else { return String(localized: "Tap the shutter when the plate fills the circle") }
+            let angle = Int(viewModel.tiltDegrees.rounded())
+            return String(localized: "\(angle)° from overhead · captures automatically when aligned")
+        case .aiming:     return String(localized: "Locking…")
+        case .countdown:  return String(localized: "Keep still")
+        case .processing: return String(localized: "Estimating on your iPhone")
+        case .result:     return ""
         }
+    }
+}
+
+// MARK: - Error banner
+
+private struct ErrorBanner: View {
+    let message: String
+    let onDismiss: () -> Void
+
+    var body: some View {
+        HStack(alignment: .top, spacing: 10) {
+            Image(systemName: "exclamationmark.triangle.fill")
+                .foregroundStyle(CBColors.gold)
+                .accessibilityHidden(true)
+            VStack(alignment: .leading, spacing: 2) {
+                Text("Couldn't estimate this meal")
+                    .font(CBTypography.body(15, weight: .semibold))
+                Text(message)
+                    .font(CBTypography.body(13))
+                    .foregroundStyle(.white.opacity(0.75))
+            }
+            Spacer(minLength: 0)
+            Button(action: onDismiss) {
+                Image(systemName: "xmark").frame(width: 32, height: 32)
+            }
+            .buttonStyle(.plain)
+            .accessibilityLabel(Text("Dismiss"))
+        }
+        .foregroundStyle(.white)
+        .padding(14)
+        .background(Color.black.opacity(0.72), in: RoundedRectangle(cornerRadius: 18, style: .continuous))
+        .overlay(RoundedRectangle(cornerRadius: 18, style: .continuous).stroke(CBColors.gold.opacity(0.5), lineWidth: 1))
+        .accessibilityElement(children: .combine)
     }
 }
 
@@ -237,10 +285,10 @@ private struct HeightGuidanceBar: View {
     private var accent: Color { inRange ? CBColors.sage : CBColors.gold }
 
     private var label: String {
-        guard heightCm != nil else { return "Measuring distance…" }
-        if inRange { return "Perfect — hold steady" }
-        if tooClose { return "Move up ↑" }
-        return "Move down ↓"
+        guard heightCm != nil else { return String(localized: "Measuring distance…") }
+        if inRange { return String(localized: "Good distance") }
+        if tooClose { return String(localized: "Move up") }
+        return String(localized: "Move down")
     }
 
     var body: some View {
@@ -289,6 +337,9 @@ private struct HeightGuidanceBar: View {
                 .stroke(inRange ? CBColors.sage.opacity(0.5) : Color.white.opacity(0.16), lineWidth: 1)
         )
         .animation(.easeInOut(duration: 0.25), value: inRange)
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(Text("Distance to plate"))
+        .accessibilityValue(Text(label))
     }
 }
 
@@ -316,11 +367,11 @@ private struct AimingProgressArc: View {
 // MARK: - Angle bubble (top-right)
 
 private struct AngleBubble: View {
-    let tiltDegrees: Double
-    private var isGood: Bool { tiltDegrees < 28 }
+    let tiltDegrees: Double?
+    private var isGood: Bool { (tiltDegrees ?? 90) < CaptureGuidance.overheadThreshold }
 
     private var dotOffset: CGSize {
-        let t = min(tiltDegrees / 70, 1.0)
+        let t = min((tiltDegrees ?? 70) / 70, 1.0)
         return CGSize(width: 0, height: CGFloat(t) * 12)
     }
 
@@ -337,6 +388,9 @@ private struct AngleBubble: View {
                 .animation(.interactiveSpring(duration: 0.15), value: dotOffset)
         }
         .frame(width: 42, height: 42)
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(Text("Camera angle"))
+        .accessibilityValue(Text(isGood ? String(localized: "Overhead") : String(localized: "Tilted")))
     }
 }
 
@@ -398,7 +452,7 @@ private struct CornerBracket: View {
 private struct CountdownOverlay: View {
     let n: Int
     var body: some View {
-        Text("\(n)")
+        Text(n.formatted())
             .font(.system(size: 120, weight: .bold, design: .rounded))
             .foregroundStyle(CBColors.sage)
             .shadow(color: .black.opacity(0.4), radius: 8)
@@ -426,6 +480,8 @@ private struct ResultSheet: View {
     let onClose: () -> Void
     @State private var multiplier: Double = 1.0
 
+    private func scaled(_ value: Int) -> Int { Int((Double(value) * multiplier).rounded()) }
+
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
             Capsule()
@@ -446,21 +502,16 @@ private struct ResultSheet: View {
                             .font(CBTypography.title(20)).foregroundStyle(.white)
                         Text(result.servingDescription)
                             .font(CBTypography.body(13)).foregroundStyle(.white.opacity(0.55))
-                        HStack(spacing: 6) {
-                            PillTag(text: "\(Int(result.confidence * 100))% match", color: CBColors.sage, filled: true)
-                            PillTag(
-                                text: result.modelFamily,
-                                color: result.modelFamily.hasPrefix("Fallback") ? CBColors.gold : CBColors.sage,
-                                filled: false
-                            )
-                        }
+                        PillTag(result.source.title,
+                                color: result.source == .onDevice ? CBColors.sage : CBColors.gold)
                     }
                     Spacer()
                     VStack(alignment: .trailing, spacing: 0) {
-                        Text("\(Int((Double(result.calories) * multiplier).rounded()))")
+                        Text(scaled(result.calories).formatted())
                             .font(CBTypography.display(30)).foregroundStyle(CBColors.terra)
                         Text("kcal").font(CBTypography.body(12)).foregroundStyle(.white.opacity(0.5))
                     }
+                    .accessibilityElement(children: .combine)
                 }
                 .padding(.horizontal, CBSpacing.page).padding(.bottom, 16)
             } else {
@@ -470,14 +521,11 @@ private struct ResultSheet: View {
                             .font(CBTypography.title(20)).foregroundStyle(.white)
                         Text(result.servingDescription)
                             .font(CBTypography.body(13)).foregroundStyle(.white.opacity(0.55))
-                        PillTag(
-                            text: result.modelFamily,
-                            color: result.modelFamily.hasPrefix("Fallback") ? CBColors.gold : CBColors.sage,
-                            filled: false
-                        )
+                        PillTag(result.source.title,
+                                color: result.source == .onDevice ? CBColors.sage : CBColors.gold)
                     }
                     Spacer()
-                    Text("\(Int((Double(result.calories) * multiplier).rounded())) kcal")
+                    Text(NutritionFormat.kcal(scaled(result.calories)))
                         .font(CBTypography.body(22, weight: .bold)).foregroundStyle(CBColors.terra)
                 }
                 .padding(.horizontal, CBSpacing.page).padding(.bottom, 16)
@@ -485,9 +533,9 @@ private struct ResultSheet: View {
 
             // Macro pills
             HStack(spacing: 8) {
-                MacroPill(label: "Protein", value: "\(Int((Double(result.protein) * multiplier).rounded()))g", color: CBColors.plum)
-                MacroPill(label: "Carbs",   value: "\(Int((Double(result.carbs)   * multiplier).rounded()))g", color: CBColors.ocean)
-                MacroPill(label: "Fat",     value: "\(Int((Double(result.fat)     * multiplier).rounded()))g", color: CBColors.gold)
+                MacroPill(label: "Protein", value: NutritionFormat.grams(scaled(result.protein)), color: CBColors.plum)
+                MacroPill(label: "Carbs",   value: NutritionFormat.grams(scaled(result.carbs)),   color: CBColors.ocean)
+                MacroPill(label: "Fat",     value: NutritionFormat.grams(scaled(result.fat)),     color: CBColors.gold)
                 Spacer(minLength: 0)
             }
             .padding(.horizontal, CBSpacing.page).padding(.bottom, 16)
@@ -502,13 +550,15 @@ private struct ResultSheet: View {
                             .foregroundStyle(.white).frame(width: 32, height: 32)
                             .background(Color.white.opacity(0.12), in: Circle())
                     }.buttonStyle(.plain)
-                    Text("\(multiplier, specifier: "%.1f")×")
+                    .accessibilityLabel(Text("Smaller serving"))
+                    Text(ServingFormat.multiplier(multiplier))
                         .font(CBTypography.body(17, weight: .bold)).foregroundStyle(.white).frame(minWidth: 44)
                     Button { if multiplier < 4 { multiplier += 0.5 } } label: {
                         Image(systemName: "plus").font(.system(size: 15, weight: .semibold))
                             .foregroundStyle(.white).frame(width: 32, height: 32)
                             .background(Color.white.opacity(0.12), in: Circle())
                     }.buttonStyle(.plain)
+                    .accessibilityLabel(Text("Larger serving"))
                 }
             }
             .padding(.horizontal, CBSpacing.page).padding(.bottom, 18)
@@ -518,7 +568,7 @@ private struct ResultSheet: View {
                 viewModel.addToLog(multiplier: multiplier)
                 onClose()
             } label: {
-                Text("Add to Today")
+                (result.source == .onDevice ? Text("Add to today") : Text("Add sample to today"))
                     .font(CBTypography.body(17, weight: .semibold))
                     .foregroundStyle(CBColors.controlOnFill)
                     .frame(maxWidth: .infinity).padding(.vertical, 15)
@@ -527,12 +577,13 @@ private struct ResultSheet: View {
             }
             .buttonStyle(.plain)
             .padding(.horizontal, CBSpacing.page)
+            .accessibilityIdentifier("addToLog")
 
             Button("Retake") { viewModel.dismissResult() }
                 .font(CBTypography.body(14)).foregroundStyle(.white.opacity(0.5))
                 .frame(maxWidth: .infinity).padding(.top, 12).buttonStyle(.plain)
 
-            Spacer(minLength: 24)
+            Color.clear.frame(height: 28)
         }
         .frame(maxWidth: .infinity)
         .background(
@@ -546,7 +597,7 @@ private struct ResultSheet: View {
 }
 
 private struct MacroPill: View {
-    let label: String; let value: String; let color: Color
+    let label: LocalizedStringKey; let value: String; let color: Color
     var body: some View {
         VStack(spacing: 1) {
             Text(value).font(CBTypography.body(15, weight: .bold)).foregroundStyle(color)
@@ -555,5 +606,6 @@ private struct MacroPill: View {
         .padding(.horizontal, 12).padding(.vertical, 7)
         .background(color.opacity(0.12)).overlay(Capsule().stroke(color.opacity(0.28), lineWidth: 1))
         .clipShape(Capsule())
+        .accessibilityElement(children: .combine)
     }
 }

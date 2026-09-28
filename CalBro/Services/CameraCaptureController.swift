@@ -1,55 +1,44 @@
 import Foundation
 @preconcurrency import AVFoundation
-import UIKit
-import os.log
+import CoreMotion
+import os
 
-private let camLog = OSLog(subsystem: "com.wydfcc.calbro", category: "Camera")
+private let camLog = Logger(subsystem: "com.wydfcc.calbro", category: "Camera")
 
 enum CameraCaptureStatus: Equatable {
     case idle
     case requestingPermission
     case starting
     case running
-    case unavailable(String)
+    case denied
+    case unavailable
 
-    var message: String {
+    /// Shown in the camera HUD when capture isn't possible.
+    var message: String? {
         switch self {
-        case .idle:                  "Camera idle"
-        case .requestingPermission:  "Requesting camera access"
-        case .starting:              "Starting camera"
-        case .running:               "Camera ready"
-        case .unavailable(let r):    r
+        case .idle, .running:       nil
+        case .requestingPermission: String(localized: "Waiting for camera access…")
+        case .starting:             String(localized: "Starting camera…")
+        case .denied:               String(localized: "Camera access is off. Turn it on in Settings › CalBro.")
+        case .unavailable:          String(localized: "The camera isn't available on this device.")
         }
     }
 
-    var canCapture: Bool {
-        if case .running = self { return true }
-        return false
-    }
+    var canCapture: Bool { self == .running }
 }
 
-enum CameraCaptureError: LocalizedError {
+enum CameraCaptureError: Error {
     case unavailable
     case captureInProgress
     case noPhotoData
-
-    var errorDescription: String? {
-        switch self {
-        case .unavailable:      "Camera is unavailable"
-        case .captureInProgress:"A capture is already in progress"
-        case .noPhotoData:      "No photo data was captured"
-        }
-    }
 }
 
 @MainActor
 @Observable
-final class CameraCaptureController: NSObject, @unchecked Sendable {
-    var status: CameraCaptureStatus = .idle
-    /// Actual measured height above surface in cm, nil when depth unavailable
-    private(set) var currentHeightCm: Double? = nil
-    /// Latest LiDAR/disparity depth frame (Float32, meters), nil when unavailable
-    private(set) var currentDepthBuffer: CVPixelBuffer? = nil
+final class CameraCaptureController {
+    private(set) var status: CameraCaptureStatus = .idle
+    /// Distance to the surface in cm from LiDAR / dual-camera depth; nil when unavailable.
+    private(set) var currentHeightCm: Double?
 
     private let box = CameraSessionBox()
 
@@ -62,18 +51,20 @@ final class CameraCaptureController: NSObject, @unchecked Sendable {
         case .notDetermined:
             status = .requestingPermission
             Task {
-                let granted = await AVCaptureDevice.requestAccess(for: .video)
-                if granted { configureAndStart() }
-                else { status = .unavailable("Camera permission denied") }
+                if await AVCaptureDevice.requestAccess(for: .video) { configureAndStart() }
+                else { status = .denied }
             }
         case .denied, .restricted:
-            status = .unavailable("Enable Camera access in Settings")
+            status = .denied
         @unknown default:
-            status = .unavailable("Camera authorization unavailable")
+            status = .unavailable
         }
     }
 
-    func stop() { box.stop() }
+    func stop() {
+        box.stop()
+        currentHeightCm = nil
+    }
 
     func capturePhotoData() async throws -> Data {
         guard status.canCapture else { throw CameraCaptureError.unavailable }
@@ -82,76 +73,95 @@ final class CameraCaptureController: NSObject, @unchecked Sendable {
 
     private func configureAndStart() {
         status = .starting
-        box.configureAndStart { [weak self] result in
+        box.onDepthSample = { [weak self] cm in
+            Task { @MainActor [weak self] in self?.currentHeightCm = cm }
+        }
+        box.configureAndStart { [weak self] succeeded in
             Task { @MainActor [weak self] in
-                switch result {
-                case .success:
-                    self?.status = .running
-                    self?.box.onDepthSample = { [weak self] cm, depthBuf in
-                        self?.currentHeightCm = cm
-                        self?.currentDepthBuffer = depthBuf
-                    }
-                case .failure(let error):
-                    self?.status = .unavailable(error.localizedDescription)
-                }
+                self?.status = succeeded ? .running : .unavailable
             }
         }
     }
 }
 
+// MARK: - Device tilt
+
+/// Reads how far the phone is from pointing straight down.
+@MainActor
+final class TiltSensor {
+    private let manager = CMMotionManager()
+
+    func start() {
+        guard manager.isDeviceMotionAvailable, !manager.isDeviceMotionActive else { return }
+        manager.deviceMotionUpdateInterval = 0.1
+        manager.startDeviceMotionUpdates()
+    }
+
+    func stop() { manager.stopDeviceMotionUpdates() }
+
+    /// 0° when the back camera points straight down, 90° when the phone is upright; nil without motion data.
+    var tiltDegrees: Double? {
+        guard let g = manager.deviceMotion?.gravity else { return nil }
+        return acos(max(-1, min(1, -g.z))) * 180 / .pi
+    }
+}
+
 // MARK: - CameraSessionBox
 
+/// Owns the capture session. Everything except `onDepthSample` assignment runs on `sessionQueue`.
 private final class CameraSessionBox: NSObject,
     AVCapturePhotoCaptureDelegate,
     AVCaptureDepthDataOutputDelegate,
     @unchecked Sendable
 {
     let session = AVCaptureSession()
-    /// Callback: (heightCm, depthBuffer?) — called on main thread each depth frame
-    var onDepthSample: ((Double?, CVPixelBuffer?) -> Void)?
+    /// Receives a smoothed height in cm (or nil) for each depth frame, on the session queue.
+    var onDepthSample: (@Sendable (Double?) -> Void)?
 
-    private let sessionQueue   = DispatchQueue(label: "calbro.camera.session", qos: .userInitiated)
-    private let photoOutput    = AVCapturePhotoOutput()
-    private let depthOutput    = AVCaptureDepthDataOutput()
+    private let sessionQueue = DispatchQueue(label: "calbro.camera.session", qos: .userInitiated)
+    private let photoOutput  = AVCapturePhotoOutput()
+    private let depthOutput  = AVCaptureDepthDataOutput()
     private var photoContinuation: CheckedContinuation<Data, Error>?
     private var configured = false
 
-    // Rolling average (last 8 frames) for stable height reading
+    // Rolling average of the last 8 frames for a stable height reading
     private var depthSamples: [Double] = []
     private let depthSampleCapacity = 8
-    private var depthFrameCount = 0
 
-    func configureAndStart(completion: @escaping @Sendable (Result<Void, Error>) -> Void) {
-        sessionQueue.async { [weak self] in
-            guard let self else { return }
+    func configureAndStart(completion: @escaping @Sendable (Bool) -> Void) {
+        sessionQueue.async { [self] in
             do {
-                if !self.configured {
-                    try self.configureSession()
-                    self.configured = true
+                if !configured {
+                    try configureSession()
+                    configured = true
                 }
-                if !self.session.isRunning { self.session.startRunning() }
-                completion(.success(()))
+                if !session.isRunning { session.startRunning() }
+                completion(true)
             } catch {
-                completion(.failure(error))
+                camLog.error("Session configuration failed: \(String(describing: error), privacy: .public)")
+                completion(false)
             }
         }
     }
 
     func stop() {
-        sessionQueue.async { [session] in
+        sessionQueue.async { [self] in
             if session.isRunning { session.stopRunning() }
+            depthSamples.removeAll()
         }
     }
 
     func capturePhotoData() async throws -> Data {
-        guard photoContinuation == nil else { throw CameraCaptureError.captureInProgress }
-        return try await withCheckedThrowingContinuation { cont in
-            photoContinuation = cont
-            let settings = AVCapturePhotoSettings()
-            settings.flashMode = .off
-            sessionQueue.async { [photoOutput, weak self] in
-                guard self != nil else { cont.resume(throwing: CameraCaptureError.unavailable); return }
-                photoOutput.capturePhoto(with: settings, delegate: self!)
+        try await withCheckedThrowingContinuation { cont in
+            sessionQueue.async { [self] in
+                guard photoContinuation == nil else {
+                    cont.resume(throwing: CameraCaptureError.captureInProgress)
+                    return
+                }
+                photoContinuation = cont
+                let settings = AVCapturePhotoSettings()
+                settings.flashMode = .off
+                photoOutput.capturePhoto(with: settings, delegate: self)
             }
         }
     }
@@ -161,22 +171,12 @@ private final class CameraSessionBox: NSObject,
         session.sessionPreset = .photo
         defer { session.commitConfiguration() }
 
-        // *** Critical: the plain wide-angle camera does NOT provide depth on the back.
-        // LiDAR/dual-cam depth comes from virtual devices. Prefer those, in priority order. ***
-        let deviceTypes: [AVCaptureDevice.DeviceType] = [
-            .builtInLiDARDepthCamera,   // iPhone Pro — true LiDAR depth (meters)
-            .builtInDualCamera,
-            .builtInDualWideCamera,
-            .builtInTripleCamera,
-            .builtInWideAngleCamera     // last resort — no depth, photo only
-        ]
+        // The plain wide-angle camera has no depth; LiDAR / dual-camera virtual devices do.
         let discovery = AVCaptureDevice.DiscoverySession(
-            deviceTypes: deviceTypes, mediaType: .video, position: .back
+            deviceTypes: [.builtInLiDARDepthCamera, .builtInDualCamera, .builtInDualWideCamera,
+                          .builtInTripleCamera, .builtInWideAngleCamera],
+            mediaType: .video, position: .back
         )
-        os_log("[CB-CAM] discovered back devices: %{public}@", log: camLog,
-               discovery.devices.map { "\($0.deviceType.rawValue)(depthFmts=\($0.activeFormat.supportedDepthDataFormats.count))" }.joined(separator: ", "))
-
-        // Pick first device that actually exposes depth formats; else any available.
         let device = discovery.devices.first(where: { !$0.activeFormat.supportedDepthDataFormats.isEmpty })
             ?? discovery.devices.first
         guard let device,
@@ -184,123 +184,80 @@ private final class CameraSessionBox: NSObject,
               session.canAddInput(input) else {
             throw CameraCaptureError.unavailable
         }
-        os_log("[CB-CAM] selected device: %{public}@", log: camLog, device.deviceType.rawValue)
         session.addInput(input)
 
         guard session.canAddOutput(photoOutput) else { throw CameraCaptureError.unavailable }
         session.addOutput(photoOutput)
         photoOutput.maxPhotoQualityPrioritization = .quality
 
-        // Add depth output and enable its connection.
-        var depthEnabled = false
-        if session.canAddOutput(depthOutput) {
-            session.addOutput(depthOutput)
-            depthOutput.isFilteringEnabled = true
-            depthOutput.alwaysDiscardsLateDepthData = true
-            depthOutput.setDelegate(self, callbackQueue: sessionQueue)
-            if let conn = depthOutput.connection(with: .depthData) {
-                conn.isEnabled = true
-            }
-            depthEnabled = true
-        }
-        os_log("[CB-CAM] depth output added: %{public}@", log: camLog, depthEnabled ? "YES" : "NO")
+        guard session.canAddOutput(depthOutput) else { return }
+        session.addOutput(depthOutput)
+        depthOutput.isFilteringEnabled = true
+        depthOutput.alwaysDiscardsLateDepthData = true
+        depthOutput.setDelegate(self, callbackQueue: sessionQueue)
+        depthOutput.connection(with: .depthData)?.isEnabled = true
 
-        // *** Must set activeDepthDataFormat (after outputs added) or delegate never fires ***
-        // Prefer Float32 (LiDAR native, meters); fall back to any available depth format.
-        let depthFormats = device.activeFormat.supportedDepthDataFormats
-        let preferredFormat = depthFormats
-            .filter { CMFormatDescriptionGetMediaSubType($0.formatDescription) == kCVPixelFormatType_DepthFloat32 }
-            .first ?? depthFormats.first
-        os_log("[CB-CAM] depth formats on activeFormat: %{public}d, preferred=%{public}@", log: camLog,
-               depthFormats.count, preferredFormat != nil ? "set" : "NONE")
-        if let df = preferredFormat {
+        // activeDepthDataFormat must be set after the outputs are added or no depth frames arrive.
+        let formats = device.activeFormat.supportedDepthDataFormats
+        let preferred = formats.first {
+            CMFormatDescriptionGetMediaSubType($0.formatDescription) == kCVPixelFormatType_DepthFloat32
+        } ?? formats.first
+        if let preferred {
             do {
                 try device.lockForConfiguration()
-                device.activeDepthDataFormat = df
+                device.activeDepthDataFormat = preferred
                 device.unlockForConfiguration()
-                os_log("[CB-CAM] activeDepthDataFormat set ✓", log: camLog)
             } catch {
-                os_log("[CB-CAM] lockForConfiguration failed: %{public}@", log: camLog, type: .error, "\(error)")
+                camLog.error("Depth format not set: \(String(describing: error), privacy: .public)")
             }
         }
     }
 
     // MARK: - AVCapturePhotoCaptureDelegate
 
-    func photoOutput(
-        _ output: AVCapturePhotoOutput,
-        didFinishProcessingPhoto photo: AVCapturePhoto,
-        error: Error?
-    ) {
-        let cont = photoContinuation
-        photoContinuation = nil
-        if let error { cont?.resume(throwing: error); return }
-        guard let data = photo.fileDataRepresentation() else {
-            cont?.resume(throwing: CameraCaptureError.noPhotoData); return
+    func photoOutput(_ output: AVCapturePhotoOutput, didFinishProcessingPhoto photo: AVCapturePhoto, error: Error?) {
+        let data = photo.fileDataRepresentation()
+        sessionQueue.async { [self] in
+            let cont = photoContinuation
+            photoContinuation = nil
+            if let error { cont?.resume(throwing: error) }
+            else if let data { cont?.resume(returning: data) }
+            else { cont?.resume(throwing: CameraCaptureError.noPhotoData) }
         }
-        cont?.resume(returning: data)
     }
 
     // MARK: - AVCaptureDepthDataOutputDelegate
 
-    func depthDataOutput(
-        _ output: AVCaptureDepthDataOutput,
-        didOutput depthData: AVDepthData,
-        timestamp: CMTime,
-        connection: AVCaptureConnection
-    ) {
-        // Convert to absolute depth in meters (disparity → depth if needed)
-        let targetType: OSType = kCVPixelFormatType_DepthFloat32
-        let converted: AVDepthData
-        if depthData.depthDataType != targetType {
-            converted = depthData.converting(toDepthDataType: targetType)
-        } else {
-            converted = depthData
-        }
+    func depthDataOutput(_ output: AVCaptureDepthDataOutput, didOutput depthData: AVDepthData,
+                         timestamp: CMTime, connection: AVCaptureConnection) {
+        let converted = depthData.depthDataType == kCVPixelFormatType_DepthFloat32
+            ? depthData
+            : depthData.converting(toDepthDataType: kCVPixelFormatType_DepthFloat32)
 
         let buf = converted.depthDataMap
         CVPixelBufferLockBaseAddress(buf, .readOnly)
         defer { CVPixelBufferUnlockBaseAddress(buf, .readOnly) }
-
-        let w = CVPixelBufferGetWidth(buf)
-        let h = CVPixelBufferGetHeight(buf)
-        let bpr = CVPixelBufferGetBytesPerRow(buf)
         guard let base = CVPixelBufferGetBaseAddress(buf) else { return }
+        let w = CVPixelBufferGetWidth(buf), h = CVPixelBufferGetHeight(buf)
+        let bpr = CVPixelBufferGetBytesPerRow(buf)
 
-        // Sample center 20% region for height scalar
-        let cx = w / 2, cy = h / 2
-        let rx = max(1, w / 10), ry = max(1, h / 10)
-        var sum: Double = 0, count: Double = 0
-        for py in stride(from: max(0, cy - ry), through: min(h - 1, cy + ry), by: 1) {
+        // Average the central 20 % of the frame, ignoring invalid readings.
+        let cx = w / 2, cy = h / 2, rx = max(1, w / 10), ry = max(1, h / 10)
+        var sum = 0.0, count = 0.0
+        for py in max(0, cy - ry)...min(h - 1, cy + ry) {
             let row = base.advanced(by: py * bpr).assumingMemoryBound(to: Float32.self)
-            for px in stride(from: max(0, cx - rx), through: min(w - 1, cx + rx), by: 1) {
+            for px in max(0, cx - rx)...min(w - 1, cx + rx) {
                 let v = Double(row[px])
                 if v > 0.05 && v < 3.0 { sum += v; count += 1 }
             }
         }
 
-        // Rolling average
-        let cm: Double?
+        var cm: Double?
         if count > 0 {
             depthSamples.append(sum / count)
             if depthSamples.count > depthSampleCapacity { depthSamples.removeFirst() }
-            cm = (depthSamples.reduce(0, +) / Double(depthSamples.count)) * 100.0
-        } else {
-            cm = nil
+            cm = depthSamples.reduce(0, +) / Double(depthSamples.count) * 100
         }
-
-        // Keep a reference to the depth buffer for use as DPF input (bypasses DA2)
-        let retainedBuf = converted.depthDataMap
-
-        depthFrameCount += 1
-        if depthFrameCount == 1 || depthFrameCount % 30 == 0 {
-            os_log("[CB-CAM] depth frame #%{public}d  %{public}dx%{public}d  validPx=%{public}d  height=%{public}@cm",
-                   log: camLog, depthFrameCount, w, h, Int(count),
-                   cm != nil ? String(format: "%.1f", cm!) : "nil")
-        }
-
-        DispatchQueue.main.async { [weak self] in
-            self?.onDepthSample?(cm, retainedBuf)
-        }
+        onDepthSample?(cm)
     }
 }

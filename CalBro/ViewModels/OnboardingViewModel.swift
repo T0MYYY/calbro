@@ -8,54 +8,56 @@ enum OnboardingStep: Int, CaseIterable {
 @Observable
 final class OnboardingViewModel {
     var step: OnboardingStep = .goal
-    var profile = UserProfile()
-    var isComplete = false
+    private(set) var profile: UserProfile
 
-    private let stateStore: AppStateStore
+    private let profileStore: ProfileStore
 
-    // Computed display values for result step (set after recalculate)
-    private(set) var displayCalories: Int = 0
-    private(set) var displayProtein: Int  = 0
-    private(set) var displayCarbs: Int    = 0
-    private(set) var displayFat: Int      = 0
-    private(set) var displayBMR: Int      = 0
-    private(set) var displayTDEE: Int     = 0
-    private(set) var weeklyDeltaLabel: String = ""
-    private(set) var goalTimelineLabel: String = ""
-
-    init(stateStore: AppStateStore = UserDefaultsAppStateStore()) {
-        self.stateStore = stateStore
-        if let snapshot = stateStore.load(), snapshot.onboardingComplete {
-            profile = snapshot.profile
-            isComplete = true
-            step = .result
-        }
+    init(profileStore: ProfileStore = .shared) {
+        self.profileStore = profileStore
+        self.profile = profileStore.profile
     }
 
-    var progressText: String { "\(min(step.rawValue + 1, 4)) / 4" }
+    var isComplete: Bool { profileStore.onboardingComplete }
 
-    var progress: Double {
-        switch step {
-        case .goal: 0.25
-        case .body: 0.5
-        case .activity: 0.75
-        case .diet, .result: 1.0
-        }
+    var progressText: String {
+        let current = min(step.rawValue + 1, 4)
+        return String(localized: "\(current) of 4", comment: "Onboarding progress, e.g. “2 of 4”")
     }
+
+    var progress: Double { Double(min(step.rawValue + 1, 4)) / 4 }
 
     // MARK: - Input handlers
 
-    func selectGoal(_ goal: FitnessGoal)      { profile.goal = goal }
-    func selectSex(_ sex: BiologicalSex)       { profile.sex = sex }
-    func adjustAge(by delta: Int)              { updateAge(profile.age + delta) }
-    func updateAge(_ age: Int)                 { profile.age = min(max(age, 13), 99) }
-    func updateHeight(_ cm: Int)               { profile.heightCentimeters = min(max(cm, 90), 240) }
-    func updateWeight(_ kg: Int)               { profile.weightKilograms = min(max(kg, 30), 250) }
-    func selectActivity(_ level: ActivityLevel){ profile.activityLevel = level }
+    func selectGoal(_ goal: FitnessGoal)       { profile.goal = goal }
+    func selectSex(_ sex: BiologicalSex)        { profile.sex = sex }
+    func selectUnits(_ units: UnitSystem)       { profile.units = units }
+    func adjustAge(by delta: Int)               { updateAge(profile.age + delta) }
+    func updateAge(_ age: Int)                  { profile.age = min(max(age, 13), 99) }
+    func updateHeight(_ cm: Int)                { profile.heightCentimeters = min(max(cm, 90), 240) }
+    func updateWeight(_ kg: Double)             { profile.weightKilograms = min(max(kg, 30), 250) }
+    func selectActivity(_ level: ActivityLevel) { profile.activityLevel = level }
+
+    /// Height in the display unit: cm, or total inches for imperial.
+    var heightDisplayValue: Int {
+        profile.units == .metric
+            ? profile.heightCentimeters
+            : Int((Double(profile.heightCentimeters) / WeightMath.cmPerInch).rounded())
+    }
+
+    func updateHeight(displayValue: Int) {
+        updateHeight(profile.units == .metric ? displayValue : Int((Double(displayValue) * WeightMath.cmPerInch).rounded()))
+    }
+
+    var weightDisplayValue: Int { profile.weightInDisplayUnit(profile.weightKilograms) }
+
+    func updateWeight(displayValue: Int) {
+        updateWeight(profile.kilograms(fromDisplayUnit: Double(displayValue)))
+    }
 
     func toggleDietPreference(_ preference: DietPreference) {
         if preference == .noRestriction {
-            profile.dietPreferences = [.noRestriction]; return
+            profile.dietPreferences = [.noRestriction]
+            return
         }
         profile.dietPreferences.remove(.noRestriction)
         if profile.dietPreferences.contains(preference) {
@@ -74,49 +76,41 @@ final class OnboardingViewModel {
         case .body:     step = .activity
         case .activity: step = .diet
         case .diet:
-            computeTargets()
+            profile.recalculateTargets()
             step = .result
         case .result:
-            isComplete = true
-            stateStore.save(AppStateSnapshot(onboardingComplete: true, profile: profile))
+            profileStore.completeOnboarding(with: profile)
         }
     }
 
     func back() {
         switch step {
-        case .goal:   break
-        case .body:   step = .goal
+        case .goal:     break
+        case .body:     step = .goal
         case .activity: step = .body
-        case .diet:   step = .activity
-        case .result: step = .diet
+        case .diet:     step = .activity
+        case .result:   step = .diet
         }
     }
 
     func skipDiet() {
         profile.dietPreferences = [.noRestriction]
-        computeTargets()
+        profile.recalculateTargets()
         step = .result
     }
 
-    // MARK: - Computation
+    // MARK: - Result step
 
-    private func computeTargets() {
-        profile.recalculateTargets()
-        displayBMR      = profile.bmr
-        displayTDEE     = profile.tdee
-        displayCalories = profile.calorieTarget
-        displayProtein  = profile.proteinTargetG
-        displayCarbs    = profile.carbTargetG
-        displayFat      = profile.fatTargetG
+    var weeklyDeltaLabel: String {
+        let weekly = profile.weeklyWeightChangeKg
+        guard abs(weekly) > 0.01 else { return String(localized: "Maintenance") }
+        let rate = profile.weightRateDisplay(kgPerWeek: abs(weekly))
+        return weekly < 0 ? String(localized: "Lose ~\(rate)") : String(localized: "Gain ~\(rate)")
+    }
 
-        let weeklyKg = abs(profile.weeklyWeightChangeKg)
-        if weeklyKg > 0.01 {
-            let direction = profile.goal.dailyAdjustment < 0 ? "Lose" : "Gain"
-            weeklyDeltaLabel  = "\(direction) ~\(String(format: "%.1f", weeklyKg)) kg/week"
-            goalTimelineLabel = "Consistent tracking gets results"
-        } else {
-            weeklyDeltaLabel  = "Maintenance mode"
-            goalTimelineLabel = "Focus on quality and consistency"
-        }
+    var goalTimelineLabel: String {
+        abs(profile.weeklyWeightChangeKg) > 0.01
+            ? String(localized: "Consistent logging is what makes this work.")
+            : String(localized: "Focus on food quality and consistency.")
     }
 }

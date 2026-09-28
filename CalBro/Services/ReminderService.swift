@@ -1,100 +1,80 @@
 import Foundation
 import UserNotifications
 
-protocol ReminderService: Sendable {
-    func updateReminder(_ reminder: ReminderSetting) async -> ReminderSetting
+protocol NotificationScheduling: Sendable {
+    func permission() async -> NotificationPermission
+    func requestPermission() async -> Bool
+    /// Replaces all pending meal reminders with one per day for the next week.
+    func scheduleMealReminders(hour: Int, minute: Int, skipToday: Bool) async
+    func cancelMealReminders() async
+    func postCalorieWarning(consumed: Int, target: Int) async
 }
 
-final class MockReminderService: ReminderService {
-    func updateReminder(_ reminder: ReminderSetting) async -> ReminderSetting {
-        reminder
-    }
-}
-
-// MARK: - Real local-notification backed reminders
-
-final class RealReminderService: ReminderService, @unchecked Sendable {
+final class UserNotificationScheduler: NotificationScheduling, @unchecked Sendable {
     private let center = UNUserNotificationCenter.current()
+    private static let mealPrefix = "calbro.reminder.meal."
+    /// Identifier used by the old repeating reminder; removed on reschedule.
+    private static let legacyMealID = "calbro.reminder.mealLogging"
+    private static let warningID = "calbro.reminder.calorieWarning"
 
-    static let mealLoggingID = "calbro.reminder.mealLogging"
-    /// Persisted so MealLogStore can decide whether to fire the threshold alert.
-    static let calorieWarningEnabledKey = "calBuddy.reminder.calorieWarning.enabled"
-
-    func updateReminder(_ reminder: ReminderSetting) async -> ReminderSetting {
-        let granted = await requestAuthorizationIfNeeded()
-        guard granted else {
-            // Permission denied — reflect the off state back to the UI.
-            var off = reminder
-            off.isEnabled = false
-            return off
-        }
-
-        switch reminder.id {
-        case .mealLogging:
-            if reminder.isEnabled { scheduleDailyMealReminder() }
-            else { center.removePendingNotificationRequests(withIdentifiers: [Self.mealLoggingID]) }
-        case .calorieWarning:
-            UserDefaults.standard.set(reminder.isEnabled, forKey: Self.calorieWarningEnabledKey)
-        }
-        return reminder
-    }
-
-    private func requestAuthorizationIfNeeded() async -> Bool {
-        let settings = await center.notificationSettings()
-        switch settings.authorizationStatus {
-        case .authorized, .provisional, .ephemeral:
-            return true
-        case .notDetermined:
-            return (try? await center.requestAuthorization(options: [.alert, .sound, .badge])) ?? false
-        default:
-            return false
+    func permission() async -> NotificationPermission {
+        switch await center.notificationSettings().authorizationStatus {
+        case .authorized, .provisional, .ephemeral: .allowed
+        case .denied: .denied
+        default: .unknown
         }
     }
 
-    private func scheduleDailyMealReminder() {
+    func requestPermission() async -> Bool {
+        switch await permission() {
+        case .allowed: return true
+        case .denied:  return false
+        case .unknown: return (try? await center.requestAuthorization(options: [.alert, .sound, .badge])) ?? false
+        }
+    }
+
+    func scheduleMealReminders(hour: Int, minute: Int, skipToday: Bool) async {
+        await cancelMealReminders()
+        let calendar = Calendar.current
+        let now = Date()
+        let today = calendar.startOfDay(for: now)
+        for offset in 0..<7 {
+            if offset == 0 && skipToday { continue }
+            let day = today.adding(days: offset, calendar: calendar)
+            guard let fire = calendar.date(bySettingHour: hour, minute: minute, second: 0, of: day),
+                  fire > now else { continue }
+
+            let content = UNMutableNotificationContent()
+            content.title = String(localized: "Log your meals")
+            content.body = String(localized: "You haven't logged anything today. Snap your next meal to keep your streak.")
+            content.sound = .default
+            let comps = calendar.dateComponents([.year, .month, .day, .hour, .minute], from: fire)
+            let request = UNNotificationRequest(
+                identifier: Self.mealPrefix + String(offset),
+                content: content,
+                trigger: UNCalendarNotificationTrigger(dateMatching: comps, repeats: false)
+            )
+            try? await center.add(request)
+        }
+    }
+
+    func cancelMealReminders() async {
+        let ids = await center.pendingNotificationRequests().map(\.identifier)
+            .filter { $0.hasPrefix(Self.mealPrefix) }
+        center.removePendingNotificationRequests(withIdentifiers: ids + [Self.legacyMealID])
+    }
+
+    func postCalorieWarning(consumed: Int, target: Int) async {
         let content = UNMutableNotificationContent()
-        content.title = "Log your meals"
-        content.body = "Don't forget to track what you've eaten today."
-        content.sound = .default
-
-        var components = DateComponents()
-        components.hour = 12
-        components.minute = 0
-        let trigger = UNCalendarNotificationTrigger(dateMatching: components, repeats: true)
-        let request = UNNotificationRequest(identifier: Self.mealLoggingID, content: content, trigger: trigger)
-        center.add(request)
-    }
-}
-
-// MARK: - Calorie warning (event-driven, fired by MealLogStore)
-
-enum CalorieWarningNotifier {
-    private static let lastFiredDayKey = "calBuddy.reminder.calorieWarning.lastFiredDay"
-    private static let identifier = "calbro.reminder.calorieWarning"
-
-    /// Fires once per day when consumption first crosses 90% of the target.
-    static func evaluate(consumed: Int, target: Int) {
-        guard UserDefaults.standard.bool(forKey: RealReminderService.calorieWarningEnabledKey),
-              target > 0,
-              Double(consumed) >= Double(target) * 0.90
-        else { return }
-
-        let today = Calendar.current.startOfDay(for: Date())
-        if let last = UserDefaults.standard.object(forKey: lastFiredDayKey) as? Date,
-           Calendar.current.isDate(last, inSameDayAs: today) {
-            return  // already fired today
-        }
-        UserDefaults.standard.set(today, forKey: lastFiredDayKey)
-
-        let content = UNMutableNotificationContent()
-        content.title = "Calorie budget almost reached"
-        content.body = "You've used \(consumed) of \(target) kcal today (\(Int(Double(consumed) / Double(target) * 100))%)."
+        content.title = String(localized: "Calorie budget almost reached")
+        let share = NutritionFormat.percent(Double(consumed) / Double(max(target, 1)))
+        content.body = String(localized: "You've had \(NutritionFormat.kcal(consumed)) of \(NutritionFormat.kcal(target)) today (\(share)).")
         content.sound = .default
         let request = UNNotificationRequest(
-            identifier: identifier,
+            identifier: Self.warningID,
             content: content,
             trigger: UNTimeIntervalNotificationTrigger(timeInterval: 1, repeats: false)
         )
-        UNUserNotificationCenter.current().add(request)
+        try? await center.add(request)
     }
 }

@@ -1,0 +1,207 @@
+{
+  "sourceLanguage" : "en",
+  "strings" : {
+    "CFBundleDisplayName" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "CalBro"
+          }
+        }
+      },
+      "shouldTranslate" : false
+    },
+    "CFBundleName" : {
+      "comment" : "Bundle name",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "CalBro"
+          }
+        }
+      }
+    },
+    "NSCameraUsageDescription" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "CalBro verwendet die Kamera, um deine Mahlzeit zu fotografieren und ihre Nährwerte auf deinem Gerät zu schätzen."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "CalBro uses the camera to photograph your meal and estimate its nutrition on your device."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "CalBro usa la cámara para fotografiar tu comida y estimar sus nutrientes en tu dispositivo."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "CalBro utilise l'appareil photo pour photographier votre repas et estimer ses valeurs nutritionnelles sur votre appareil."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "CalBroはカメラを使用して食事を撮影し、デバイス上で栄養を推定します。"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "CalBro는 카메라를 사용해 식사를 촬영하고 기기에서 영양 정보를 추정합니다."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "O CalBro usa a câmera para fotografar sua refeição e estimar a nutrição dela no seu dispositivo."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "CalBro 使用相机拍摄你的餐食，并在设备上估算其营养成分。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "CalBro 使用相機拍攝你的餐點，並在裝置上估算其營養成分。"
+          }
+        }
+      }
+    },
+    "NSHealthShareUsageDescription" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "CalBro liest dein Gewicht, deine Größe, dein Alter, dein Geschlecht und deine aktive Energie aus Health, um dein Kalorienziel anzupassen."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "CalBro reads your weight, height, age, sex and active energy from Apple Health to personalize your calorie target."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "CalBro lee tu peso, altura, edad, sexo y energía activa de Salud para personalizar tu meta de calorías."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "CalBro lit votre poids, votre taille, votre âge, votre sexe et votre énergie active dans Santé pour personnaliser votre objectif calorique."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "CalBroはカロリー目標をパーソナライズするために、ヘルスケアから体重、身長、年齢、性別、アクティブエネルギーを読み取ります。"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "CalBro는 칼로리 목표를 맞춤 설정하기 위해 건강 앱에서 체중, 키, 나이, 성별, 활동 에너지를 읽습니다."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "O CalBro lê seu peso, altura, idade, sexo e energia ativa do app Saúde para personalizar sua meta de calorias."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "CalBro 从 Apple 健康读取你的体重、身高、年龄、性别和活动能量，以个性化你的热量目标。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "CalBro 從 Apple 健康讀取你的體重、身高、年齡、性別和活動能量，以個人化你的熱量目標。"
+          }
+        }
+      }
+    },
+    "NSHealthUpdateUsageDescription" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "CalBro sichert die Kalorien und Makronährstoffe deiner erfassten Mahlzeiten in Health."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "CalBro saves the calories and macronutrients of meals you log to Apple Health."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "CalBro guarda en Salud las calorías y los macronutrientes de las comidas que registras."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "CalBro enregistre dans Santé les calories et les macronutriments des repas que vous notez."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "CalBroは記録した食事のカロリーと主要栄養素をヘルスケアに保存します。"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "CalBro는 기록한 식사의 칼로리와 다량 영양소를 건강 앱에 저장합니다."
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "O CalBro salva no app Saúde as calorias e os macronutrientes das refeições que você registra."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "CalBro 会将你记录的餐食的热量和宏量营养素存储到 Apple 健康。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "CalBro 會將你記錄的餐點的熱量和巨量營養素儲存到 Apple 健康。"
+          }
+        }
+      }
+    }
+  },
+  "version" : "1.0"
+}

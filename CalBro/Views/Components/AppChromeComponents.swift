@@ -1,61 +1,5 @@
 import SwiftUI
 
-struct BottomTabBar: View {
-    @Binding var selectedTab: AppTab
-    @Namespace private var indicator
-
-    var body: some View {
-        GeometryReader { geo in
-            let tabs: [AppTab] = [.today, .stats, .profile]
-            let tabW = geo.size.width / CGFloat(tabs.count)
-
-            ZStack(alignment: .leading) {
-                // Sliding selection capsule
-                if let idx = tabs.firstIndex(of: selectedTab) {
-                    Capsule()
-                        .fill(CBColors.terra.opacity(0.12))
-                        .frame(width: tabW - 16, height: 46)
-                        .overlay(Capsule().stroke(CBColors.terra.opacity(0.18), lineWidth: 1))
-                        .offset(x: CGFloat(idx) * tabW + 8)
-                        .animation(.spring(duration: 0.38, bounce: 0.2), value: selectedTab)
-                }
-
-                HStack(spacing: 0) {
-                    ForEach(tabs) { tab in
-                        tabButton(tab)
-                            .frame(width: tabW)
-                    }
-                }
-            }
-        }
-        .padding(.horizontal, 8)
-        .padding(.top, 9)
-        .padding(.bottom, 8)
-        .frame(height: 66)
-        .cbGlass(.regular, cornerRadius: 33, tint: CBColors.terra.opacity(0.04), interactive: true)
-        .shadow(color: CBColors.ink.opacity(0.08), radius: 18, x: 0, y: 8)
-    }
-
-    private func tabButton(_ tab: AppTab) -> some View {
-        Button {
-            selectedTab = tab
-        } label: {
-            VStack(spacing: 2) {
-                Image(systemName: tab.symbol)
-                    .font(.system(size: 21, weight: selectedTab == tab ? .semibold : .regular))
-                    .scaleEffect(selectedTab == tab ? 1.08 : 1.0)
-                Text(tab.rawValue)
-                    .font(CBTypography.body(12, weight: selectedTab == tab ? .semibold : .regular))
-            }
-            .foregroundStyle(selectedTab == tab ? CBColors.terra : CBColors.ink.opacity(0.38))
-            .frame(maxWidth: .infinity)
-            .contentShape(Rectangle())
-            .animation(.spring(duration: 0.25), value: selectedTab)
-        }
-        .buttonStyle(.plain)
-    }
-}
-
 struct FloatingActionButton: View {
     let action: () -> Void
 
@@ -70,21 +14,32 @@ struct FloatingActionButton: View {
         .buttonStyle(.plain)
         .cbGlass(.regular, cornerRadius: 29, tint: CBColors.terra.opacity(0.22), interactive: true)
         .shadow(color: CBColors.ink.opacity(0.14), radius: 16, x: 0, y: 8)
+        .accessibilityLabel(Text("Scan a meal"))
+        .accessibilityIdentifier("scanMeal")
     }
 }
 
-struct NavHeader: View {
-    let title: String
+struct NavHeader<Trailing: View>: View {
+    let title: Text
     var subtitle: String?
     var showsBack = false
-    var trailing: AnyView?
+    @ViewBuilder var trailing: Trailing
     @Environment(\.dismiss) private var dismiss
 
-    init(title: String, subtitle: String? = nil, showsBack: Bool = false, trailing: AnyView? = nil) {
-        self.title = title
+    init(_ title: LocalizedStringKey, subtitle: String? = nil, showsBack: Bool = false,
+         @ViewBuilder trailing: () -> Trailing = { EmptyView() }) {
+        self.title = Text(title)
         self.subtitle = subtitle
         self.showsBack = showsBack
-        self.trailing = trailing
+        self.trailing = trailing()
+    }
+
+    init(verbatim title: String, subtitle: String? = nil, showsBack: Bool = false,
+         @ViewBuilder trailing: () -> Trailing = { EmptyView() }) {
+        self.title = Text(title)
+        self.subtitle = subtitle
+        self.showsBack = showsBack
+        self.trailing = trailing()
     }
 
     var body: some View {
@@ -96,13 +51,20 @@ struct NavHeader: View {
                     Image(systemName: "chevron.left")
                         .font(.system(size: 18, weight: .semibold))
                         .foregroundStyle(CBColors.inkMid)
+                        .frame(width: 32, height: 44, alignment: .leading)
+                        .contentShape(Rectangle())
                 }
                 .buttonStyle(.plain)
+                .accessibilityLabel(Text("Back"))
+                .accessibilityIdentifier("back")
             }
             VStack(alignment: .leading, spacing: 2) {
-                Text(title)
+                title
                     .font(CBTypography.title(22))
                     .foregroundStyle(CBColors.ink)
+                    .lineLimit(2)
+                    .minimumScaleFactor(0.8)
+                    .accessibilityAddTraits(.isHeader)
                 if let subtitle {
                     Text(subtitle)
                         .font(CBTypography.body(13))
@@ -121,57 +83,35 @@ struct NavHeader: View {
 struct WeekStrip: View {
     let monthLabel: String
     let streakLabel: String
-    let days: [String]
-    let dates: [Int]
-    let statuses: [NutritionColorKey]
-    let selectedIndex: Int
-    let onSelect: (Int) -> Void
+    let days: [WeekDay]
+    let selectedDate: Date
+    let onSelect: (Date) -> Void
     var onOpenCalendar: () -> Void = {}
 
     var body: some View {
         VStack(spacing: 8) {
             HStack {
                 Button(action: onOpenCalendar) {
-                    Text(monthLabel)
-                        .font(CBTypography.body(13, weight: .medium))
-                        .foregroundStyle(CBColors.inkMid)
+                    HStack(spacing: 4) {
+                        Text(monthLabel)
+                        Image(systemName: "calendar").imageScale(.small)
+                    }
+                    .font(CBTypography.body(13, weight: .medium))
+                    .foregroundStyle(CBColors.inkMid)
                 }
                 .buttonStyle(.plain)
+                .accessibilityHint(Text("Opens the monthly calendar"))
+                .accessibilityIdentifier("openCalendar")
                 Spacer()
-                Button(action: onOpenCalendar) {
-                    Text(streakLabel)
-                        .font(CBTypography.body(13, weight: .semibold))
-                        .foregroundStyle(CBColors.terra)
-                }
-                .buttonStyle(.plain)
+                Text(streakLabel)
+                    .font(CBTypography.body(13, weight: .semibold))
+                    .foregroundStyle(CBColors.terra)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.8)
             }
             HStack {
-                ForEach(days.indices, id: \.self) { index in
-                    let isSelected = selectedIndex == index
-                    Button {
-                        onSelect(index)
-                    } label: {
-                        VStack(spacing: 4) {
-                            Text(days[index])
-                                .font(CBTypography.body(11, weight: .medium))
-                                .foregroundStyle(isSelected ? CBColors.terra : CBColors.inkMid)
-                            Text("\(dates[index])")
-                                .font(CBTypography.body(15, weight: isSelected ? .bold : .medium))
-                                .foregroundStyle(isSelected ? Color.white : CBColors.ink)
-                                .frame(width: 32, height: 32)
-                                .background(
-                                    Circle()
-                                        .fill(isSelected ? CBColors.terra : CBColors.inkFaint.opacity(0.45))
-                                )
-                                .clipShape(Circle())
-                            Circle()
-                                .fill(CBColors.nutrition(statuses[index]))
-                                .opacity(statuses[index] == .ink ? 0.0 : 1)
-                                .frame(width: 6, height: 6)
-                        }
-                        .frame(maxWidth: .infinity)
-                    }
-                    .buttonStyle(.plain)
+                ForEach(days) { day in
+                    dayButton(day)
                 }
             }
         }
@@ -182,6 +122,34 @@ struct WeekStrip: View {
             Rectangle().fill(CBColors.inkFaint).frame(height: 1)
         }
     }
+
+    private func dayButton(_ day: WeekDay) -> some View {
+        let isSelected = Calendar.current.isDate(day.date, inSameDayAs: selectedDate)
+        return Button {
+            onSelect(day.date)
+        } label: {
+            VStack(spacing: 4) {
+                Text(day.symbol)
+                    .font(CBTypography.body(11, weight: .medium))
+                    .foregroundStyle(isSelected ? CBColors.terra : CBColors.inkMid)
+                Text(day.dayNumber.formatted())
+                    .font(CBTypography.body(15, weight: isSelected ? .bold : .medium))
+                    .foregroundStyle(isSelected ? Color.white : (day.isFuture ? CBColors.inkMid : CBColors.ink))
+                    .frame(width: 32, height: 32)
+                    .background(Circle().fill(isSelected ? CBColors.terra : CBColors.inkFaint.opacity(0.45)))
+                    .clipShape(Circle())
+                Circle()
+                    .fill(day.status.colorKey.map(CBColors.nutrition) ?? .clear)
+                    .frame(width: 6, height: 6)
+            }
+            .frame(maxWidth: .infinity)
+        }
+        .buttonStyle(.plain)
+        .disabled(day.isFuture)
+        .accessibilityLabel(Text(day.date.formatted(date: .complete, time: .omitted)))
+        .accessibilityValue(Text(day.isFuture ? "" : day.status.title))
+        .accessibilityAddTraits(isSelected ? .isSelected : [])
+    }
 }
 
 struct CalendarDayCell: View {
@@ -189,6 +157,7 @@ struct CalendarDayCell: View {
     let status: NutritionColorKey?
     let isToday: Bool
     let isSelected: Bool
+    let accessibilityLabel: String
     let action: () -> Void
 
     var body: some View {
@@ -199,7 +168,7 @@ struct CalendarDayCell: View {
                     .overlay(RoundedRectangle(cornerRadius: 10).stroke(border, lineWidth: border == .clear ? 0 : 1))
                 VStack(spacing: 2) {
                     if let day {
-                        Text("\(day)")
+                        Text(day.formatted())
                             .font(CBTypography.body(14, weight: isToday ? .bold : .regular))
                             .foregroundStyle(isToday ? CBColors.controlOnFill : CBColors.ink)
                         if let status, !isToday {
@@ -214,18 +183,21 @@ struct CalendarDayCell: View {
         }
         .buttonStyle(.plain)
         .disabled(day == nil)
+        .accessibilityHidden(day == nil)
+        .accessibilityLabel(Text(accessibilityLabel))
+        .accessibilityAddTraits(isSelected ? .isSelected : [])
     }
 
     private var background: Color {
         if isToday { return CBColors.controlFill }
         if isSelected { return CBColors.terra.opacity(0.14) }
-        if let status, status != .ink { return CBColors.nutrition(status).opacity(0.13) }
+        if let status { return CBColors.nutrition(status).opacity(0.13) }
         return .clear
     }
 
     private var border: Color {
         if isSelected { return CBColors.terra.opacity(0.55) }
-        if let status, status != .ink { return CBColors.nutrition(status).opacity(0.28) }
+        if let status { return CBColors.nutrition(status).opacity(0.28) }
         return .clear
     }
 }
@@ -249,16 +221,21 @@ struct TrendBarChart: View {
                         VStack(spacing: 4) {
                             Text(bar.valueLabel)
                                 .font(CBTypography.mono(9))
-                                .foregroundStyle(bar.progress > 1 ? CBColors.terra : CBColors.inkMid)
+                                .foregroundStyle(bar.progress > 1.1 ? CBColors.terra : CBColors.inkMid)
+                                .lineLimit(1)
+                                .minimumScaleFactor(0.6)
                             RoundedRectangle(cornerRadius: 4)
-                                .fill(bar.isToday ? CBColors.terra : (bar.progress > 1 ? CBColors.terra.opacity(0.55) : CBColors.sage.opacity(0.55)))
-                                .frame(height: CGFloat(min(bar.progress, 1.15)) * 90)
+                                .fill(bar.isToday ? CBColors.terra : (bar.progress > 1.1 ? CBColors.terra.opacity(0.55) : CBColors.sage.opacity(0.55)))
+                                .frame(height: max(CGFloat(min(bar.progress, 1.15)) * 90, bar.consumed > 0 ? 3 : 0))
                                 .overlay(RoundedRectangle(cornerRadius: 4).stroke(bar.isToday ? CBColors.terra : .clear, lineWidth: 1.5))
                             Text(bar.day)
                                 .font(CBTypography.body(11, weight: bar.isToday ? .bold : .regular))
                                 .foregroundStyle(bar.isToday ? CBColors.ink : CBColors.inkMid)
                         }
                         .frame(maxWidth: .infinity)
+                        .accessibilityElement(children: .ignore)
+                        .accessibilityLabel(Text(bar.accessibilityDay))
+                        .accessibilityValue(Text(bar.consumed > 0 ? NutritionFormat.kcal(bar.consumed) : String(localized: "No log")))
                     }
                 }
                 .frame(height: 122, alignment: .bottom)
@@ -288,7 +265,23 @@ struct TDEEBreakdownCard: View {
                     }
                     ProgressBar(progress: item.progress, color: CBColors.nutrition(item.colorKey), height: 5)
                 }
+                .accessibilityElement(children: .combine)
             }
         }
+    }
+}
+
+/// Section caption used above grouped rows.
+struct SectionLabel: View {
+    let text: Text
+
+    init(_ key: LocalizedStringKey) { text = Text(key) }
+
+    var body: some View {
+        text
+            .textCase(.uppercase)
+            .font(CBTypography.body(12, weight: .medium))
+            .foregroundStyle(CBColors.inkMid)
+            .accessibilityAddTraits(.isHeader)
     }
 }

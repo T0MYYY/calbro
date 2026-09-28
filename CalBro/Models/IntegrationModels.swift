@@ -1,41 +1,24 @@
 import Foundation
 
-enum HealthMetricID: String, CaseIterable, Identifiable, Codable {
-    case steps = "Steps"
-    case activeCalories = "Active calories"
-    case workouts = "Workouts"
-    case sleep = "Sleep"
-    case heartRate = "Heart rate"
+/// What CalBro exchanges with Apple Health. Each is off until the user turns it on.
+struct HealthSettings: Equatable, Codable {
+    /// Import weight, height, age and sex into the profile, plus weight history.
+    var readBody = false
+    /// Replace the activity-multiplier allowance with today's measured active energy.
+    var useActiveEnergy = false
+    /// Save each logged meal's energy and macros to Health.
+    var writeMeals = false
 
-    var id: String { rawValue }
+    var anyEnabled: Bool { readBody || useActiveEnergy || writeMeals }
 }
 
-struct HealthMetricSetting: Identifiable, Equatable, Codable {
-    let id: HealthMetricID
-    let subtitle: String
-    var isEnabled: Bool
+struct ReminderSettings: Equatable, Codable {
+    var mealReminderEnabled = false
+    var mealReminderHour = 12
+    var mealReminderMinute = 0
+    var calorieWarningEnabled = false
 }
 
-enum ReminderID: String, CaseIterable, Identifiable, Codable {
-    case mealLogging = "Meal logging reminder"
-    case calorieWarning = "Calorie warning"
-
-    var id: String { rawValue }
-}
-
-struct ReminderSetting: Identifiable, Equatable, Codable {
-    let id: ReminderID
-    let detail: String
-    var isEnabled: Bool
-}
-
-struct HealthSyncStatus: Equatable, Codable {
-    var isConnected: Bool
-    var statusText: String
-}
-
-struct WidgetPreviewModel: Identifiable, Equatable, Codable {
-    let id: String
-    let title: String
-    let subtitle: String
+enum NotificationPermission: Equatable {
+    case unknown, allowed, denied
 }

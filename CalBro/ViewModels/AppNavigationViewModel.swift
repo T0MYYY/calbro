@@ -1,17 +1,13 @@
 import SwiftUI
 
-enum AppTab: String, Identifiable, Codable, Equatable, Hashable {
-    case today   = "Today"
-    case log     = "Log"
-    case stats   = "Stats"
-    case profile = "Profile"
-
-    var id: String { rawValue }
+enum AppTab: Hashable {
+    case today
+    case stats
+    case profile
 
     var symbol: String {
         switch self {
         case .today:   "circle.grid.cross.fill"
-        case .log:     "camera.fill"
         case .stats:   "chart.bar.fill"
         case .profile: "person.crop.circle.fill"
         }
@@ -22,9 +18,8 @@ enum AppRoute: Hashable {
     case nutrition
     case calendar
     case weeklyReport
-    case goals
     case prediction
-    case plateau
+    case weightTrend
     case integrations
     case widgets
 }
@@ -43,10 +38,8 @@ final class AppNavigationViewModel {
     var profilePath: [AppRoute] = []
     var presentedSheet: AppSheet?
 
-    // Camera is presented modally from the Today + button (no dedicated tab).
-    func showCameraSheet() {
-        presentedSheet = .camera
-    }
+    /// Camera is presented modally from the Today + button (no dedicated tab).
+    func showCameraSheet() { presentedSheet = .camera }
 
     func dismissSheet() { presentedSheet = nil }
 
@@ -55,7 +48,6 @@ final class AppNavigationViewModel {
         case .today:   todayPath.append(route)
         case .stats:   statsPath.append(route)
         case .profile: profilePath.append(route)
-        case .log:     selectedTab = .log
         }
     }
 }

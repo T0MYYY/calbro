@@ -6,7 +6,7 @@ struct OnboardingFlowView: View {
     var body: some View {
         ZStack {
             CBColors.bg.ignoresSafeArea()
-            VStack(spacing: 0) {
+            ScrollView {
                 switch viewModel.step {
                 case .goal:
                     GoalSelectionStep(viewModel: viewModel)
@@ -20,7 +20,8 @@ struct OnboardingFlowView: View {
                     TargetResultStep(viewModel: viewModel)
                 }
             }
-            .frame(maxWidth: 390, maxHeight: 800)
+            .scrollBounceBehavior(.basedOnSize)
+            .frame(maxWidth: 500)
             .background(CBColors.bg)
         }
     }
@@ -35,13 +36,18 @@ private struct StepProgressHeader: View {
                 Image(systemName: "chevron.left")
                     .font(.system(size: 18, weight: .semibold))
                     .foregroundStyle(CBColors.inkMid)
+                    .frame(width: 32, height: 44, alignment: .leading)
+                    .contentShape(Rectangle())
             }
             .buttonStyle(.plain)
+            .accessibilityLabel(Text("Back"))
             ProgressBar(progress: viewModel.progress, color: CBColors.ink, height: 5)
             Text(viewModel.progressText)
                 .font(CBTypography.body(13))
                 .foregroundStyle(CBColors.inkMid)
+                .fixedSize()
         }
+        .accessibilityElement(children: .contain)
         .padding(.horizontal, CBSpacing.page)
         .padding(.vertical, 12)
         .overlay(alignment: .bottom) {
@@ -59,6 +65,7 @@ private struct StepDots: View {
                     .frame(width: index == 0 ? 24 : 8, height: 8)
             }
         }
+        .accessibilityHidden(true)
     }
 }
 
@@ -86,11 +93,11 @@ private struct GoalSelectionStep: View {
                 }
             }
             .padding(.bottom, 20)
-            PrimaryButton(title: "Next ->", action: viewModel.next)
-            Spacer()
+            PrimaryButton("Next", action: viewModel.next)
         }
         .padding(.horizontal, CBSpacing.page)
         .padding(.top, 14)
+        .padding(.bottom, 24)
     }
 }
 
@@ -127,7 +134,8 @@ private struct GoalCard: View {
                 Image(systemName: icon)
                     .font(.system(size: 25, weight: .semibold))
                     .foregroundStyle(color)
-                Text(goal.rawValue)
+                    .accessibilityHidden(true)
+                Text(goal.title)
                     .font(CBTypography.body(15, weight: .bold))
                     .foregroundStyle(CBColors.ink)
                     .lineLimit(2)
@@ -141,22 +149,29 @@ private struct GoalCard: View {
             .clipShape(RoundedRectangle(cornerRadius: CBSpacing.cardRadius, style: .continuous))
         }
         .buttonStyle(.plain)
+        .accessibilityAddTraits(selected ? .isSelected : [])
     }
 }
 
 private struct BodyStatsStep: View {
     @Bindable var viewModel: OnboardingViewModel
 
+    private var imperial: Bool { viewModel.profile.units == .imperial }
+
     var body: some View {
         VStack(alignment: .leading, spacing: 20) {
             StepProgressHeader(viewModel: viewModel)
             VStack(alignment: .leading, spacing: 20) {
                 StepTitle(title: "About you", subtitle: "Used to calculate your metabolism")
+                Picker("Units", selection: Binding(get: { viewModel.profile.units }, set: viewModel.selectUnits)) {
+                    ForEach(UnitSystem.allCases) { Text($0.title).tag($0) }
+                }
+                .pickerStyle(.segmented)
                 VStack(alignment: .leading, spacing: 8) {
                     FieldLabel("Biological sex")
                     HStack(spacing: 10) {
                         ForEach(BiologicalSex.allCases) { sex in
-                            SelectableCapsule(title: sex.rawValue, selected: viewModel.profile.sex == sex) {
+                            SelectableCapsule(title: sex.title, selected: viewModel.profile.sex == sex) {
                                 viewModel.selectSex(sex)
                             }
                         }
@@ -166,45 +181,48 @@ private struct BodyStatsStep: View {
                     FieldLabel("Age")
                     CBCard {
                         HStack {
-                            Button("-") { viewModel.adjustAge(by: -1) }
+                            Button { viewModel.adjustAge(by: -1) } label: {
+                                Image(systemName: "minus").frame(width: 44, height: 44)
+                            }
+                            .accessibilityLabel(Text("Decrease age"))
                             Spacer()
                             EditableNumberField(
-                                value: Binding(
-                                    get: { viewModel.profile.age },
-                                    set: { viewModel.updateAge($0) }
-                                ),
-                                unit: "years",
-                                width: 96
+                                value: Binding(get: { viewModel.profile.age }, set: { viewModel.updateAge($0) }),
+                                unit: String(localized: "years"),
+                                accessibilityLabel: Text("Age"),
+                                width: 96, large: true
                             )
                             Spacer()
-                            Button("+") { viewModel.adjustAge(by: 1) }
+                            Button { viewModel.adjustAge(by: 1) } label: {
+                                Image(systemName: "plus").frame(width: 44, height: 44)
+                            }
+                            .accessibilityLabel(Text("Increase age"))
                         }
                         .font(CBTypography.body(20))
                         .foregroundStyle(CBColors.ink)
+                        .buttonStyle(.plain)
                     }
                 }
                 HStack(spacing: 10) {
                     StatField(
                         label: "Height",
-                        value: Binding(
-                            get: { viewModel.profile.heightCentimeters },
-                            set: { viewModel.updateHeight($0) }
-                        ),
-                        unit: "cm"
+                        value: Binding(get: { viewModel.heightDisplayValue },
+                                       set: { viewModel.updateHeight(displayValue: $0) }),
+                        unit: imperial ? String(localized: "in") : String(localized: "cm"),
+                        caption: imperial ? viewModel.profile.heightDisplay : nil
                     )
                     StatField(
                         label: "Weight",
-                        value: Binding(
-                            get: { viewModel.profile.weightKilograms },
-                            set: { viewModel.updateWeight($0) }
-                        ),
-                        unit: "kg"
+                        value: Binding(get: { viewModel.weightDisplayValue },
+                                       set: { viewModel.updateWeight(displayValue: $0) }),
+                        unit: viewModel.profile.weightUnitSymbol,
+                        caption: nil
                     )
                 }
-                PrimaryButton(title: "Next ->", action: viewModel.next)
+                PrimaryButton("Next", action: viewModel.next)
             }
             .padding(.horizontal, CBSpacing.page)
-            Spacer()
+            .padding(.bottom, 24)
         }
     }
 }
@@ -225,7 +243,7 @@ private struct ActivityStep: View {
                         let selected = viewModel.profile.activityLevel == level
                         HStack {
                             VStack(alignment: .leading, spacing: 2) {
-                                Text(level.rawValue)
+                                Text(level.title)
                                     .font(CBTypography.body(16, weight: selected ? .bold : .medium))
                                     .foregroundStyle(selected ? CBColors.controlOnFill : CBColors.ink)
                                 Text(level.subtitle)
@@ -248,13 +266,14 @@ private struct ActivityStep: View {
                         .clipShape(RoundedRectangle(cornerRadius: CBSpacing.cardRadius, style: .continuous))
                     }
                     .buttonStyle(.plain)
+                    .accessibilityAddTraits(viewModel.profile.activityLevel == level ? .isSelected : [])
                 }
-                PrimaryButton(title: "Next ->", action: viewModel.next)
+                PrimaryButton("Next", action: viewModel.next)
                     .padding(.top, 6)
             }
             .padding(.horizontal, CBSpacing.page)
             .padding(.top, 18)
-            Spacer()
+            .padding(.bottom, 24)
         }
     }
 }
@@ -266,7 +285,8 @@ private struct DietPreferencesStep: View {
         VStack(spacing: 0) {
             StepProgressHeader(viewModel: viewModel)
             VStack(alignment: .leading, spacing: 20) {
-                StepTitle(title: "Any dietary preferences?", subtitle: "Select all that apply")
+                StepTitle(title: "Any dietary preferences?",
+                          subtitle: "Select all that apply. Keto, low-carb and high-protein change your macro split.")
                 FlowLayout(spacing: 10) {
                     ForEach(DietPreference.allCases) { preference in
                         let selected = viewModel.profile.dietPreferences.contains(preference)
@@ -274,14 +294,14 @@ private struct DietPreferencesStep: View {
                             viewModel.toggleDietPreference(preference)
                         } label: {
                             HStack(spacing: 6) {
-                                Text(preference.displayLabel)
+                                Text(preference.title)
                                 Image(systemName: "checkmark")
                                     .font(.system(size: 11, weight: .bold))
                                     .opacity(selected ? 1 : 0)
                             }
                                 .font(CBTypography.body(15, weight: selected ? .semibold : .regular))
                                 .foregroundStyle(selected ? CBColors.controlOnFill : CBColors.ink)
-                                .frame(minWidth: chipWidth(for: preference), minHeight: 22)
+                                .frame(minHeight: 22)
                                 .padding(.horizontal, 18)
                                 .padding(.vertical, 10)
                                 .background(selected ? CBColors.controlFill : Color.clear)
@@ -289,27 +309,19 @@ private struct DietPreferencesStep: View {
                                 .clipShape(Capsule())
                         }
                         .buttonStyle(.plain)
+                        .accessibilityAddTraits(selected ? .isSelected : [])
                     }
                 }
-                PrimaryButton(title: "See my targets ->", action: viewModel.next)
+                PrimaryButton("See my targets", action: viewModel.next)
                 Button("Skip for now", action: viewModel.skipDiet)
                     .font(CBTypography.body(14))
                     .foregroundStyle(CBColors.inkMid)
                     .frame(maxWidth: .infinity)
                     .buttonStyle(.plain)
-                Spacer()
             }
             .padding(.horizontal, CBSpacing.page)
             .padding(.top, 18)
-        }
-    }
-
-    private func chipWidth(for preference: DietPreference) -> CGFloat {
-        switch preference {
-        case .noRestriction: 124
-        case .vegetarian, .glutenFree, .dairyFree, .highProtein: 108
-        case .lowCarb: 88
-        case .vegan, .keto: 70
+            .padding(.bottom, 24)
         }
     }
 }
@@ -317,13 +329,15 @@ private struct DietPreferencesStep: View {
 private struct TargetResultStep: View {
     @Bindable var viewModel: OnboardingViewModel
 
+    private var adjustment: Int { viewModel.profile.goal.dailyAdjustment }
+
     var body: some View {
         VStack(alignment: .leading, spacing: 20) {
             Text("Your daily targets")
                 .font(CBTypography.body())
                 .foregroundStyle(CBColors.inkMid)
             VStack(spacing: 4) {
-                Text(viewModel.displayCalories.formatted())
+                Text(viewModel.profile.calorieTarget.formatted())
                     .font(CBTypography.display(80))
                     .foregroundStyle(CBColors.ink)
                     .lineLimit(1)
@@ -334,9 +348,9 @@ private struct TargetResultStep: View {
             }
             .frame(maxWidth: .infinity)
             HStack(spacing: 10) {
-                MacroTarget(label: "Protein", value: "\(viewModel.displayProtein)g", color: CBColors.plum)
-                MacroTarget(label: "Carbs",   value: "\(viewModel.displayCarbs)g",   color: CBColors.ocean)
-                MacroTarget(label: "Fat",     value: "\(viewModel.displayFat)g",     color: CBColors.gold)
+                MacroTarget(label: "Protein", value: NutritionFormat.grams(viewModel.profile.proteinTargetG), color: CBColors.plum)
+                MacroTarget(label: "Carbs",   value: NutritionFormat.grams(viewModel.profile.carbTargetG),    color: CBColors.ocean)
+                MacroTarget(label: "Fat",     value: NutritionFormat.grams(viewModel.profile.fatTargetG),     color: CBColors.gold)
             }
             CBCard(background: CBColors.bgSoft) {
                 VStack(alignment: .leading, spacing: 8) {
@@ -345,7 +359,7 @@ private struct TargetResultStep: View {
                             .font(CBTypography.body(15, weight: .semibold))
                             .foregroundStyle(CBColors.ink)
                         Spacer()
-                        PillTag(text: viewModel.weeklyDeltaLabel, color: CBColors.sage)
+                        PillTag(viewModel.weeklyDeltaLabel, color: CBColors.sage)
                     }
                     Text(viewModel.goalTimelineLabel)
                         .font(CBTypography.body(14))
@@ -353,31 +367,39 @@ private struct TargetResultStep: View {
                 }
             }
             HStack {
-                MetricCard(value: "\(viewModel.displayBMR.formatted()) kcal", label: "BMR")
-                MetricCard(value: "\(viewModel.displayTDEE.formatted()) kcal", label: "TDEE")
-                MetricCard(
-                    value: "\(viewModel.profile.goal.dailyAdjustment < 0 ? "-" : "+")\(abs(viewModel.profile.goal.dailyAdjustment)) kcal",
-                    label: viewModel.profile.goal.dailyAdjustment < 0 ? "Deficit" : "Surplus",
-                    color: viewModel.profile.goal.dailyAdjustment < 0 ? CBColors.terra : CBColors.sage
-                )
+                MetricCard(value: NutritionFormat.kcal(viewModel.profile.bmr), label: "BMR")
+                MetricCard(value: NutritionFormat.kcal(viewModel.profile.tdee), label: "TDEE")
+                if adjustment != 0 {
+                    MetricCard(
+                        value: NutritionFormat.signedKcal(adjustment),
+                        label: adjustment < 0 ? "Deficit" : "Surplus",
+                        color: adjustment < 0 ? CBColors.terra : CBColors.sage
+                    )
+                }
             }
-            PrimaryButton(title: "Start Tracking", action: viewModel.next)
-            Spacer()
+            PrimaryButton("Start tracking", action: viewModel.next)
+            Button("Back", action: viewModel.back)
+                .font(CBTypography.body(14))
+                .foregroundStyle(CBColors.inkMid)
+                .frame(maxWidth: .infinity)
+                .buttonStyle(.plain)
         }
         .padding(.horizontal, CBSpacing.page)
         .padding(.top, 20)
+        .padding(.bottom, 24)
     }
 }
 
 private struct StepTitle: View {
-    let title: String
-    let subtitle: String
+    let title: LocalizedStringKey
+    let subtitle: LocalizedStringKey
 
     var body: some View {
         VStack(alignment: .leading, spacing: 4) {
             Text(title)
                 .font(CBTypography.title())
                 .foregroundStyle(CBColors.ink)
+                .accessibilityAddTraits(.isHeader)
             Text(subtitle)
                 .font(CBTypography.body())
                 .foregroundStyle(CBColors.inkMid)
@@ -386,9 +408,9 @@ private struct StepTitle: View {
 }
 
 private struct FieldLabel: View {
-    let title: String
+    let title: LocalizedStringKey
 
-    init(_ title: String) {
+    init(_ title: LocalizedStringKey) {
         self.title = title
     }
 
@@ -416,19 +438,27 @@ private struct SelectableCapsule: View {
                 .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
         }
         .buttonStyle(.plain)
+        .accessibilityAddTraits(selected ? .isSelected : [])
     }
 }
 
 private struct StatField: View {
-    let label: String
+    let label: LocalizedStringKey
     @Binding var value: Int
     let unit: String
+    let caption: String?
 
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
             FieldLabel(label)
             CBCard {
-                EditableNumberField(value: $value, unit: unit, width: 76)
+                VStack(alignment: .leading, spacing: 2) {
+                    EditableNumberField(value: $value, unit: unit, accessibilityLabel: Text(label),
+                                        width: 76, large: false)
+                    if let caption {
+                        Text(caption).font(CBTypography.body(12)).foregroundStyle(CBColors.inkMid)
+                    }
+                }
             }
         }
     }
@@ -437,22 +467,24 @@ private struct StatField: View {
 private struct EditableNumberField: View {
     @Binding var value: Int
     let unit: String
+    let accessibilityLabel: Text
     let width: CGFloat
+    let large: Bool
 
     var body: some View {
         HStack(alignment: .firstTextBaseline, spacing: 8) {
-            TextField("", value: $value, format: .number)
+            TextField(value: $value, format: .number) { accessibilityLabel }
                 .keyboardType(.numberPad)
                 .multilineTextAlignment(.center)
-                .font(CBTypography.display(unit == "years" ? 32 : 28))
+                .font(CBTypography.display(large ? 32 : 28))
                 .foregroundStyle(CBColors.ink)
                 .frame(width: width)
                 .textFieldStyle(.plain)
-                .accessibilityLabel(unit)
             Text(unit)
                 .font(CBTypography.body(14))
                 .foregroundStyle(CBColors.inkMid)
-            if unit != "years" {
+                .accessibilityHidden(true)
+            if !large {
                 Spacer(minLength: 0)
             }
         }
@@ -460,7 +492,7 @@ private struct EditableNumberField: View {
 }
 
 private struct MacroTarget: View {
-    let label: String
+    let label: LocalizedStringKey
     let value: String
     let color: Color
 

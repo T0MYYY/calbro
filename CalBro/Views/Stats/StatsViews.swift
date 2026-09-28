@@ -6,39 +6,33 @@ struct StatsCaloriesView: View {
 
     var body: some View {
         VStack(spacing: 0) {
-            NavHeader(
-                title: "Stats",
-                subtitle: "This week · \(weekRangeLabel)",
-                trailing: AnyView(
-                    Button {
-                        navigation.navigate(.weeklyReport, in: .stats)
-                    } label: {
-                        PillTag(text: "Report >", color: CBColors.inkMid)
-                    }
-                    .buttonStyle(.plain)
-                )
-            )
+            NavHeader("Stats", subtitle: String(localized: "Last 7 days · \(viewModel.rangeLabel)")) {
+                Button {
+                    navigation.navigate(.weeklyReport, in: .stats)
+                } label: {
+                    PillTag("Report", color: CBColors.inkMid)
+                }
+                .buttonStyle(.plain)
+                .accessibilityIdentifier("openReport")
+            }
             ScrollView {
                 VStack(spacing: 16) {
                     HStack {
                         MetricCard(
-                            value: viewModel.weekAvgCalories > 0 ? "\(viewModel.weekAvgCalories.formatted()) kcal" : "—",
-                            label: "Avg"
+                            value: viewModel.averageCalories > 0 ? NutritionFormat.kcal(viewModel.averageCalories) : "—",
+                            label: "Daily average"
                         )
+                        MetricCard(value: viewModel.calorieTargetLabel, label: "Target")
                         MetricCard(
-                            value: viewModel.calorieTargetLabel,
-                            label: "Target"
-                        )
-                        MetricCard(
-                            value: "\(viewModel.loggedDays)/7 days",
-                            label: "Logged",
+                            value: String(localized: "\(viewModel.loggedDays) of 7"),
+                            label: "Days logged",
                             color: viewModel.loggedDays >= 5 ? CBColors.sage : CBColors.gold
                         )
                     }
                     Rectangle().fill(CBColors.inkFaint).frame(height: 1)
                     TrendBarChart(bars: viewModel.calorieBars)
                     VStack(alignment: .leading, spacing: 10) {
-                        Text("Weekly macro averages")
+                        Text("Macros, average per logged day")
                             .font(CBTypography.body(13)).foregroundStyle(CBColors.inkMid)
                         ForEach(viewModel.weeklyMacros) { macro in
                             MacroBar(macro: macro)
@@ -51,43 +45,29 @@ struct StatsCaloriesView: View {
         }
         .background(CBColors.bg)
     }
-
-    private var weekRangeLabel: String {
-        let cal = Calendar.current, today = cal.startOfDay(for: Date())
-        let offset = (cal.component(.weekday, from: today) + 5) % 7
-        let monday = cal.date(byAdding: .day, value: -offset, to: today)!
-        let sunday = cal.date(byAdding: .day, value: 6 - offset, to: today)!
-        let f = DateFormatter(); f.dateFormat = "MMM d"
-        return "\(f.string(from: monday))–\(f.string(from: sunday))"
-    }
 }
 
 struct StatsReportView: View {
-    @State var stats: StatsViewModel
-
-    init(stats: StatsViewModel? = nil) {
-        _stats = State(initialValue: stats ?? StatsViewModel())
-    }
+    let stats: StatsViewModel
 
     var body: some View {
         VStack(spacing: 0) {
-            NavHeader(title: "Weekly Report", subtitle: weekRangeLabel, showsBack: true)
+            NavHeader("Weekly report", subtitle: stats.rangeLabel, showsBack: true)
             ScrollView {
                 VStack(spacing: 14) {
-                    // Summary ring
                     HStack(spacing: 20) {
                         CalorieRing(
-                            progress: adherenceRatio,
-                            label: "\(Int(adherenceRatio * 100))%",
-                            subtitle: "",
+                            progress: adherence,
+                            label: NutritionFormat.percent(adherence),
                             size: 92, stroke: 9,
-                            color: adherenceRatio >= 0.7 ? CBColors.sage : CBColors.gold,
+                            color: adherence >= 0.7 ? CBColors.sage : CBColors.gold,
                             display: false
                         )
+                        .accessibilityLabel(Text("Days on target"))
                         VStack(alignment: .leading, spacing: 4) {
-                            Text(weekSummaryLabel).font(CBTypography.title(22))
-                            Text("\(stats.loggedDays) / 7 days on target")
-                            Text("\(stats.streak > 0 ? "\(stats.streak)-day streak" : "No streak yet")")
+                            Text(summaryTitle).font(CBTypography.title(22)).foregroundStyle(CBColors.ink)
+                            Text("\(stats.onTargetDays) of 7 days on target")
+                            Text(stats.streak > 0 ? String(localized: "\(stats.streak)-day streak") : String(localized: "No streak yet"))
                         }
                         .font(CBTypography.body(14))
                         .foregroundStyle(CBColors.inkMid)
@@ -96,31 +76,31 @@ struct StatsReportView: View {
 
                     Rectangle().fill(CBColors.inkFaint).frame(height: 1)
 
-                    // Calorie trend (real data)
                     VStack(alignment: .leading, spacing: 8) {
                         Text("Calorie trend").font(CBTypography.body(15, weight: .semibold))
                         TrendBarChart(bars: stats.calorieBars)
                     }
 
-                    // Macro averages
                     VStack(alignment: .leading, spacing: 8) {
                         Text("Macro averages").font(CBTypography.body(15, weight: .semibold))
                         ForEach(stats.weeklyMacros) { macro in MacroBar(macro: macro) }
                     }
 
-                    // Insights
                     VStack(alignment: .leading, spacing: 8) {
                         Text("Insights").font(CBTypography.body(15, weight: .semibold))
-                        InsightRow(label: "Days logged", value: "\(stats.loggedDays) / 7")
-                        InsightRow(label: "Avg calories",
-                                   value: stats.weekAvgCalories > 0 ? "\(stats.weekAvgCalories.formatted()) kcal" : "No data")
+                        InsightRow(label: "Days logged", value: String(localized: "\(stats.loggedDays) of 7"))
+                        InsightRow(label: "Average intake",
+                                   value: stats.averageCalories > 0 ? NutritionFormat.kcal(stats.averageCalories)
+                                                                    : String(localized: "No data"))
                         if let bestDay = stats.bestDayLabel {
-                            InsightRow(label: "Best day", value: bestDay)
+                            InsightRow(label: "Closest to target", value: bestDay)
                         }
                         if let mostLogged = stats.mostLoggedFood {
                             InsightRow(label: "Most logged", value: mostLogged)
                         }
-                        InsightRow(label: "Streak", value: stats.streak > 0 ? "\(stats.streak) days" : "Start today!")
+                        InsightRow(label: "Streak",
+                                   value: stats.streak > 0 ? String(localized: "\(stats.streak) days")
+                                                           : String(localized: "Start today"))
                     }
                 }
                 .padding(.horizontal, CBSpacing.page)
@@ -133,41 +113,32 @@ struct StatsReportView: View {
         .edgeSwipeBackEnabled()
     }
 
-    private var weekRangeLabel: String {
-        let cal = Calendar.current, today = cal.startOfDay(for: Date())
-        let offset = (cal.component(.weekday, from: today) + 5) % 7
-        let monday = cal.date(byAdding: .day, value: -offset, to: today)!
-        let sunday = cal.date(byAdding: .day, value: 6 - offset, to: today)!
-        let f = DateFormatter(); f.dateFormat = "MMM d"
-        return "\(f.string(from: monday))–\(f.string(from: sunday))"
-    }
+    private var adherence: Double { Double(stats.onTargetDays) / 7 }
 
-    private var adherenceRatio: Double {
-        guard stats.loggedDays > 0 else { return 0 }
-        return Double(stats.loggedDays) / 7.0
-    }
-
-    private var weekSummaryLabel: String {
-        let pct = Int(adherenceRatio * 100)
-        switch pct {
-        case 86...: return "Great week!"
-        case 57...: return "Good week!"
-        case 29...: return "Getting there"
-        default:    return "Log more!"
+    private var summaryTitle: String {
+        switch stats.onTargetDays {
+        case 6...: String(localized: "Great week!")
+        case 4...: String(localized: "Good week")
+        case 2...: String(localized: "Getting there")
+        default:   stats.loggedDays == 0 ? String(localized: "No data yet") : String(localized: "Keep going")
         }
     }
 }
 
 private struct InsightRow: View {
-    let label: String; let value: String
+    let label: LocalizedStringKey
+    let value: String
+
     var body: some View {
         HStack {
             Text(label).foregroundStyle(CBColors.inkMid)
             Spacer()
             Text(value).fontWeight(.medium).foregroundStyle(CBColors.ink)
+                .multilineTextAlignment(.trailing)
         }
         .font(CBTypography.body(14))
         .padding(.vertical, 9)
         .overlay(alignment: .bottom) { Rectangle().fill(CBColors.inkLine).frame(height: 1) }
+        .accessibilityElement(children: .combine)
     }
 }

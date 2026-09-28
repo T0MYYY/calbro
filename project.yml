@@ -4,6 +4,7 @@ options:
   deploymentTarget:
     iOS: "26.0"
   createIntermediateGroups: true
+  developmentLanguage: en
 settings:
   base:
     SWIFT_VERSION: "6.0"
@@ -13,6 +14,10 @@ settings:
     CURRENT_PROJECT_VERSION: "1"
     SUPPORTED_PLATFORMS: "iphoneos iphonesimulator"
     TARGETED_DEVICE_FAMILY: "1"
+    DEVELOPMENT_TEAM: A9J5Z9ZASH
+    CODE_SIGN_STYLE: Automatic
+    LOCALIZATION_PREFERS_STRING_CATALOGS: YES
+    SWIFT_EMIT_LOC_STRINGS: YES
 targets:
   CalBro:
     type: application
@@ -27,19 +32,43 @@ targets:
       - path: CalBro/Resources/Models
         buildPhase: resources
         type: folder
-      - path: CalBro/Assets.xcassets
-        buildPhase: resources
+    dependencies:
+      - target: CalBroWidgetExtension
+        embed: true
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.wydfcc.calbro
-        DEVELOPMENT_TEAM: A9J5Z9ZASH
-        CODE_SIGN_STYLE: Automatic
-        TARGETED_DEVICE_FAMILY: "1"
+        CODE_SIGN_ENTITLEMENTS: CalBro/CalBro.entitlements
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+        ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME: AccentColor
+        INFOPLIST_KEY_CFBundleDisplayName: CalBro
         INFOPLIST_KEY_UIApplicationSceneManifest_Generation: YES
         INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents: YES
         INFOPLIST_KEY_UILaunchScreen_Generation: YES
-        INFOPLIST_KEY_NSCameraUsageDescription: CalBro uses the camera to capture meal photos for nutrition logging.
+        INFOPLIST_KEY_UISupportedInterfaceOrientations: UIInterfaceOrientationPortrait
+        INFOPLIST_KEY_NSCameraUsageDescription: CalBro uses the camera to photograph your meal and estimate its nutrition on your device.
+        INFOPLIST_KEY_NSHealthShareUsageDescription: CalBro reads your weight, height, age, sex and active energy from Apple Health to personalize your calorie target.
+        INFOPLIST_KEY_NSHealthUpdateUsageDescription: CalBro saves the calories and macronutrients of meals you log to Apple Health.
+  CalBroWidgetExtension:
+    type: app-extension
+    platform: iOS
+    supportedDestinations:
+      - iOS
+      - iOS Simulator
+    sources:
+      - path: CalBroWidget
+      - path: CalBro/Shared
+      - path: CalBro/Localizable.xcstrings
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.wydfcc.calbro.CalBroWidget
+        PRODUCT_NAME: CalBroWidgetExtension
+        CODE_SIGN_ENTITLEMENTS: CalBroWidget/CalBroWidget.entitlements
+        INFOPLIST_FILE: CalBroWidget/Info.plist
+        INFOPLIST_KEY_CFBundleDisplayName: CalBro
         ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME: AccentColor
+        SKIP_INSTALL: YES
+        LD_RUNPATH_SEARCH_PATHS: "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks"
   CalBroTests:
     type: bundle.unit-test
     platform: iOS
@@ -53,8 +82,8 @@ targets:
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.wydfcc.calbro.tests
-        DEVELOPMENT_TEAM: A9J5Z9ZASH
-        CODE_SIGN_STYLE: Automatic
+        BUNDLE_LOADER: "$(TEST_HOST)"
+        TEST_HOST: "$(BUILT_PRODUCTS_DIR)/CalBro.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/CalBro"
 schemes:
   CalBro:
     build:

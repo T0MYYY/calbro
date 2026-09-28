@@ -1,50 +1,53 @@
 import Foundation
 
-enum CameraFlowState: Equatable {
-    case scan
-    case height
-    case ready
-    case recognizing
-    case result
-}
-
-struct CameraHeightGuidance: Equatable {
-    var currentCentimeters: Int
-    var targetRange: ClosedRange<Int>
-    var targetCentimeters: Int
-    var directionLabel: String
-    var isReady: Bool
+/// Live framing state used to gate auto-capture and passed along with each photo.
+struct CaptureGuidance: Equatable, Sendable {
+    /// Degrees away from pointing straight down (0 = overhead).
     var tiltDegrees: Double
-    var isTopDown: Bool
+    /// Distance to the food in cm from LiDAR / depth; nil on devices without depth.
+    var heightCm: Double?
 
-    var isCaptureReady: Bool {
-        isReady && isTopDown && targetRange.contains(currentCentimeters)
+    static let overheadThreshold: Double = 28
+    /// Matches the camera-to-plate distance of the DPF training data.
+    static let heightRange: ClosedRange<Double> = 27...34
+
+    var isOverhead: Bool { tiltDegrees < Self.overheadThreshold }
+
+    var isHeightInRange: Bool {
+        guard let heightCm else { return true }
+        return Self.heightRange.contains(heightCm)
     }
 
-    static let captureReadyMock = CameraHeightGuidance(
-        currentCentimeters: 30,
-        targetRange: 27...33,
-        targetCentimeters: 30,
-        directionLabel: "Top-down locked",
-        isReady: true,
-        tiltDegrees: 3,
-        isTopDown: true
-    )
+    var isReady: Bool { isOverhead && isHeightInRange }
+}
+
+enum RecognitionSource: Equatable {
+    case onDevice
+    case simulatorSample
+
+    var title: String {
+        switch self {
+        case .onDevice:        String(localized: "On-device estimate")
+        case .simulatorSample: String(localized: "Simulator sample")
+        }
+    }
 }
 
 struct FoodRecognitionResult: Identifiable, Equatable {
     let id = UUID()
     let foodName: String
-    let servingDescription: String
-    var servingMultiplier: Double
-    let confidence: Double
+    let massGrams: Int?
     let calories: Int
     let protein: Int
     let carbs: Int
     let fat: Int
-    var modelFamily: String = "—"
+    var source: RecognitionSource = .onDevice
 
-    var adjustedCalories: Int {
-        Int((Double(calories) * servingMultiplier).rounded())
+    var servingDescription: String {
+        if let massGrams {
+            String(localized: "About \(NutritionFormat.grams(massGrams))", comment: "Estimated portion mass")
+        } else {
+            String(localized: "Estimated portion")
+        }
     }
 }

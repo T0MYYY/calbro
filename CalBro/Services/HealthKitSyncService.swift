@@ -1,127 +1,130 @@
 import Foundation
 import HealthKit
 
-protocol HealthKitSyncService: Sendable {
-    func setConnected(_ isConnected: Bool) async -> HealthSyncStatus
+struct HealthBodyMetrics: Equatable, Sendable {
+    var weightKilograms: Double?
+    var heightCentimeters: Double?
+    var age: Int?
+    var sex: BiologicalSex?
+
+    var isEmpty: Bool { weightKilograms == nil && heightCentimeters == nil && age == nil && sex == nil }
 }
 
-final class MockHealthKitSyncService: HealthKitSyncService {
-    func setConnected(_ isConnected: Bool) async -> HealthSyncStatus {
-        HealthSyncStatus(isConnected: isConnected, statusText: isConnected ? "Connected" : "Mock disconnected")
-    }
+protocol HealthDataProviding: Sendable {
+    var isAvailable: Bool { get }
+    func requestAuthorization(for settings: HealthSettings) async throws
+    func bodyMetrics() async -> HealthBodyMetrics
+    func weightHistory(days: Int) async -> [WeightEntry]
+    func activeEnergyToday() async -> Int?
+    func saveMeal(_ meal: LoggedMeal) async throws
+    func deleteMeal(id: UUID) async throws
 }
 
-// MARK: - Real HealthKit integration
-
-final class RealHealthKitSyncService: HealthKitSyncService, @unchecked Sendable {
+final class HealthKitService: HealthDataProviding, @unchecked Sendable {
     private let store = HKHealthStore()
-    private let appStateStore: AppStateStore
+    private static let mealIDKey = "CalBroMealID"
 
-    init(appStateStore: AppStateStore = UserDefaultsAppStateStore()) {
-        self.appStateStore = appStateStore
+    var isAvailable: Bool { HKHealthStore.isHealthDataAvailable() }
+
+    nonisolated(unsafe) private static let dietaryTypes: [(HKQuantityTypeIdentifier, HKUnit, KeyPath<LoggedMeal, Int>)] = [
+        (.dietaryEnergyConsumed, .kilocalorie(), \.adjustedCalories),
+        (.dietaryProtein, .gram(), \.adjustedProtein),
+        (.dietaryCarbohydrates, .gram(), \.adjustedCarbs),
+        (.dietaryFatTotal, .gram(), \.adjustedFat)
+    ]
+
+    func requestAuthorization(for settings: HealthSettings) async throws {
+        var read = Set<HKObjectType>()
+        var share = Set<HKSampleType>()
+        if settings.readBody {
+            read.formUnion([HKQuantityType(.bodyMass), HKQuantityType(.height),
+                            HKCharacteristicType(.dateOfBirth), HKCharacteristicType(.biologicalSex)])
+        }
+        if settings.useActiveEnergy {
+            read.insert(HKQuantityType(.activeEnergyBurned))
+        }
+        if settings.writeMeals {
+            share.formUnion(Self.dietaryTypes.map { HKQuantityType($0.0) })
+        }
+        guard !read.isEmpty || !share.isEmpty else { return }
+        try await store.requestAuthorization(toShare: share, read: read)
     }
 
-    private var readTypes: Set<HKObjectType> {
-        var types = Set<HKObjectType>()
-        if let steps = HKObjectType.quantityType(forIdentifier: .stepCount) { types.insert(steps) }
-        if let active = HKObjectType.quantityType(forIdentifier: .activeEnergyBurned) { types.insert(active) }
-        if let hr = HKObjectType.quantityType(forIdentifier: .heartRate) { types.insert(hr) }
-        if let mass = HKObjectType.quantityType(forIdentifier: .bodyMass) { types.insert(mass) }
-        if let height = HKObjectType.quantityType(forIdentifier: .height) { types.insert(height) }
-        if let dob = HKObjectType.characteristicType(forIdentifier: .dateOfBirth) { types.insert(dob) }
-        if let sex = HKObjectType.characteristicType(forIdentifier: .biologicalSex) { types.insert(sex) }
-        types.insert(HKObjectType.workoutType())
-        return types
-    }
-
-    func setConnected(_ isConnected: Bool) async -> HealthSyncStatus {
-        guard HKHealthStore.isHealthDataAvailable() else {
-            return HealthSyncStatus(isConnected: false, statusText: "Health data unavailable on this device")
-        }
-        // HealthKit has no programmatic "disconnect"; toggling off just stops reads locally.
-        guard isConnected else {
-            return HealthSyncStatus(isConnected: false, statusText: "Not syncing")
-        }
-
-        do {
-            try await store.requestAuthorization(toShare: [], read: readTypes)
-        } catch {
-            return HealthSyncStatus(isConnected: false, statusText: "Authorization failed")
-        }
-
-        // Replace manually-entered profile values with the unified Health source.
-        let imported = await importProfileFromHealth()
-
-        let active = await todayActiveEnergyKcal()
-        if imported {
-            return HealthSyncStatus(isConnected: true, statusText: "Connected · profile synced from Health")
-        }
-        if let kcal = active {
-            return HealthSyncStatus(isConnected: true, statusText: "Connected · \(kcal) kcal burned today")
-        }
-        return HealthSyncStatus(isConnected: true, statusText: "Connected")
-    }
-
-    /// Reads body metrics from the unified Health store and backfills the saved profile.
-    /// Returns true if at least one field was updated.
-    @discardableResult
-    func importProfileFromHealth() async -> Bool {
-        var snapshot = appStateStore.load() ?? AppStateSnapshot(onboardingComplete: false, profile: UserProfile())
-        var profile = snapshot.profile
-        var changed = false
-
-        if let kg = await mostRecentQuantity(.bodyMass, unit: .gramUnit(with: .kilo)) {
-            profile.weightKilograms = Int(kg.rounded()); changed = true
-        }
-        if let cm = await mostRecentQuantity(.height, unit: .meterUnit(with: .centi)) {
-            profile.heightCentimeters = Int(cm.rounded()); changed = true
-        }
+    func bodyMetrics() async -> HealthBodyMetrics {
+        var metrics = HealthBodyMetrics()
+        metrics.weightKilograms = await latestValue(.bodyMass, unit: .gramUnit(with: .kilo))
+        metrics.heightCentimeters = await latestValue(.height, unit: .meterUnit(with: .centi))
         if let comps = try? store.dateOfBirthComponents(),
-           let birthDate = Calendar.current.date(from: comps) {
-            let years = Calendar.current.dateComponents([.year], from: birthDate, to: Date()).year
-            if let y = years, y > 0, y < 120 { profile.age = y; changed = true }
+           let birth = Calendar.current.date(from: comps),
+           let years = Calendar.current.dateComponents([.year], from: birth, to: Date()).year,
+           (13...110).contains(years) {
+            metrics.age = years
         }
-        if let hkSex = try? store.biologicalSex().biologicalSex {
-            switch hkSex {
-            case .male:   profile.sex = .male;   changed = true
-            case .female: profile.sex = .female; changed = true
-            case .other:  profile.sex = .other;  changed = true
-            default: break
-            }
+        switch (try? store.biologicalSex())?.biologicalSex {
+        case .male:   metrics.sex = .male
+        case .female: metrics.sex = .female
+        case .other:  metrics.sex = .other
+        default:      break
         }
-
-        guard changed else { return false }
-        profile.recalculateTargets()
-        snapshot.profile = profile
-        appStateStore.save(snapshot)
-        return true
+        return metrics
     }
 
-    private func mostRecentQuantity(_ id: HKQuantityTypeIdentifier, unit: HKUnit) async -> Double? {
-        guard let type = HKObjectType.quantityType(forIdentifier: id) else { return nil }
-        return await withCheckedContinuation { continuation in
-            let sort = NSSortDescriptor(key: HKSampleSortIdentifierEndDate, ascending: false)
-            let query = HKSampleQuery(sampleType: type, predicate: nil, limit: 1, sortDescriptors: [sort]) { _, samples, _ in
-                let value = (samples?.first as? HKQuantitySample)?.quantity.doubleValue(for: unit)
-                continuation.resume(returning: value)
-            }
-            store.execute(query)
+    func weightHistory(days: Int) async -> [WeightEntry] {
+        let start = Date().adding(days: -days)
+        let predicate = HKQuery.predicateForSamples(withStart: start, end: Date())
+        let descriptor = HKSampleQueryDescriptor(
+            predicates: [.quantitySample(type: HKQuantityType(.bodyMass), predicate: predicate)],
+            sortDescriptors: [SortDescriptor(\.endDate)]
+        )
+        guard let samples = try? await descriptor.result(for: store) else { return [] }
+        return samples.map {
+            WeightEntry(date: $0.endDate, kilograms: $0.quantity.doubleValue(for: .gramUnit(with: .kilo)), source: .health)
         }
     }
 
-    /// Reads today's active energy burned (kcal). Returns nil if unauthorized/unavailable.
-    func todayActiveEnergyKcal() async -> Int? {
-        guard let type = HKObjectType.quantityType(forIdentifier: .activeEnergyBurned) else { return nil }
-        let start = Calendar.current.startOfDay(for: Date())
-        let predicate = HKQuery.predicateForSamples(withStart: start, end: Date(), options: .strictStartDate)
+    func activeEnergyToday() async -> Int? {
+        let predicate = HKQuery.predicateForSamples(withStart: Calendar.current.startOfDay(for: Date()), end: Date())
+        let descriptor = HKStatisticsQueryDescriptor(
+            predicate: .quantitySample(type: HKQuantityType(.activeEnergyBurned), predicate: predicate),
+            options: .cumulativeSum
+        )
+        guard let stats = try? await descriptor.result(for: store),
+              let sum = stats.sumQuantity() else { return nil }
+        return Int(sum.doubleValue(for: .kilocalorie()).rounded())
+    }
 
-        return await withCheckedContinuation { continuation in
-            let query = HKStatisticsQuery(quantityType: type, quantitySamplePredicate: predicate,
-                                          options: .cumulativeSum) { _, stats, _ in
-                let kcal = stats?.sumQuantity()?.doubleValue(for: .kilocalorie())
-                continuation.resume(returning: kcal.map { Int($0.rounded()) })
-            }
-            store.execute(query)
+    /// Writes (or overwrites, via sync identifiers) the meal's energy and macros.
+    func saveMeal(_ meal: LoggedMeal) async throws {
+        let version = Int(Date().timeIntervalSince1970)
+        let samples: [HKQuantitySample] = Self.dietaryTypes.map { id, unit, value in
+            HKQuantitySample(
+                type: HKQuantityType(id),
+                quantity: HKQuantity(unit: unit, doubleValue: Double(meal[keyPath: value])),
+                start: meal.timestamp, end: meal.timestamp,
+                metadata: [
+                    HKMetadataKeyFoodType: meal.name,
+                    HKMetadataKeySyncIdentifier: "\(meal.id.uuidString).\(id.rawValue)",
+                    HKMetadataKeySyncVersion: version,
+                    Self.mealIDKey: meal.id.uuidString
+                ]
+            )
         }
+        try await store.save(samples)
+    }
+
+    func deleteMeal(id: UUID) async throws {
+        let predicate = HKQuery.predicateForObjects(withMetadataKey: Self.mealIDKey, allowedValues: [id.uuidString])
+        for (type, _, _) in Self.dietaryTypes {
+            _ = try await store.deleteObjects(of: HKQuantityType(type), predicate: predicate)
+        }
+    }
+
+    private func latestValue(_ id: HKQuantityTypeIdentifier, unit: HKUnit) async -> Double? {
+        let descriptor = HKSampleQueryDescriptor(
+            predicates: [.quantitySample(type: HKQuantityType(id))],
+            sortDescriptors: [SortDescriptor(\.endDate, order: .reverse)],
+            limit: 1
+        )
+        return (try? await descriptor.result(for: store))?.first?.quantity.doubleValue(for: unit)
     }
 }

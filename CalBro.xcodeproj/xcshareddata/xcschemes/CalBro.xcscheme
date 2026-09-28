@@ -15,7 +15,7 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "BDE20EFB01D9D57DF7CC44DB"
+               BlueprintIdentifier = "3F607C8C5D713AE20AB332F1"
                BuildableName = "CalBro.app"
                BlueprintName = "CalBro"
                ReferencedContainer = "container:CalBro.xcodeproj">
@@ -32,7 +32,7 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "BDE20EFB01D9D57DF7CC44DB"
+            BlueprintIdentifier = "3F607C8C5D713AE20AB332F1"
             BuildableName = "CalBro.app"
             BlueprintName = "CalBro"
             ReferencedContainer = "container:CalBro.xcodeproj">
@@ -44,7 +44,7 @@
             parallelizable = "NO">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "EABEF9A6CC950A1AD42B020A"
+               BlueprintIdentifier = "1A8D79F7227161A20F0E680F"
                BuildableName = "CalBroTests.xctest"
                BlueprintName = "CalBroTests"
                ReferencedContainer = "container:CalBro.xcodeproj">
@@ -68,7 +68,7 @@
          runnableDebuggingMode = "0">
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "BDE20EFB01D9D57DF7CC44DB"
+            BlueprintIdentifier = "3F607C8C5D713AE20AB332F1"
             BuildableName = "CalBro.app"
             BlueprintName = "CalBro"
             ReferencedContainer = "container:CalBro.xcodeproj">
@@ -87,7 +87,7 @@
          runnableDebuggingMode = "0">
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "BDE20EFB01D9D57DF7CC44DB"
+            BlueprintIdentifier = "3F607C8C5D713AE20AB332F1"
             BuildableName = "CalBro.app"
             BlueprintName = "CalBro"
             ReferencedContainer = "container:CalBro.xcodeproj">

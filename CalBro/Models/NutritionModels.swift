@@ -17,26 +17,32 @@ enum NutritionColorKey: String, Equatable {
     case ink
 }
 
-struct Micronutrient: Identifiable, Equatable {
-    let id = UUID()
-    let name: String
-    let value: String
-    let target: String
-    let progress: Double
-    let colorKey: NutritionColorKey
-}
-
 struct DailyNutrition: Equatable {
-    var caloriesConsumed: Int
+    var totals: DayTotals
     var calorieTarget: Int
-    var macros: [Macro]
-    var micronutrients: [Micronutrient]
+    var proteinTarget: Int
+    var carbTarget: Int
+    var fatTarget: Int
 
-    var remainingCalories: Int {
-        max(calorieTarget - caloriesConsumed, 0)
-    }
+    var caloriesConsumed: Int { totals.calories }
+    var remainingCalories: Int { max(calorieTarget - caloriesConsumed, 0) }
+    var overCalories: Int { max(caloriesConsumed - calorieTarget, 0) }
 
     var calorieProgress: Double {
-        min(Double(caloriesConsumed) / Double(calorieTarget), 1.2)
+        min(Double(caloriesConsumed) / Double(max(calorieTarget, 1)), 1.2)
+    }
+
+    var macros: [Macro] {
+        [
+            Macro(id: "protein", label: String(localized: "Protein"),
+                  value: NutritionFormat.grams(totals.protein),
+                  progress: Double(totals.protein) / Double(max(1, proteinTarget)), colorKey: .plum),
+            Macro(id: "carbs", label: String(localized: "Carbs"),
+                  value: NutritionFormat.grams(totals.carbs),
+                  progress: Double(totals.carbs) / Double(max(1, carbTarget)), colorKey: .ocean),
+            Macro(id: "fat", label: String(localized: "Fat"),
+                  value: NutritionFormat.grams(totals.fat),
+                  progress: Double(totals.fat) / Double(max(1, fatTarget)), colorKey: .gold)
+        ]
     }
 }

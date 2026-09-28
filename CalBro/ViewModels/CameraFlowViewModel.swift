@@ -13,83 +13,61 @@ enum CapturePhase: Equatable {
 @Observable
 final class CameraFlowViewModel {
     private(set) var phase: CapturePhase = .scanning
-    private(set) var tiltDegrees: Double = 45.0
+    private(set) var guidance = CaptureGuidance(tiltDegrees: 90, heightCm: nil)
+    private(set) var hasTiltReading = false
     private(set) var aimingProgress: Double = 0.0
-    /// Measured height above surface in cm (nil = depth unavailable on this device)
-    private(set) var heightCm: Double? = nil
 
-    var result: FoodRecognitionResult?
-    var capturedImageData: Data?
+    private(set) var result: FoodRecognitionResult?
+    private(set) var capturedImageData: Data?
+    /// Set when a capture fails; the result sheet is never shown in that case.
     var errorMessage: String?
 
-    private let motionService = CMMotionMeasurementService()
+    private let tilt = TiltSensor()
     private let recognitionService: FoodRecognitionService
     private let mealStore: MealLogStore
-
     private var countdownTask: Task<Void, Never>?
 
-    /// Tilt angle threshold for overhead detection (degrees from straight-down)
-    static let overheadThreshold: Double = 28
-    /// Acceptable height range for capture (cm) — tight 27–34 cm band to match DPF training distribution
-    static let heightRange: ClosedRange<Double> = 27...34
-
-    init(
-        recognitionService: FoodRecognitionService? = nil,
-        mealStore: MealLogStore = .shared
-    ) {
+    init(recognitionService: FoodRecognitionService? = nil, mealStore: MealLogStore = .shared) {
         #if targetEnvironment(simulator)
-        self.recognitionService = recognitionService ?? MockFoodRecognitionService()
+        self.recognitionService = recognitionService ?? SimulatorSampleRecognitionService()
         #else
         self.recognitionService = recognitionService ?? DPFFoodRecognitionService()
         #endif
         self.mealStore = mealStore
     }
 
-    // MARK: - Ready check
+    var tiltDegrees: Double { guidance.tiltDegrees }
+    var heightCm: Double? { guidance.heightCm }
 
-    /// True when both tilt AND height (if available) are within acceptable range.
-    var isReadyToAim: Bool {
-        guard tiltDegrees < Self.overheadThreshold else { return false }
-        if let h = heightCm {
-            return Self.heightRange.contains(h)
-        }
-        return true   // no depth sensor — gate on tilt only
-    }
-
-    /// True during countdown if phone has moved too far out of alignment.
+    /// Countdown tolerates a little drift before giving up.
     private var countdownShouldCancel: Bool {
-        if tiltDegrees > Self.overheadThreshold + 15 { return true }
-        // Cancel if height drifts outside a relaxed range during countdown
-        if let h = heightCm, (h < 22 || h > 40) { return true }
+        if guidance.tiltDegrees > CaptureGuidance.overheadThreshold + 15 { return true }
+        if let h = guidance.heightCm, h < 22 || h > 40 { return true }
         return false
     }
 
-    // MARK: - Main guidance loop
+    // MARK: - Guidance loop
 
     func run(camera: CameraCaptureController) async {
+        recognitionService.warmUp()
+        tilt.start()
+        defer { tilt.stop() }
         while !Task.isCancelled {
-            let g = await motionService.currentGuidance()
-            tiltDegrees = g.tiltDegrees
-            heightCm = camera.currentHeightCm
+            if let degrees = tilt.tiltDegrees {
+                hasTiltReading = true
+                guidance.tiltDegrees = degrees
+            }
+            guidance.heightCm = camera.currentHeightCm
 
             switch phase {
             case .scanning:
-                if isReadyToAim { enterAiming(camera: camera) }
-
+                if hasTiltReading, camera.status.canCapture, errorMessage == nil, guidance.isReady {
+                    enterAiming(camera: camera)
+                }
             case .aiming:
-                if !isReadyToAim {
-                    cancelCountdown()
-                    aimingProgress = 0
-                    phase = .scanning
-                }
-
+                if !guidance.isReady { backToScanning() }
             case .countdown:
-                if countdownShouldCancel {
-                    cancelCountdown()
-                    aimingProgress = 0
-                    phase = .scanning
-                }
-
+                if countdownShouldCancel { backToScanning() }
             case .processing, .result:
                 break
             }
@@ -99,15 +77,14 @@ final class CameraFlowViewModel {
         }
     }
 
-    // MARK: - Manual shutter
+    // MARK: - Actions
 
     func manualCapture(camera: CameraCaptureController) {
         guard phase == .scanning || phase == .aiming else { return }
         cancelCountdown()
+        errorMessage = nil
         Task { await doCapture(camera: camera) }
     }
-
-    // MARK: - Result actions
 
     func addToLog(multiplier: Double) {
         guard let r = result else { return }
@@ -122,21 +99,28 @@ final class CameraFlowViewModel {
 
     func dismissResult() { reset() }
 
+    func dismissError() { errorMessage = nil }
+
     // MARK: - Private
+
+    private func backToScanning() {
+        cancelCountdown()
+        aimingProgress = 0
+        phase = .scanning
+    }
 
     private func enterAiming(camera: CameraCaptureController) {
         guard phase == .scanning else { return }
         phase = .aiming
         aimingProgress = 0
         countdownTask = Task { @MainActor [weak self] in
-            guard let self else { return }
             let steps = 50
             for i in 0...steps {
-                guard !Task.isCancelled else { return }
+                guard !Task.isCancelled, let self else { return }
                 self.aimingProgress = Double(i) / Double(steps)
                 try? await Task.sleep(for: .milliseconds(50))
             }
-            guard !Task.isCancelled, self.phase == .aiming else { return }
+            guard !Task.isCancelled, let self, self.phase == .aiming else { return }
             for n in [3, 2, 1] {
                 guard !Task.isCancelled else { return }
                 self.phase = .countdown(n)
@@ -156,16 +140,19 @@ final class CameraFlowViewModel {
     private func doCapture(camera: CameraCaptureController) async {
         phase = .processing
         UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
-        let imageData: Data? = camera.status.canCapture
-            ? (try? await camera.capturePhotoData()) : nil
+        let frameGuidance = guidance
+        let imageData = try? await camera.capturePhotoData()
         capturedImageData = imageData
         do {
-            result = try await recognitionService.recognizeFood(from: imageData,
-                                                                guidance: .captureReadyMock)
+            result = try await recognitionService.recognizeFood(from: imageData, guidance: frameGuidance)
             phase = .result
         } catch {
-            errorMessage = "Recognition failed"
+            result = nil
+            errorMessage = (error as? LocalizedError)?.errorDescription
+                ?? String(localized: "The estimate failed on this photo. Try again from straight above.")
+            aimingProgress = 0
             phase = .scanning
+            UINotificationFeedbackGenerator().notificationOccurred(.error)
         }
     }
 

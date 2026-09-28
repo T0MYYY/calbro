@@ -1,54 +1,91 @@
 import SwiftUI
+import WidgetKit
 
 struct HealthKitSyncView: View {
-    @Bindable var viewModel: IntegrationViewModel
+    let viewModel: IntegrationViewModel
+    @Environment(\.openURL) private var openURL
 
     var body: some View {
         VStack(spacing: 0) {
-            NavHeader(title: "Integrations", showsBack: true)
+            NavHeader("Health & reminders", showsBack: true)
             ScrollView {
                 VStack(alignment: .leading, spacing: 16) {
                     CBCard(background: CBColors.bgSoft) {
-                        VStack(alignment: .leading, spacing: 12) {
-                            HStack(spacing: 14) {
-                                HatchPlaceholder(label: "HK")
-                                    .frame(width: 48, height: 48)
-                                VStack(alignment: .leading, spacing: 3) {
-                                    Text("Apple Health")
-                                        .font(CBTypography.body(17, weight: .bold))
-                                    Text(viewModel.healthConnected ? "Connected" : viewModel.healthStatusText)
-                                        .font(CBTypography.body(13, weight: .semibold))
-                                        .foregroundStyle(viewModel.healthConnected ? CBColors.sage : CBColors.terra)
-                                }
-                                Spacer()
-                                Toggle("", isOn: Binding(
-                                    get: { viewModel.healthConnected },
-                                    set: { _ in Task { await viewModel.toggleHealthConnected() } }
-                                ))
-                                .labelsHidden()
-                                .tint(CBColors.terra)
+                        HStack(spacing: 14) {
+                            Image(systemName: "heart.fill")
+                                .font(.system(size: 22, weight: .semibold))
+                                .foregroundStyle(.white)
+                                .frame(width: 48, height: 48)
+                                .background(Color.pink, in: RoundedRectangle(cornerRadius: 12, style: .continuous))
+                                .accessibilityHidden(true)
+                            VStack(alignment: .leading, spacing: 3) {
+                                Text("Apple Health").font(CBTypography.body(17, weight: .bold))
+                                Text(healthStatus)
+                                    .font(CBTypography.body(13, weight: .semibold))
+                                    .foregroundStyle(viewModel.healthError == nil ? CBColors.inkMid : CBColors.terra)
                             }
-                            Text("Exercise burn syncs automatically to your daily calorie budget.")
-                                .font(CBTypography.body(14))
-                                .foregroundStyle(CBColors.inkMid)
+                            Spacer()
+                            if viewModel.isWorking { ProgressView() }
                         }
                     }
 
-                    SectionLabel("Read from Health")
+                    SectionLabel("Apple Health")
                     VStack(spacing: 0) {
-                        ForEach(viewModel.healthMetrics) { setting in
-                            ToggleRow(title: setting.id.rawValue, subtitle: setting.subtitle, isOn: setting.isEnabled) {
-                                viewModel.toggleMetric(setting.id)
-                            }
+                        ToggleRow(title: "Body measurements",
+                                  subtitle: "Imports weight, height, age and sex, plus weight history",
+                                  isOn: viewModel.health.readBody) { on in
+                            Task { await viewModel.setReadBody(on) }
+                        }
+                        ToggleRow(title: "Active energy",
+                                  subtitle: "Replaces the activity estimate in today's budget with calories burned",
+                                  isOn: viewModel.health.useActiveEnergy) { on in
+                            Task { await viewModel.setUseActiveEnergy(on) }
+                        }
+                        ToggleRow(title: "Save meals to Health",
+                                  subtitle: "Writes the energy, protein, carbs and fat of each meal you log",
+                                  isOn: viewModel.health.writeMeals) { on in
+                            Task { await viewModel.setWriteMeals(on) }
+                        }
+                    }
+                    .disabled(viewModel.isWorking || !viewModel.isHealthAvailable)
+
+                    if viewModel.health.readBody {
+                        Button("Import now") { Task { await viewModel.importBodyData() } }
+                            .font(CBTypography.body(14, weight: .semibold))
+                            .foregroundStyle(CBColors.terra)
+                    }
+
+                    SectionLabel("Reminders")
+                    VStack(spacing: 0) {
+                        ToggleRow(title: "Meal reminder",
+                                  subtitle: "Only if nothing is logged by then",
+                                  isOn: viewModel.reminders.mealReminderEnabled) { on in
+                            Task { await viewModel.setMealReminder(on) }
+                        }
+                        if viewModel.reminders.mealReminderEnabled {
+                            DatePicker("Time",
+                                       selection: Binding(get: { viewModel.mealReminderTime },
+                                                          set: { date in Task { await viewModel.setMealReminderTime(date) } }),
+                                       displayedComponents: .hourAndMinute)
+                                .font(CBTypography.body(15))
+                                .padding(.vertical, 8)
+                        }
+                        ToggleRow(title: "Calorie warning",
+                                  subtitle: "Alerts once a day at 90% of your target",
+                                  isOn: viewModel.reminders.calorieWarningEnabled) { on in
+                            Task { await viewModel.setCalorieWarning(on) }
                         }
                     }
 
-                    SectionLabel("Smart Reminders")
-                    VStack(spacing: 0) {
-                        ForEach(viewModel.reminders) { reminder in
-                            ToggleRow(title: reminder.id.rawValue, subtitle: reminder.detail, isOn: reminder.isEnabled) {
-                                Task { await viewModel.toggleReminder(reminder.id) }
+                    if viewModel.notificationPermission == .denied {
+                        VStack(alignment: .leading, spacing: 6) {
+                            Text("Notifications are turned off for CalBro.")
+                                .font(CBTypography.body(13)).foregroundStyle(CBColors.terra)
+                            Button("Open Settings") {
+                                if let url = URL(string: UIApplication.openSettingsURLString) { openURL(url) }
                             }
+                            .font(CBTypography.body(14, weight: .semibold))
+                            .foregroundStyle(CBColors.terra)
                         }
                     }
                 }
@@ -60,106 +97,29 @@ struct HealthKitSyncView: View {
         .navigationBarBackButtonHidden()
         .edgeSwipeBackEnabled()
     }
-}
 
-struct WidgetPreviewView: View {
-    @Bindable var viewModel: IntegrationViewModel
-    @State private var snapshot: WidgetNutritionSnapshot = .empty()
-
-    private var caloriesText: String { snapshot.caloriesConsumed.formatted() }
-    private var pctText: String { "\(Int((snapshot.progress * 100).rounded()))%" }
-
-    var body: some View {
-        VStack(spacing: 0) {
-            NavHeader(title: "Widgets", showsBack: true)
-            ScrollView {
-                VStack(alignment: .leading, spacing: 20) {
-                    Text("Add these from the Home Screen: long-press → + → search “CalBro”.")
-                        .font(CBTypography.body(13))
-                        .foregroundStyle(CBColors.inkMid)
-
-                    SectionLabel("Lock Screen")
-                    HStack(spacing: 10) {
-                        LockWidgetCard(title: "Calories", value: caloriesText,
-                                       subtitle: "of \(snapshot.calorieTarget.formatted()) kcal", showBar: true,
-                                       progress: snapshot.progress)
-                        LockWidgetCard(title: "Macros", value: "P \(snapshot.protein)g",
-                                       subtitle: "C \(snapshot.carbs)g · F \(snapshot.fat)g", showBar: false,
-                                       progress: snapshot.progress)
-                    }
-                    .padding(16)
-                    .background(Color(hex: 0x111828))
-                    .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
-
-                    SectionLabel("Home Screen")
-                    VStack {
-                        VStack(spacing: 12) {
-                            HStack {
-                                VStack(alignment: .leading, spacing: 2) {
-                                    Text("Today")
-                                        .font(CBTypography.body(12))
-                                        .foregroundStyle(Color.white.opacity(0.45))
-                                    Text(caloriesText)
-                                        .font(CBTypography.display(26))
-                                        .foregroundStyle(.white)
-                                    Text("\(snapshot.remaining) kcal left")
-                                        .font(CBTypography.body(13))
-                                        .foregroundStyle(Color.white.opacity(0.45))
-                                }
-                                Spacer()
-                                CalorieRing(progress: snapshot.progress, label: pctText, subtitle: "", size: 64, stroke: 7, color: CBColors.terra, display: false)
-                            }
-                            HStack(spacing: 6) {
-                                WidgetMacro(label: "P", value: "\(snapshot.protein)g", color: CBColors.plum)
-                                WidgetMacro(label: "C", value: "\(snapshot.carbs)g", color: CBColors.ocean)
-                                WidgetMacro(label: "F", value: "\(snapshot.fat)g", color: CBColors.gold)
-                            }
-                        }
-                        .padding(16)
-                        .background(Color.white.opacity(0.08))
-                        .overlay(RoundedRectangle(cornerRadius: 18).stroke(Color.white.opacity(0.12), lineWidth: 1))
-                        .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
-                    }
-                    .padding(16)
-                    .background(Color(hex: 0x111828))
-                    .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
-                }
-                .padding(.horizontal, CBSpacing.page)
-                .padding(.bottom, 96)
-            }
+    private var healthStatus: String {
+        if let error = viewModel.healthError { return error }
+        if !viewModel.isHealthAvailable { return String(localized: "Not available on this device") }
+        guard viewModel.health.anyEnabled else { return String(localized: "Off") }
+        if viewModel.health.useActiveEnergy, let kcal = viewModel.todayActiveEnergy {
+            return String(localized: "On · \(NutritionFormat.kcal(kcal)) burned today")
         }
-        .background(CBColors.bg)
-        .navigationBarBackButtonHidden()
-        .edgeSwipeBackEnabled()
-        .task {
-            snapshot = SharedNutritionStore.load()
-            await viewModel.refreshWidgets()
+        if let date = viewModel.lastHealthImport {
+            return String(localized: "On · imported \(date.formatted(.relative(presentation: .named)))")
         }
-    }
-}
-
-private struct SectionLabel: View {
-    let text: String
-
-    init(_ text: String) {
-        self.text = text
-    }
-
-    var body: some View {
-        Text(text.uppercased())
-            .font(CBTypography.body(12, weight: .medium))
-            .foregroundStyle(CBColors.inkMid)
+        return String(localized: "On")
     }
 }
 
 private struct ToggleRow: View {
-    let title: String
-    let subtitle: String
+    let title: LocalizedStringKey
+    let subtitle: LocalizedStringKey
     let isOn: Bool
-    let action: () -> Void
+    let onChange: (Bool) -> Void
 
     var body: some View {
-        HStack {
+        Toggle(isOn: Binding(get: { isOn }, set: { onChange($0) })) {
             VStack(alignment: .leading, spacing: 2) {
                 Text(title)
                     .font(CBTypography.body(16, weight: .medium))
@@ -168,15 +128,9 @@ private struct ToggleRow: View {
                     .font(CBTypography.body(13))
                     .foregroundStyle(CBColors.inkMid)
             }
-            Spacer()
-            Toggle("", isOn: Binding(
-                get: { isOn },
-                set: { _ in action() }
-            ))
-            .labelsHidden()
-            .toggleStyle(.switch)
-            .tint(CBColors.terra)
         }
+        .toggleStyle(.switch)
+        .tint(CBColors.terra)
         .padding(.vertical, 13)
         .overlay(alignment: .bottom) {
             Rectangle().fill(CBColors.inkLine).frame(height: 1)
@@ -184,54 +138,63 @@ private struct ToggleRow: View {
     }
 }
 
-private struct LockWidgetCard: View {
-    let title: String
-    let value: String
-    let subtitle: String
-    let showBar: Bool
-    var progress: Double = 0.69
+// MARK: - Widgets
+
+/// Renders the real widget views with today's data.
+struct WidgetPreviewView: View {
+    @State private var snapshot: WidgetNutritionSnapshot = .empty()
+    private let mealStore = MealLogStore.shared
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 4) {
-            Text(title)
-                .font(CBTypography.body(11))
-                .foregroundStyle(Color.white.opacity(0.5))
-            Text(value)
-                .font(showBar ? CBTypography.display(22) : CBTypography.body(15, weight: .bold))
-                .foregroundStyle(.white)
-            Text(subtitle)
-                .font(CBTypography.body(10))
-                .foregroundStyle(Color.white.opacity(0.4))
-            if showBar {
-                ProgressBar(progress: progress, color: CBColors.terra, height: 4)
-                    .padding(.top, 2)
+        VStack(spacing: 0) {
+            NavHeader("Widgets", showsBack: true)
+            ScrollView {
+                VStack(alignment: .leading, spacing: 20) {
+                    Text("Touch and hold the Home Screen, tap Edit › Add Widget, then search for CalBro.")
+                        .font(CBTypography.body(13))
+                        .foregroundStyle(CBColors.inkMid)
+
+                    SectionLabel("Lock Screen")
+                    HStack(spacing: 18) {
+                        NutritionWidgetFace(family: .accessoryCircular, snapshot: snapshot)
+                            .frame(width: 72, height: 72)
+                        NutritionWidgetFace(family: .accessoryRectangular, snapshot: snapshot)
+                            .frame(width: 170, height: 72, alignment: .leading)
+                    }
+                    .foregroundStyle(.white)
+                    .environment(\.colorScheme, .dark)
+                    .padding(16)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .background(Color(hex: 0x1b2438))
+                    .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
+
+                    SectionLabel("Home Screen")
+                    HStack(alignment: .top, spacing: 14) {
+                        widgetTile(.systemSmall, width: 158)
+                        Spacer(minLength: 0)
+                    }
+                    widgetTile(.systemMedium, width: nil)
+                }
+                .padding(.horizontal, CBSpacing.page)
+                .padding(.bottom, 96)
             }
         }
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .padding(12)
-        .background(Color.white.opacity(0.08))
-        .overlay(RoundedRectangle(cornerRadius: 14).stroke(Color.white.opacity(0.12), lineWidth: 1))
-        .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
-    }
-}
-
-private struct WidgetMacro: View {
-    let label: String
-    let value: String
-    let color: Color
-
-    var body: some View {
-        VStack(spacing: 1) {
-            Text(value)
-                .font(CBTypography.body(14, weight: .bold))
-                .foregroundStyle(color)
-            Text(label)
-                .font(CBTypography.body(10))
-                .foregroundStyle(Color.white.opacity(0.4))
+        .background(CBColors.bg)
+        .navigationBarBackButtonHidden()
+        .edgeSwipeBackEnabled()
+        .task(id: mealStore.totalsForToday()) {
+            mealStore.syncWidget()
+            snapshot = SharedNutritionStore.load()
         }
-        .frame(maxWidth: .infinity)
-        .padding(.vertical, 6)
-        .background(color.opacity(0.14))
-        .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
+    }
+
+    private func widgetTile(_ family: WidgetFamily, width: CGFloat?) -> some View {
+        NutritionWidgetFace(family: family, snapshot: snapshot)
+            .padding(16)
+            .frame(width: width, height: 158)
+            .frame(maxWidth: width == nil ? .infinity : nil)
+            .background(WidgetPalette.card)
+            .clipShape(RoundedRectangle(cornerRadius: 22, style: .continuous))
+            .accessibilityElement(children: .combine)
     }
 }

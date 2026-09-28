@@ -7,444 +7,440 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		020D87DD32F05D45E392CF95 /* IntegrationModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7D2BEEE28ED1B9605B38B13D /* IntegrationModels.swift */; };
-		09E5C66C5E86F034F08E07E4 /* NutritionDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6A6BE5441347FE8D296B4B2B /* NutritionDetailView.swift */; };
-		0D90F0BDAE1E8CE86B10331D /* RootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C90D5B1AEF54202B352ECE4F /* RootView.swift */; };
-		0EC7E7B62D85BEB65324CC3D /* HealthKitSyncService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 334988098DA00198B63D28B2 /* HealthKitSyncService.swift */; };
-		1339A7710BD6C8293C6726AF /* CBGlass.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8DD5B3A404976A8B97C4DDF6 /* CBGlass.swift */; };
-		137A5E455E35374FE6BDCEA7 /* ImagePreprocessing.swift in Sources */ = {isa = PBXBuildFile; fileRef = D000CAB4EF39FC1C1924B013 /* ImagePreprocessing.swift */; };
-		14CFA924F6B4494A87BE1D5D /* NutritionViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0926F838E5D0702C86E86454 /* NutritionViewModel.swift */; };
-		19B497BDA1AC831C11BA0E77 /* AppChromeComponents.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7BF2AB04A1E4636D4D6B517 /* AppChromeComponents.swift */; };
-		1A3D0E724C29BAB21AB4FB82 /* FoodRecognitionService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7840D551DC640E4BE5C79B0E /* FoodRecognitionService.swift */; };
-		1B034B50F6D70686E0F7A2E4 /* CameraFlowViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15047B1B3BF33319D20025A7 /* CameraFlowViewModel.swift */; };
-		1E9F04DDCCD70E34F0AAEE49 /* CameraModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16AEBDB418892382D21B1F84 /* CameraModels.swift */; };
-		2211B4F99B39DDF3908CE5F7 /* CameraCaptureController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A52F81D9446C6629F08F1B48 /* CameraCaptureController.swift */; };
-		2660E372EF56DDC2367C61FB /* MealLogStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF395FDCD40C551D02293EE7 /* MealLogStore.swift */; };
-		2B68D31B3F67C09CF7545E29 /* CameraFlowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B11BD6766D3BE62245E7B87F /* CameraFlowView.swift */; };
-		2E1F2970132EA39A4E066627 /* CalendarViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B8273DF98DEBABBDC797414 /* CalendarViewModel.swift */; };
-		2EEFB61B761139488E2866B2 /* CalBroApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = F2A463053241DC77C304C529 /* CalBroApp.swift */; };
-		386ED210322B1955E5DD3DF7 /* UserProfile.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E1B1AC3A59AB575BA4E6680 /* UserProfile.swift */; };
-		39E668E6FB1788BF5875D93A /* OnboardingFlowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 372B754A2426A5BE3D91DBA9 /* OnboardingFlowView.swift */; };
-		3B56D9F6BF8D32BE27040E7E /* CalBroStateTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A68CE2E897C821C18C910B09 /* CalBroStateTests.swift */; };
-		44CAB532402179D2D98D079B /* DashboardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EC3B1938A40ED2D03C8051B3 /* DashboardView.swift */; };
-		45D37C37801B48C82128C2FF /* LoggedMeal.swift in Sources */ = {isa = PBXBuildFile; fileRef = B682364B0AAB5944D06AAFA2 /* LoggedMeal.swift */; };
-		4678B5EBC088C13BADC5BADB /* StatsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B7C9DF1D9C0B8263A9D0D4C /* StatsViewModel.swift */; };
-		586270989EBC0D6BD37803BA /* AppNavigationViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1AE5EF49A0125C56D55E15A /* AppNavigationViewModel.swift */; };
-		5E8C6F75C4D9F4FBB61DBBCF /* CBComponents.swift in Sources */ = {isa = PBXBuildFile; fileRef = 773477D45A849EB3817EC32F /* CBComponents.swift */; };
-		615198AB79D0C14A8857954E /* NutritionPredictionModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9BB47C770C505F4FAB41C74A /* NutritionPredictionModels.swift */; };
-		6C2356D3A19A74C79906C2A7 /* Models in Resources */ = {isa = PBXBuildFile; fileRef = 2650A7C30BECFBB599F21C2C /* Models */; };
-		6C81ACD99F56C11C7A7889BB /* CBTypography.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2267F7F799B12DF251C63DB5 /* CBTypography.swift */; };
-		79312819784EA4758E897C2A /* CameraPreviewView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 103C1434CA33AAA8F861B396 /* CameraPreviewView.swift */; };
-		8049D03FF832E8189F9B2167 /* OnboardingViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 405C14F9E7D01732E8E3D2F4 /* OnboardingViewModel.swift */; };
-		81765B44BBC19A0FBBE75F41 /* ARMeasurementService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7A7407960BB589F8D5C44FA1 /* ARMeasurementService.swift */; };
-		82307300E41312004AF24DFB /* NutritionPredictionService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1482E1470F1C31CFE5468E77 /* NutritionPredictionService.swift */; };
-		8709D64E934E3CECE23F2FE9 /* StatsViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = 844134BB0DC7339EE1818F8C /* StatsViews.swift */; };
-		90FEB27BDD7744CBF461F994 /* CBSpacing.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7F6B4D5288A878CE9C4407CE /* CBSpacing.swift */; };
-		917AAFFD3898C9F31815404D /* StatsModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E8A43ADDA2FB4B3006A36AA /* StatsModels.swift */; };
-		9534698D53F3A0BB1DD2F4E0 /* WidgetPreviewService.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0EE831FA0F762BCD9AD33DA /* WidgetPreviewService.swift */; };
-		9B4EDC7929739FCDC463A0B0 /* MainTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE07DBC8D4903BAF280843F2 /* MainTabView.swift */; };
-		A597436E0940318ED6264549 /* DashboardViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F7427980A6786F4BBA603E2 /* DashboardViewModel.swift */; };
-		A89207019FC25072F33D0B6D /* NutritionModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 667ACFB5A0F7997988BA5DBA /* NutritionModels.swift */; };
-		AB89C0353316C79B0EF29F5A /* GoalsViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = 994F39FFE053FFAA49C09F0F /* GoalsViews.swift */; };
-		B187CD0CEAA2698FEA55016B /* ReminderService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 949D8A1276A31992A095D927 /* ReminderService.swift */; };
-		BE24F0798EEABDFD1FFB2279 /* AppStateStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BDE612553FE7D4ABBF37970 /* AppStateStore.swift */; };
-		C05FB0136E83495F13114F08 /* GoalsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 22A63FE3C4DCBE2F6DAC1F98 /* GoalsViewModel.swift */; };
-		C149013CAE7664E6DF772298 /* IntegrationViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB6B1C01E4F71ECB7F2AF045 /* IntegrationViews.swift */; };
-		C177B0B33068A5B98954C018 /* CBColors.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7D13DB2C948D8AF329941E15 /* CBColors.swift */; };
-		C2A33C9BA7809CAD99BE1B95 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 212E93C1DA1C3C58463EC0A4 /* Assets.xcassets */; };
-		DF953B605094355A82831969 /* GoalModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86932842D7A46A9B8A93D7C1 /* GoalModels.swift */; };
-		E163BBA86252FC0648BB5588 /* MealModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8281DC81477D006AFE3E342 /* MealModels.swift */; };
-		E390B4EDD29D0ABB4DC11127 /* IntegrationViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4365E5332BAD969C2E25682F /* IntegrationViewModel.swift */; };
-		EB47B1FF280E26DA6CCF460A /* CalendarMonthView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6CF623274912AFBED3155CC5 /* CalendarMonthView.swift */; };
-		F8D939DA02A384E57A49EC9B /* PredictionService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C0D3FEDE00EFEBC7A40D1DE /* PredictionService.swift */; };
-		AA0000000000000000000001 /* SharedNutrition.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000005 /* SharedNutrition.swift */; };
-		AA0000000000000000000002 /* SharedNutrition.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000005 /* SharedNutrition.swift */; };
-		AA0000000000000000000003 /* CalBroWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000007 /* CalBroWidget.swift */; };
-		AA0000000000000000000004 /* CalBroWidgetExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = AA000000000000000000000A /* CalBroWidgetExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		011CF5C7F659B0138A4AF123 /* OnboardingFlowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6DAFC5195E319872E6460D5 /* OnboardingFlowView.swift */; };
+		07BDCEEEF375090AD1AE67BD /* AppChromeComponents.swift in Sources */ = {isa = PBXBuildFile; fileRef = C07D03C2082FE205427400C2 /* AppChromeComponents.swift */; };
+		09366C073054E07809ABF173 /* RootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7ACD4C575D0D98147428A935 /* RootView.swift */; };
+		18D72F9B6947D22620E95FC7 /* OnboardingViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05E76A16CD7FF289117CB94B /* OnboardingViewModel.swift */; };
+		1BF3181F80B656CCF67BE0C6 /* CBGlass.swift in Sources */ = {isa = PBXBuildFile; fileRef = 88585922F7009A277532045F /* CBGlass.swift */; };
+		21B4E63F5F1EC32962790077 /* CameraFlowViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = FE662B2218B82265C3B11DD0 /* CameraFlowViewModel.swift */; };
+		319A668CB9FEE57D26BF0BD2 /* StatsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 777438AE5D72D2201001394C /* StatsViewModel.swift */; };
+		3C37E8AD1A743156EB00C88A /* CalBroWidgetExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = EA1D6D80421E4B502B0264E6 /* CalBroWidgetExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		3E4C97642DFD6FC63EC09DCB /* FoodRecognitionService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E5F8DD8D72204051D158B90E /* FoodRecognitionService.swift */; };
+		46A8E75CB741876A9E9C7012 /* CBComponents.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A56C401FF60ABB1A6CFCFEE /* CBComponents.swift */; };
+		481F91C81574E9E1ABDDAA94 /* NutritionModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4010E8A4A433AB528F573BCF /* NutritionModels.swift */; };
+		5456F251496B56926C298800 /* Models in Resources */ = {isa = PBXBuildFile; fileRef = 2DFB17A86BBB820565CB52DF /* Models */; };
+		55F05BFED6739FDDBC550441 /* InfoPlist.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = 5E8C0FA301B5E664E4968932 /* InfoPlist.xcstrings */; };
+		5D89720E527AA530D76B48DE /* CBSpacing.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1116234547C1E97FB5AD2885 /* CBSpacing.swift */; };
+		700B2F0C0BBEA9E33AC0C7DD /* MealLogStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14EE7C59C77620FCC25C5A74 /* MealLogStore.swift */; };
+		710397093D8E91D073BE8733 /* IntegrationViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 76A767CA7E1EECB7D96E8E1B /* IntegrationViewModel.swift */; };
+		74652C23896FB1EED5E95BDF /* ImagePreprocessing.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B5CC259F8AED318DFA290E7 /* ImagePreprocessing.swift */; };
+		79518D394029620D98C5963D /* GoalsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2EBB45E0ADB25D4B3EB343B6 /* GoalsViewModel.swift */; };
+		7F0ACD0B78EC76FA8DA9786D /* CalendarMonthView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E35D4A465515A450993BFBF5 /* CalendarMonthView.swift */; };
+		893DF7FFEE2E13F6C9328065 /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = 98CE5A5AC813D026AD59C44D /* Localizable.xcstrings */; };
+		8AE29B35E2DC4865D18CF6A0 /* NutritionDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24283EE069337329210F57CA /* NutritionDetailView.swift */; };
+		8C7E8B8F0034FE00CF81A0EF /* GoalModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = F11882A6268CBE9F5019F2B3 /* GoalModels.swift */; };
+		8CD595C8597254C821656E2C /* StatsViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = 732D599F45D1A250670BCEB1 /* StatsViews.swift */; };
+		8F2F6BC25BA4CA7C996DE8EC /* CameraModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = B545CC6E4117E827C016CB90 /* CameraModels.swift */; };
+		93B93400A3AEB167EDD1497D /* CameraFlowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF4EDF2C649454EB516A2EC9 /* CameraFlowView.swift */; };
+		987F5CD363128D555D7C5F21 /* ReminderService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E3C54932F731131DA33974C /* ReminderService.swift */; };
+		9B053DC1CDB43B6BDC51F3FD /* MainTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C29C1E0DAB59FD187663977 /* MainTabView.swift */; };
+		9DB18A6D06A7CE940F03A94C /* NutritionWidgetFace.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8F5A475C8587E03F0E6ED702 /* NutritionWidgetFace.swift */; };
+		9FEE6C2A2ECA971EAF0F2A17 /* AppStateStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D0527119E1F39C35010E3EB /* AppStateStore.swift */; };
+		A4FA5161A20F112CE995194D /* NutritionWidgetFace.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8F5A475C8587E03F0E6ED702 /* NutritionWidgetFace.swift */; };
+		A663916FC2CC88A72E3F7A80 /* SharedNutrition.swift in Sources */ = {isa = PBXBuildFile; fileRef = D06FF6EBE8841945C1EE67CF /* SharedNutrition.swift */; };
+		A7D878220883F4D8C443F677 /* DashboardViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7ED8B7A9F4A7216AE397721 /* DashboardViewModel.swift */; };
+		AF1E08F16F85A6FCCC5EBB69 /* UserProfile.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B3349469F38908D9778D493 /* UserProfile.swift */; };
+		B032C083EC278B382ED3CE94 /* DashboardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B66D0006BDEE0E3223AE636F /* DashboardView.swift */; };
+		B0E2AD090ED81EE2412C4705 /* NutritionFormat.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D21696E55721E69CFD42796 /* NutritionFormat.swift */; };
+		B2C201278CA6ED509A5D4648 /* WeightModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 33FB56F2C327E526E32888B7 /* WeightModels.swift */; };
+		B530C1FD9DDA92AF070A2FE6 /* CalendarViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF7693996927D4F7948BEAD4 /* CalendarViewModel.swift */; };
+		B705FE73646DE93884201EB7 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 593C3C0996404AC7319C576E /* Assets.xcassets */; };
+		B7CA85DC90A235B7E713422B /* CBColors.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0C261E2E261413250726B72 /* CBColors.swift */; };
+		B84176DD32F80180FD89D51C /* NutritionPredictionService.swift in Sources */ = {isa = PBXBuildFile; fileRef = B771EAC117D7037EC455A8BE /* NutritionPredictionService.swift */; };
+		BF59082C21E45ACDD1C56C79 /* CameraPreviewView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 798AA9BCF4F6664E691C7079 /* CameraPreviewView.swift */; };
+		C01918EF0C37551351B53663 /* HealthKitSyncService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05C457DF66749CB33CF2F3CE /* HealthKitSyncService.swift */; };
+		C4A6B5EBB4054E0455793BCE /* CalBroWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 746609762768BF26E6315371 /* CalBroWidget.swift */; };
+		C69AE92322E5BE54CAA0942D /* CBTypography.swift in Sources */ = {isa = PBXBuildFile; fileRef = 87E751885F2D1828D65823AE /* CBTypography.swift */; };
+		C9AF99D507B5513FCD64CD6F /* ProfileStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D6DABD75FD3D634923908E4 /* ProfileStore.swift */; };
+		D0DE00F4BDC91D20D5560930 /* NutritionPredictionModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3244B076E20990AFB0406268 /* NutritionPredictionModels.swift */; };
+		D321E5F14DC438C345D4C0C6 /* SharedNutrition.swift in Sources */ = {isa = PBXBuildFile; fileRef = D06FF6EBE8841945C1EE67CF /* SharedNutrition.swift */; };
+		D7561616919558F0FFF59398 /* NutritionFormat.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D21696E55721E69CFD42796 /* NutritionFormat.swift */; };
+		D7E8ADF6CCA09484F7BA2991 /* StatsModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = E65A4B65961394BB45D9D515 /* StatsModels.swift */; };
+		E315B9F5F6403DCE6554AFC9 /* AppNavigationViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2A09940E9E94031B424F427F /* AppNavigationViewModel.swift */; };
+		E85129210BB96249FB64CF05 /* CalBroApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9786943F843A175132E6274 /* CalBroApp.swift */; };
+		EE573BEC6D53AB1C5FCA09C0 /* IntegrationModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7F5D25EA783A0886648FBF70 /* IntegrationModels.swift */; };
+		F2428C5BC009A2DA412B836A /* LoggedMeal.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15C9B77B2F884ADD4DF6BE1E /* LoggedMeal.swift */; };
+		F3D2009D58B3658BF3C05651 /* GoalsViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9BB31D7B868494BCB2DB7CC6 /* GoalsViews.swift */; };
+		F626966770F18ECEF19A946D /* CameraCaptureController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6FE28B45EA20DA63BE0FFBBD /* CameraCaptureController.swift */; };
+		F796D36AF6E06C917A07B026 /* IntegrationViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = FCC94E06D5FE7625DA3FB7E8 /* IntegrationViews.swift */; };
+		F95727635AB69A6F2E7CD98F /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = 98CE5A5AC813D026AD59C44D /* Localizable.xcstrings */; };
+		FFB44E1F0B142A518D2C4084 /* CalBroStateTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3C1D7E3EF686DFF2B9383CFE /* CalBroStateTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
-		E5F81BE302AE8D32A7887850 /* PBXContainerItemProxy */ = {
+		4E0DBA167B2AAC8C78C2FAF6 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
-			containerPortal = 8C3A5A80619CA54CF69B2EDE /* Project object */;
+			containerPortal = D4DB5577380E7C3FDF5FAF5E /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = BDE20EFB01D9D57DF7CC44DB;
+			remoteGlobalIDString = 3F607C8C5D713AE20AB332F1;
 			remoteInfo = CalBro;
 		};
-		AA0000000000000000000015 /* PBXContainerItemProxy */ = {
+		A59A7CCEA2E032DD4345483D /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
-			containerPortal = 8C3A5A80619CA54CF69B2EDE /* Project object */;
+			containerPortal = D4DB5577380E7C3FDF5FAF5E /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = AA000000000000000000000D;
+			remoteGlobalIDString = 9F9C84ADD1180CB4135B61D1;
 			remoteInfo = CalBroWidgetExtension;
 		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
-		AA000000000000000000000F /* Embed Foundation Extensions */ = {
+		1027E5BDD64D70A1DAB9B099 /* Embed Foundation Extensions */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
 			dstPath = "";
 			dstSubfolderSpec = 13;
 			files = (
-				AA0000000000000000000004 /* CalBroWidgetExtension.appex in Embed Foundation Extensions */,
+				3C37E8AD1A743156EB00C88A /* CalBroWidgetExtension.appex in Embed Foundation Extensions */,
 			);
 			name = "Embed Foundation Extensions";
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXCopyFilesBuildPhase section */
 
-/* Begin PBXFrameworksBuildPhase section */
-		AA0000000000000000000010 /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-/* End PBXFrameworksBuildPhase section */
-
 /* Begin PBXFileReference section */
-		0926F838E5D0702C86E86454 /* NutritionViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NutritionViewModel.swift; sourceTree = "<group>"; };
-		103C1434CA33AAA8F861B396 /* CameraPreviewView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraPreviewView.swift; sourceTree = "<group>"; };
-		1482E1470F1C31CFE5468E77 /* NutritionPredictionService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NutritionPredictionService.swift; sourceTree = "<group>"; };
-		15047B1B3BF33319D20025A7 /* CameraFlowViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraFlowViewModel.swift; sourceTree = "<group>"; };
-		16AEBDB418892382D21B1F84 /* CameraModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraModels.swift; sourceTree = "<group>"; };
-		1E8A43ADDA2FB4B3006A36AA /* StatsModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatsModels.swift; sourceTree = "<group>"; };
-		212E93C1DA1C3C58463EC0A4 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
-		2267F7F799B12DF251C63DB5 /* CBTypography.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CBTypography.swift; sourceTree = "<group>"; };
-		22A63FE3C4DCBE2F6DAC1F98 /* GoalsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoalsViewModel.swift; sourceTree = "<group>"; };
-		2650A7C30BECFBB599F21C2C /* Models */ = {isa = PBXFileReference; lastKnownFileType = folder; name = Models; path = CalBro/Resources/Models; sourceTree = SOURCE_ROOT; };
-		2C0D3FEDE00EFEBC7A40D1DE /* PredictionService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PredictionService.swift; sourceTree = "<group>"; };
-		334988098DA00198B63D28B2 /* HealthKitSyncService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HealthKitSyncService.swift; sourceTree = "<group>"; };
-		372B754A2426A5BE3D91DBA9 /* OnboardingFlowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingFlowView.swift; sourceTree = "<group>"; };
-		38C3A5C54F1626C28F9232BB /* CalBro.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CalBro.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		405C14F9E7D01732E8E3D2F4 /* OnboardingViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingViewModel.swift; sourceTree = "<group>"; };
-		4365E5332BAD969C2E25682F /* IntegrationViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IntegrationViewModel.swift; sourceTree = "<group>"; };
-		4F7427980A6786F4BBA603E2 /* DashboardViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DashboardViewModel.swift; sourceTree = "<group>"; };
-		5BDE612553FE7D4ABBF37970 /* AppStateStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppStateStore.swift; sourceTree = "<group>"; };
-		667ACFB5A0F7997988BA5DBA /* NutritionModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NutritionModels.swift; sourceTree = "<group>"; };
-		6A6BE5441347FE8D296B4B2B /* NutritionDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NutritionDetailView.swift; sourceTree = "<group>"; };
-		6CF623274912AFBED3155CC5 /* CalendarMonthView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarMonthView.swift; sourceTree = "<group>"; };
-		6E1B1AC3A59AB575BA4E6680 /* UserProfile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserProfile.swift; sourceTree = "<group>"; };
-		773477D45A849EB3817EC32F /* CBComponents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CBComponents.swift; sourceTree = "<group>"; };
-		7840D551DC640E4BE5C79B0E /* FoodRecognitionService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FoodRecognitionService.swift; sourceTree = "<group>"; };
-		7A7407960BB589F8D5C44FA1 /* ARMeasurementService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ARMeasurementService.swift; sourceTree = "<group>"; };
-		7B8273DF98DEBABBDC797414 /* CalendarViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarViewModel.swift; sourceTree = "<group>"; };
-		7D13DB2C948D8AF329941E15 /* CBColors.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CBColors.swift; sourceTree = "<group>"; };
-		7D2BEEE28ED1B9605B38B13D /* IntegrationModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IntegrationModels.swift; sourceTree = "<group>"; };
-		7F6B4D5288A878CE9C4407CE /* CBSpacing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CBSpacing.swift; sourceTree = "<group>"; };
-		844134BB0DC7339EE1818F8C /* StatsViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatsViews.swift; sourceTree = "<group>"; };
-		86932842D7A46A9B8A93D7C1 /* GoalModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoalModels.swift; sourceTree = "<group>"; };
-		8B7C9DF1D9C0B8263A9D0D4C /* StatsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatsViewModel.swift; sourceTree = "<group>"; };
-		8DD5B3A404976A8B97C4DDF6 /* CBGlass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CBGlass.swift; sourceTree = "<group>"; };
-		949D8A1276A31992A095D927 /* ReminderService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReminderService.swift; sourceTree = "<group>"; };
-		994F39FFE053FFAA49C09F0F /* GoalsViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoalsViews.swift; sourceTree = "<group>"; };
-		9BB47C770C505F4FAB41C74A /* NutritionPredictionModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NutritionPredictionModels.swift; sourceTree = "<group>"; };
-		A52F81D9446C6629F08F1B48 /* CameraCaptureController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraCaptureController.swift; sourceTree = "<group>"; };
-		A68CE2E897C821C18C910B09 /* CalBroStateTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalBroStateTests.swift; sourceTree = "<group>"; };
-		B0C5FDBFC78C422C5970BBC3 /* CalBroTests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = CalBroTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		B0EE831FA0F762BCD9AD33DA /* WidgetPreviewService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WidgetPreviewService.swift; sourceTree = "<group>"; };
-		B11BD6766D3BE62245E7B87F /* CameraFlowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraFlowView.swift; sourceTree = "<group>"; };
-		B682364B0AAB5944D06AAFA2 /* LoggedMeal.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoggedMeal.swift; sourceTree = "<group>"; };
-		C90D5B1AEF54202B352ECE4F /* RootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootView.swift; sourceTree = "<group>"; };
-		CB6B1C01E4F71ECB7F2AF045 /* IntegrationViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IntegrationViews.swift; sourceTree = "<group>"; };
-		D000CAB4EF39FC1C1924B013 /* ImagePreprocessing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImagePreprocessing.swift; sourceTree = "<group>"; };
-		D8281DC81477D006AFE3E342 /* MealModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MealModels.swift; sourceTree = "<group>"; };
-		E1AE5EF49A0125C56D55E15A /* AppNavigationViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppNavigationViewModel.swift; sourceTree = "<group>"; };
-		E7BF2AB04A1E4636D4D6B517 /* AppChromeComponents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppChromeComponents.swift; sourceTree = "<group>"; };
-		EC3B1938A40ED2D03C8051B3 /* DashboardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DashboardView.swift; sourceTree = "<group>"; };
-		EE07DBC8D4903BAF280843F2 /* MainTabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainTabView.swift; sourceTree = "<group>"; };
-		F2A463053241DC77C304C529 /* CalBroApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalBroApp.swift; sourceTree = "<group>"; };
-		FF395FDCD40C551D02293EE7 /* MealLogStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MealLogStore.swift; sourceTree = "<group>"; };
-		AA0000000000000000000005 /* SharedNutrition.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SharedNutrition.swift; sourceTree = "<group>"; };
-		AA0000000000000000000006 /* CalBro.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = CalBro.entitlements; sourceTree = "<group>"; };
-		AA0000000000000000000007 /* CalBroWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalBroWidget.swift; sourceTree = "<group>"; };
-		AA0000000000000000000008 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		AA0000000000000000000009 /* CalBroWidget.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = CalBroWidget.entitlements; sourceTree = "<group>"; };
-		AA000000000000000000000A /* CalBroWidgetExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = CalBroWidgetExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		05C457DF66749CB33CF2F3CE /* HealthKitSyncService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HealthKitSyncService.swift; sourceTree = "<group>"; };
+		05E76A16CD7FF289117CB94B /* OnboardingViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingViewModel.swift; sourceTree = "<group>"; };
+		0D21696E55721E69CFD42796 /* NutritionFormat.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NutritionFormat.swift; sourceTree = "<group>"; };
+		1116234547C1E97FB5AD2885 /* CBSpacing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CBSpacing.swift; sourceTree = "<group>"; };
+		14EE7C59C77620FCC25C5A74 /* MealLogStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MealLogStore.swift; sourceTree = "<group>"; };
+		15C9B77B2F884ADD4DF6BE1E /* LoggedMeal.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoggedMeal.swift; sourceTree = "<group>"; };
+		1A56C401FF60ABB1A6CFCFEE /* CBComponents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CBComponents.swift; sourceTree = "<group>"; };
+		24283EE069337329210F57CA /* NutritionDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NutritionDetailView.swift; sourceTree = "<group>"; };
+		268CF09751F291C566288E6E /* CalBroWidget.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = CalBroWidget.entitlements; sourceTree = "<group>"; };
+		2A09940E9E94031B424F427F /* AppNavigationViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppNavigationViewModel.swift; sourceTree = "<group>"; };
+		2B3349469F38908D9778D493 /* UserProfile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserProfile.swift; sourceTree = "<group>"; };
+		2DFB17A86BBB820565CB52DF /* Models */ = {isa = PBXFileReference; lastKnownFileType = folder; name = Models; path = CalBro/Resources/Models; sourceTree = SOURCE_ROOT; };
+		2EBB45E0ADB25D4B3EB343B6 /* GoalsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoalsViewModel.swift; sourceTree = "<group>"; };
+		30070E91247EF9288E979B9A /* CalBro.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = CalBro.entitlements; sourceTree = "<group>"; };
+		3244B076E20990AFB0406268 /* NutritionPredictionModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NutritionPredictionModels.swift; sourceTree = "<group>"; };
+		33FB56F2C327E526E32888B7 /* WeightModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeightModels.swift; sourceTree = "<group>"; };
+		3C1D7E3EF686DFF2B9383CFE /* CalBroStateTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalBroStateTests.swift; sourceTree = "<group>"; };
+		3D6DABD75FD3D634923908E4 /* ProfileStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileStore.swift; sourceTree = "<group>"; };
+		4010E8A4A433AB528F573BCF /* NutritionModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NutritionModels.swift; sourceTree = "<group>"; };
+		4D0527119E1F39C35010E3EB /* AppStateStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppStateStore.swift; sourceTree = "<group>"; };
+		4E3C54932F731131DA33974C /* ReminderService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReminderService.swift; sourceTree = "<group>"; };
+		593C3C0996404AC7319C576E /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		5C29C1E0DAB59FD187663977 /* MainTabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainTabView.swift; sourceTree = "<group>"; };
+		5E8C0FA301B5E664E4968932 /* InfoPlist.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = InfoPlist.xcstrings; sourceTree = "<group>"; };
+		6FE28B45EA20DA63BE0FFBBD /* CameraCaptureController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraCaptureController.swift; sourceTree = "<group>"; };
+		70FC9D5A6EB206ED8572EC8A /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		732D599F45D1A250670BCEB1 /* StatsViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatsViews.swift; sourceTree = "<group>"; };
+		746609762768BF26E6315371 /* CalBroWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalBroWidget.swift; sourceTree = "<group>"; };
+		76A767CA7E1EECB7D96E8E1B /* IntegrationViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IntegrationViewModel.swift; sourceTree = "<group>"; };
+		777438AE5D72D2201001394C /* StatsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatsViewModel.swift; sourceTree = "<group>"; };
+		798AA9BCF4F6664E691C7079 /* CameraPreviewView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraPreviewView.swift; sourceTree = "<group>"; };
+		7ACD4C575D0D98147428A935 /* RootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootView.swift; sourceTree = "<group>"; };
+		7B5CC259F8AED318DFA290E7 /* ImagePreprocessing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImagePreprocessing.swift; sourceTree = "<group>"; };
+		7F5D25EA783A0886648FBF70 /* IntegrationModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IntegrationModels.swift; sourceTree = "<group>"; };
+		87E751885F2D1828D65823AE /* CBTypography.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CBTypography.swift; sourceTree = "<group>"; };
+		88585922F7009A277532045F /* CBGlass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CBGlass.swift; sourceTree = "<group>"; };
+		8F5A475C8587E03F0E6ED702 /* NutritionWidgetFace.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NutritionWidgetFace.swift; sourceTree = "<group>"; };
+		98CE5A5AC813D026AD59C44D /* Localizable.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = Localizable.xcstrings; sourceTree = "<group>"; };
+		9BB31D7B868494BCB2DB7CC6 /* GoalsViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoalsViews.swift; sourceTree = "<group>"; };
+		9C4B650096BF4E404F692132 /* CalBroTests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = CalBroTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		A7ED8B7A9F4A7216AE397721 /* DashboardViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DashboardViewModel.swift; sourceTree = "<group>"; };
+		B0C261E2E261413250726B72 /* CBColors.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CBColors.swift; sourceTree = "<group>"; };
+		B545CC6E4117E827C016CB90 /* CameraModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraModels.swift; sourceTree = "<group>"; };
+		B66D0006BDEE0E3223AE636F /* DashboardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DashboardView.swift; sourceTree = "<group>"; };
+		B771EAC117D7037EC455A8BE /* NutritionPredictionService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NutritionPredictionService.swift; sourceTree = "<group>"; };
+		BF7693996927D4F7948BEAD4 /* CalendarViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarViewModel.swift; sourceTree = "<group>"; };
+		C07D03C2082FE205427400C2 /* AppChromeComponents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppChromeComponents.swift; sourceTree = "<group>"; };
+		D06FF6EBE8841945C1EE67CF /* SharedNutrition.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SharedNutrition.swift; sourceTree = "<group>"; };
+		D9786943F843A175132E6274 /* CalBroApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalBroApp.swift; sourceTree = "<group>"; };
+		DA544B9B06B4EB86E2CAE34F /* CalBro.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = CalBro.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		E35D4A465515A450993BFBF5 /* CalendarMonthView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarMonthView.swift; sourceTree = "<group>"; };
+		E5F8DD8D72204051D158B90E /* FoodRecognitionService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FoodRecognitionService.swift; sourceTree = "<group>"; };
+		E65A4B65961394BB45D9D515 /* StatsModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatsModels.swift; sourceTree = "<group>"; };
+		E6DAFC5195E319872E6460D5 /* OnboardingFlowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingFlowView.swift; sourceTree = "<group>"; };
+		EA1D6D80421E4B502B0264E6 /* CalBroWidgetExtension.appex */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = "wrapper.app-extension"; path = CalBroWidgetExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		F11882A6268CBE9F5019F2B3 /* GoalModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoalModels.swift; sourceTree = "<group>"; };
+		FCC94E06D5FE7625DA3FB7E8 /* IntegrationViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IntegrationViews.swift; sourceTree = "<group>"; };
+		FE662B2218B82265C3B11DD0 /* CameraFlowViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraFlowViewModel.swift; sourceTree = "<group>"; };
+		FF4EDF2C649454EB516A2EC9 /* CameraFlowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraFlowView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
-		11BBC66EAD405D51BF590C7D /* Stats */ = {
+		043A439C1791C87FF9EE29BA /* Resources */ = {
 			isa = PBXGroup;
 			children = (
-				844134BB0DC7339EE1818F8C /* StatsViews.swift */,
-			);
-			path = Stats;
-			sourceTree = "<group>";
-		};
-		268A69A19B211870E0AD86AC /* Models */ = {
-			isa = PBXGroup;
-			children = (
-				16AEBDB418892382D21B1F84 /* CameraModels.swift */,
-				86932842D7A46A9B8A93D7C1 /* GoalModels.swift */,
-				7D2BEEE28ED1B9605B38B13D /* IntegrationModels.swift */,
-				B682364B0AAB5944D06AAFA2 /* LoggedMeal.swift */,
-				D8281DC81477D006AFE3E342 /* MealModels.swift */,
-				667ACFB5A0F7997988BA5DBA /* NutritionModels.swift */,
-				9BB47C770C505F4FAB41C74A /* NutritionPredictionModels.swift */,
-				1E8A43ADDA2FB4B3006A36AA /* StatsModels.swift */,
-				6E1B1AC3A59AB575BA4E6680 /* UserProfile.swift */,
-			);
-			path = Models;
-			sourceTree = "<group>";
-		};
-		2922BFD8E9D08476710889FD /* Calendar */ = {
-			isa = PBXGroup;
-			children = (
-				6CF623274912AFBED3155CC5 /* CalendarMonthView.swift */,
-			);
-			path = Calendar;
-			sourceTree = "<group>";
-		};
-		3E5700346BBB8E6CDDC952D3 /* ViewModels */ = {
-			isa = PBXGroup;
-			children = (
-				E1AE5EF49A0125C56D55E15A /* AppNavigationViewModel.swift */,
-				7B8273DF98DEBABBDC797414 /* CalendarViewModel.swift */,
-				15047B1B3BF33319D20025A7 /* CameraFlowViewModel.swift */,
-				4F7427980A6786F4BBA603E2 /* DashboardViewModel.swift */,
-				22A63FE3C4DCBE2F6DAC1F98 /* GoalsViewModel.swift */,
-				4365E5332BAD969C2E25682F /* IntegrationViewModel.swift */,
-				0926F838E5D0702C86E86454 /* NutritionViewModel.swift */,
-				405C14F9E7D01732E8E3D2F4 /* OnboardingViewModel.swift */,
-				8B7C9DF1D9C0B8263A9D0D4C /* StatsViewModel.swift */,
-			);
-			path = ViewModels;
-			sourceTree = "<group>";
-		};
-		6641577AD64EBD4AF0B007FC /* Onboarding */ = {
-			isa = PBXGroup;
-			children = (
-				372B754A2426A5BE3D91DBA9 /* OnboardingFlowView.swift */,
-			);
-			path = Onboarding;
-			sourceTree = "<group>";
-		};
-		708FF0D932B78B2DF8B8E7D2 /* DesignSystem */ = {
-			isa = PBXGroup;
-			children = (
-				7D13DB2C948D8AF329941E15 /* CBColors.swift */,
-				773477D45A849EB3817EC32F /* CBComponents.swift */,
-				8DD5B3A404976A8B97C4DDF6 /* CBGlass.swift */,
-				7F6B4D5288A878CE9C4407CE /* CBSpacing.swift */,
-				2267F7F799B12DF251C63DB5 /* CBTypography.swift */,
-			);
-			path = DesignSystem;
-			sourceTree = "<group>";
-		};
-		7ABAFB082E09D1559D4ED972 /* Resources */ = {
-			isa = PBXGroup;
-			children = (
-				2650A7C30BECFBB599F21C2C /* Models */,
+				2DFB17A86BBB820565CB52DF /* Models */,
 			);
 			path = Resources;
 			sourceTree = "<group>";
 		};
-		7E07E2E6B109C9C8F46C3757 /* Camera */ = {
+		0E48BAA56DCE130CBB04BD71 = {
 			isa = PBXGroup;
 			children = (
-				B11BD6766D3BE62245E7B87F /* CameraFlowView.swift */,
-				103C1434CA33AAA8F861B396 /* CameraPreviewView.swift */,
+				B558B1B7331F361879DA440D /* CalBro */,
+				E40564ACB6296903D3879197 /* CalBroTests */,
+				33B37B84846DB36F201B216A /* CalBroWidget */,
+				3305B135E71CC2842387187A /* Products */,
 			);
-			path = Camera;
 			sourceTree = "<group>";
 		};
-		872A9E50D0D006EAEAFB7A4E /* Services */ = {
+		123DECE873916E916BCF34E3 /* Goals */ = {
 			isa = PBXGroup;
 			children = (
-				5BDE612553FE7D4ABBF37970 /* AppStateStore.swift */,
-				7A7407960BB589F8D5C44FA1 /* ARMeasurementService.swift */,
-				A52F81D9446C6629F08F1B48 /* CameraCaptureController.swift */,
-				7840D551DC640E4BE5C79B0E /* FoodRecognitionService.swift */,
-				334988098DA00198B63D28B2 /* HealthKitSyncService.swift */,
-				D000CAB4EF39FC1C1924B013 /* ImagePreprocessing.swift */,
-				FF395FDCD40C551D02293EE7 /* MealLogStore.swift */,
-				1482E1470F1C31CFE5468E77 /* NutritionPredictionService.swift */,
-				2C0D3FEDE00EFEBC7A40D1DE /* PredictionService.swift */,
-				949D8A1276A31992A095D927 /* ReminderService.swift */,
-				B0EE831FA0F762BCD9AD33DA /* WidgetPreviewService.swift */,
-			);
-			path = Services;
-			sourceTree = "<group>";
-		};
-		90436E2567A8BC53E3DF5B38 /* Products */ = {
-			isa = PBXGroup;
-			children = (
-				38C3A5C54F1626C28F9232BB /* CalBro.app */,
-				B0C5FDBFC78C422C5970BBC3 /* CalBroTests.xctest */,
-				AA000000000000000000000A /* CalBroWidgetExtension.appex */,
-			);
-			name = Products;
-			sourceTree = "<group>";
-		};
-		ADA3F5099411C2018866DEC9 /* Integrations */ = {
-			isa = PBXGroup;
-			children = (
-				CB6B1C01E4F71ECB7F2AF045 /* IntegrationViews.swift */,
-			);
-			path = Integrations;
-			sourceTree = "<group>";
-		};
-		B1AE79807A560EAA3174F2D5 /* Goals */ = {
-			isa = PBXGroup;
-			children = (
-				994F39FFE053FFAA49C09F0F /* GoalsViews.swift */,
+				9BB31D7B868494BCB2DB7CC6 /* GoalsViews.swift */,
 			);
 			path = Goals;
 			sourceTree = "<group>";
 		};
-		B4BCF79B9AB0BB91B2762208 = {
+		129B587547E8BCB68D683229 /* Dashboard */ = {
 			isa = PBXGroup;
 			children = (
-				B8EAC87ECC42261570E84358 /* CalBro */,
-				D718041D28B45BACD06ED29F /* CalBroTests */,
-				AA000000000000000000000C /* CalBroWidget */,
-				90436E2567A8BC53E3DF5B38 /* Products */,
-			);
-			sourceTree = "<group>";
-		};
-		B8EAC87ECC42261570E84358 /* CalBro */ = {
-			isa = PBXGroup;
-			children = (
-				212E93C1DA1C3C58463EC0A4 /* Assets.xcassets */,
-				F2A463053241DC77C304C529 /* CalBroApp.swift */,
-				AA0000000000000000000006 /* CalBro.entitlements */,
-				AA000000000000000000000B /* Shared */,
-				708FF0D932B78B2DF8B8E7D2 /* DesignSystem */,
-				268A69A19B211870E0AD86AC /* Models */,
-				7ABAFB082E09D1559D4ED972 /* Resources */,
-				872A9E50D0D006EAEAFB7A4E /* Services */,
-				3E5700346BBB8E6CDDC952D3 /* ViewModels */,
-				DE85702A2D697D9295FC577E /* Views */,
-			);
-			path = CalBro;
-			sourceTree = "<group>";
-		};
-		BA01C040560DB727792F04A7 /* Components */ = {
-			isa = PBXGroup;
-			children = (
-				E7BF2AB04A1E4636D4D6B517 /* AppChromeComponents.swift */,
-			);
-			path = Components;
-			sourceTree = "<group>";
-		};
-		D27449CDBE3F31774DA3D052 /* Root */ = {
-			isa = PBXGroup;
-			children = (
-				EE07DBC8D4903BAF280843F2 /* MainTabView.swift */,
-				C90D5B1AEF54202B352ECE4F /* RootView.swift */,
-			);
-			path = Root;
-			sourceTree = "<group>";
-		};
-		D4D9F0F181A8AD0992A27022 /* Dashboard */ = {
-			isa = PBXGroup;
-			children = (
-				EC3B1938A40ED2D03C8051B3 /* DashboardView.swift */,
+				B66D0006BDEE0E3223AE636F /* DashboardView.swift */,
 			);
 			path = Dashboard;
 			sourceTree = "<group>";
 		};
-		D718041D28B45BACD06ED29F /* CalBroTests */ = {
+		1E211276C88ADFBBA38FAAE6 /* DesignSystem */ = {
 			isa = PBXGroup;
 			children = (
-				A68CE2E897C821C18C910B09 /* CalBroStateTests.swift */,
+				B0C261E2E261413250726B72 /* CBColors.swift */,
+				1A56C401FF60ABB1A6CFCFEE /* CBComponents.swift */,
+				88585922F7009A277532045F /* CBGlass.swift */,
+				1116234547C1E97FB5AD2885 /* CBSpacing.swift */,
+				87E751885F2D1828D65823AE /* CBTypography.swift */,
 			);
-			path = CalBroTests;
+			path = DesignSystem;
 			sourceTree = "<group>";
 		};
-		DE85702A2D697D9295FC577E /* Views */ = {
+		2F91C71CA8CBB183527C09EF /* Shared */ = {
 			isa = PBXGroup;
 			children = (
-				2922BFD8E9D08476710889FD /* Calendar */,
-				7E07E2E6B109C9C8F46C3757 /* Camera */,
-				BA01C040560DB727792F04A7 /* Components */,
-				D4D9F0F181A8AD0992A27022 /* Dashboard */,
-				B1AE79807A560EAA3174F2D5 /* Goals */,
-				ADA3F5099411C2018866DEC9 /* Integrations */,
-				E9D1B1A898B0E94810C499C4 /* Nutrition */,
-				6641577AD64EBD4AF0B007FC /* Onboarding */,
-				D27449CDBE3F31774DA3D052 /* Root */,
-				11BBC66EAD405D51BF590C7D /* Stats */,
-			);
-			path = Views;
-			sourceTree = "<group>";
-		};
-		E9D1B1A898B0E94810C499C4 /* Nutrition */ = {
-			isa = PBXGroup;
-			children = (
-				6A6BE5441347FE8D296B4B2B /* NutritionDetailView.swift */,
-			);
-			path = Nutrition;
-			sourceTree = "<group>";
-		};
-		AA000000000000000000000B /* Shared */ = {
-			isa = PBXGroup;
-			children = (
-				AA0000000000000000000005 /* SharedNutrition.swift */,
+				0D21696E55721E69CFD42796 /* NutritionFormat.swift */,
+				8F5A475C8587E03F0E6ED702 /* NutritionWidgetFace.swift */,
+				D06FF6EBE8841945C1EE67CF /* SharedNutrition.swift */,
 			);
 			path = Shared;
 			sourceTree = "<group>";
 		};
-		AA000000000000000000000C /* CalBroWidget */ = {
+		3305B135E71CC2842387187A /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				AA0000000000000000000007 /* CalBroWidget.swift */,
-				AA0000000000000000000008 /* Info.plist */,
-				AA0000000000000000000009 /* CalBroWidget.entitlements */,
+				DA544B9B06B4EB86E2CAE34F /* CalBro.app */,
+				9C4B650096BF4E404F692132 /* CalBroTests.xctest */,
+				EA1D6D80421E4B502B0264E6 /* CalBroWidgetExtension.appex */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		33B37B84846DB36F201B216A /* CalBroWidget */ = {
+			isa = PBXGroup;
+			children = (
+				268CF09751F291C566288E6E /* CalBroWidget.entitlements */,
+				746609762768BF26E6315371 /* CalBroWidget.swift */,
+				70FC9D5A6EB206ED8572EC8A /* Info.plist */,
 			);
 			path = CalBroWidget;
+			sourceTree = "<group>";
+		};
+		5DEFD9C529658FA0AD6B1863 /* Calendar */ = {
+			isa = PBXGroup;
+			children = (
+				E35D4A465515A450993BFBF5 /* CalendarMonthView.swift */,
+			);
+			path = Calendar;
+			sourceTree = "<group>";
+		};
+		69330B0AE223C40365D8AB79 /* Root */ = {
+			isa = PBXGroup;
+			children = (
+				5C29C1E0DAB59FD187663977 /* MainTabView.swift */,
+				7ACD4C575D0D98147428A935 /* RootView.swift */,
+			);
+			path = Root;
+			sourceTree = "<group>";
+		};
+		6A40912B03C9A58D6B5FE42E /* Camera */ = {
+			isa = PBXGroup;
+			children = (
+				FF4EDF2C649454EB516A2EC9 /* CameraFlowView.swift */,
+				798AA9BCF4F6664E691C7079 /* CameraPreviewView.swift */,
+			);
+			path = Camera;
+			sourceTree = "<group>";
+		};
+		762FF7B8313169CB8A982491 /* Integrations */ = {
+			isa = PBXGroup;
+			children = (
+				FCC94E06D5FE7625DA3FB7E8 /* IntegrationViews.swift */,
+			);
+			path = Integrations;
+			sourceTree = "<group>";
+		};
+		83A6BD8A698D25802334F620 /* ViewModels */ = {
+			isa = PBXGroup;
+			children = (
+				2A09940E9E94031B424F427F /* AppNavigationViewModel.swift */,
+				BF7693996927D4F7948BEAD4 /* CalendarViewModel.swift */,
+				FE662B2218B82265C3B11DD0 /* CameraFlowViewModel.swift */,
+				A7ED8B7A9F4A7216AE397721 /* DashboardViewModel.swift */,
+				2EBB45E0ADB25D4B3EB343B6 /* GoalsViewModel.swift */,
+				76A767CA7E1EECB7D96E8E1B /* IntegrationViewModel.swift */,
+				05E76A16CD7FF289117CB94B /* OnboardingViewModel.swift */,
+				777438AE5D72D2201001394C /* StatsViewModel.swift */,
+			);
+			path = ViewModels;
+			sourceTree = "<group>";
+		};
+		93D2A6049427C0DAC7C97C61 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				B545CC6E4117E827C016CB90 /* CameraModels.swift */,
+				F11882A6268CBE9F5019F2B3 /* GoalModels.swift */,
+				7F5D25EA783A0886648FBF70 /* IntegrationModels.swift */,
+				15C9B77B2F884ADD4DF6BE1E /* LoggedMeal.swift */,
+				4010E8A4A433AB528F573BCF /* NutritionModels.swift */,
+				3244B076E20990AFB0406268 /* NutritionPredictionModels.swift */,
+				E65A4B65961394BB45D9D515 /* StatsModels.swift */,
+				2B3349469F38908D9778D493 /* UserProfile.swift */,
+				33FB56F2C327E526E32888B7 /* WeightModels.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		9C005AC2BB7F3B49C56D56CD /* Stats */ = {
+			isa = PBXGroup;
+			children = (
+				732D599F45D1A250670BCEB1 /* StatsViews.swift */,
+			);
+			path = Stats;
+			sourceTree = "<group>";
+		};
+		B558B1B7331F361879DA440D /* CalBro */ = {
+			isa = PBXGroup;
+			children = (
+				593C3C0996404AC7319C576E /* Assets.xcassets */,
+				30070E91247EF9288E979B9A /* CalBro.entitlements */,
+				D9786943F843A175132E6274 /* CalBroApp.swift */,
+				5E8C0FA301B5E664E4968932 /* InfoPlist.xcstrings */,
+				98CE5A5AC813D026AD59C44D /* Localizable.xcstrings */,
+				1E211276C88ADFBBA38FAAE6 /* DesignSystem */,
+				93D2A6049427C0DAC7C97C61 /* Models */,
+				043A439C1791C87FF9EE29BA /* Resources */,
+				E641E2771EB56DAEDFECB74A /* Services */,
+				2F91C71CA8CBB183527C09EF /* Shared */,
+				83A6BD8A698D25802334F620 /* ViewModels */,
+				EF124D45B71CF80112FC3543 /* Views */,
+			);
+			path = CalBro;
+			sourceTree = "<group>";
+		};
+		C0E4232DCBF594E029CE2BA9 /* Nutrition */ = {
+			isa = PBXGroup;
+			children = (
+				24283EE069337329210F57CA /* NutritionDetailView.swift */,
+			);
+			path = Nutrition;
+			sourceTree = "<group>";
+		};
+		CDA6148B4B8A382C8498B138 /* Components */ = {
+			isa = PBXGroup;
+			children = (
+				C07D03C2082FE205427400C2 /* AppChromeComponents.swift */,
+			);
+			path = Components;
+			sourceTree = "<group>";
+		};
+		D9B069EFE537D48674D7C663 /* Onboarding */ = {
+			isa = PBXGroup;
+			children = (
+				E6DAFC5195E319872E6460D5 /* OnboardingFlowView.swift */,
+			);
+			path = Onboarding;
+			sourceTree = "<group>";
+		};
+		E40564ACB6296903D3879197 /* CalBroTests */ = {
+			isa = PBXGroup;
+			children = (
+				3C1D7E3EF686DFF2B9383CFE /* CalBroStateTests.swift */,
+			);
+			path = CalBroTests;
+			sourceTree = "<group>";
+		};
+		E641E2771EB56DAEDFECB74A /* Services */ = {
+			isa = PBXGroup;
+			children = (
+				4D0527119E1F39C35010E3EB /* AppStateStore.swift */,
+				6FE28B45EA20DA63BE0FFBBD /* CameraCaptureController.swift */,
+				E5F8DD8D72204051D158B90E /* FoodRecognitionService.swift */,
+				05C457DF66749CB33CF2F3CE /* HealthKitSyncService.swift */,
+				7B5CC259F8AED318DFA290E7 /* ImagePreprocessing.swift */,
+				14EE7C59C77620FCC25C5A74 /* MealLogStore.swift */,
+				B771EAC117D7037EC455A8BE /* NutritionPredictionService.swift */,
+				3D6DABD75FD3D634923908E4 /* ProfileStore.swift */,
+				4E3C54932F731131DA33974C /* ReminderService.swift */,
+			);
+			path = Services;
+			sourceTree = "<group>";
+		};
+		EF124D45B71CF80112FC3543 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				5DEFD9C529658FA0AD6B1863 /* Calendar */,
+				6A40912B03C9A58D6B5FE42E /* Camera */,
+				CDA6148B4B8A382C8498B138 /* Components */,
+				129B587547E8BCB68D683229 /* Dashboard */,
+				123DECE873916E916BCF34E3 /* Goals */,
+				762FF7B8313169CB8A982491 /* Integrations */,
+				C0E4232DCBF594E029CE2BA9 /* Nutrition */,
+				D9B069EFE537D48674D7C663 /* Onboarding */,
+				69330B0AE223C40365D8AB79 /* Root */,
+				9C005AC2BB7F3B49C56D56CD /* Stats */,
+			);
+			path = Views;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		BDE20EFB01D9D57DF7CC44DB /* CalBro */ = {
+		1A8D79F7227161A20F0E680F /* CalBroTests */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 3C74D2D0BDA754508F364EFD /* Build configuration list for PBXNativeTarget "CalBro" */;
+			buildConfigurationList = 4DC523A3EA247FE3CD5D0F0B /* Build configuration list for PBXNativeTarget "CalBroTests" */;
 			buildPhases = (
-				B8173321D0B97ACCE2426643 /* Sources */,
-				D66C9799EF18181FBC14FB2A /* Resources */,
-				AA000000000000000000000F /* Embed Foundation Extensions */,
+				15E72211CA5844FCB5EFDA2D /* Sources */,
 			);
 			buildRules = (
 			);
 			dependencies = (
-				AA0000000000000000000014 /* PBXTargetDependency */,
-			);
-			name = CalBro;
-			packageProductDependencies = (
-			);
-			productName = CalBro;
-			productReference = 38C3A5C54F1626C28F9232BB /* CalBro.app */;
-			productType = "com.apple.product-type.application";
-		};
-		EABEF9A6CC950A1AD42B020A /* CalBroTests */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = A86FC140F7384E13A9429DEE /* Build configuration list for PBXNativeTarget "CalBroTests" */;
-			buildPhases = (
-				2AE84CA0CD8CE73A7A9EDF3C /* Sources */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-				7A8EAF1DD44F9C595E1ED3A0 /* PBXTargetDependency */,
+				AB175240B375AA2CD5C32D1D /* PBXTargetDependency */,
 			);
 			name = CalBroTests;
 			packageProductDependencies = (
 			);
 			productName = CalBroTests;
-			productReference = B0C5FDBFC78C422C5970BBC3 /* CalBroTests.xctest */;
+			productReference = 9C4B650096BF4E404F692132 /* CalBroTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
-		AA000000000000000000000D /* CalBroWidgetExtension */ = {
+		3F607C8C5D713AE20AB332F1 /* CalBro */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = AA0000000000000000000013 /* Build configuration list for PBXNativeTarget "CalBroWidgetExtension" */;
+			buildConfigurationList = A4E84FC13234E63FB118FE2A /* Build configuration list for PBXNativeTarget "CalBro" */;
 			buildPhases = (
-				AA000000000000000000000E /* Sources */,
-				AA0000000000000000000010 /* Frameworks */,
+				7ED4922E82C8BDAB2D66DD26 /* Sources */,
+				1A5ABDBADB11ED936FEEA7F3 /* Resources */,
+				1027E5BDD64D70A1DAB9B099 /* Embed Foundation Extensions */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				2558C09E18C084D76A97B738 /* PBXTargetDependency */,
+			);
+			name = CalBro;
+			packageProductDependencies = (
+			);
+			productName = CalBro;
+			productReference = DA544B9B06B4EB86E2CAE34F /* CalBro.app */;
+			productType = "com.apple.product-type.application";
+		};
+		9F9C84ADD1180CB4135B61D1 /* CalBroWidgetExtension */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = B48AD10B6CB4E415C8300456 /* Build configuration list for PBXNativeTarget "CalBroWidgetExtension" */;
+			buildPhases = (
+				BC772AAECFC40808C3D5EFD8 /* Sources */,
+				13E1AD8CDC97613D9F45A597 /* Resources */,
 			);
 			buildRules = (
 			);
@@ -454,173 +450,252 @@
 			packageProductDependencies = (
 			);
 			productName = CalBroWidgetExtension;
-			productReference = AA000000000000000000000A /* CalBroWidgetExtension.appex */;
+			productReference = EA1D6D80421E4B502B0264E6 /* CalBroWidgetExtension.appex */;
 			productType = "com.apple.product-type.app-extension";
 		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
-		8C3A5A80619CA54CF69B2EDE /* Project object */ = {
+		D4DB5577380E7C3FDF5FAF5E /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = YES;
 				LastUpgradeCheck = 1430;
 				TargetAttributes = {
-					EABEF9A6CC950A1AD42B020A = {
+					1A8D79F7227161A20F0E680F = {
 						DevelopmentTeam = A9J5Z9ZASH;
 						ProvisioningStyle = Automatic;
 					};
-					AA000000000000000000000D = {
+					3F607C8C5D713AE20AB332F1 = {
+						DevelopmentTeam = A9J5Z9ZASH;
+						ProvisioningStyle = Automatic;
+					};
+					9F9C84ADD1180CB4135B61D1 = {
 						DevelopmentTeam = A9J5Z9ZASH;
 						ProvisioningStyle = Automatic;
 					};
 				};
 			};
-			buildConfigurationList = 515AE0EB880AEFF32902E77B /* Build configuration list for PBXProject "CalBro" */;
+			buildConfigurationList = EE8AFB18E5B4FF67DD1D7956 /* Build configuration list for PBXProject "CalBro" */;
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
 				Base,
+				de,
 				en,
+				es,
+				fr,
+				ja,
+				ko,
+				"pt-BR",
+				"zh-Hans",
+				"zh-Hant",
 			);
-			mainGroup = B4BCF79B9AB0BB91B2762208;
+			mainGroup = 0E48BAA56DCE130CBB04BD71;
 			minimizedProjectReferenceProxies = 1;
 			preferredProjectObjectVersion = 77;
-			productRefGroup = 90436E2567A8BC53E3DF5B38 /* Products */;
+			productRefGroup = 3305B135E71CC2842387187A /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				BDE20EFB01D9D57DF7CC44DB /* CalBro */,
-				EABEF9A6CC950A1AD42B020A /* CalBroTests */,
-				AA000000000000000000000D /* CalBroWidgetExtension */,
+				3F607C8C5D713AE20AB332F1 /* CalBro */,
+				9F9C84ADD1180CB4135B61D1 /* CalBroWidgetExtension */,
+				1A8D79F7227161A20F0E680F /* CalBroTests */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
-		D66C9799EF18181FBC14FB2A /* Resources */ = {
+		13E1AD8CDC97613D9F45A597 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				C2A33C9BA7809CAD99BE1B95 /* Assets.xcassets in Resources */,
-				6C2356D3A19A74C79906C2A7 /* Models in Resources */,
+				893DF7FFEE2E13F6C9328065 /* Localizable.xcstrings in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		1A5ABDBADB11ED936FEEA7F3 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				B705FE73646DE93884201EB7 /* Assets.xcassets in Resources */,
+				55F05BFED6739FDDBC550441 /* InfoPlist.xcstrings in Resources */,
+				F95727635AB69A6F2E7CD98F /* Localizable.xcstrings in Resources */,
+				5456F251496B56926C298800 /* Models in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
-		2AE84CA0CD8CE73A7A9EDF3C /* Sources */ = {
+		15E72211CA5844FCB5EFDA2D /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				3B56D9F6BF8D32BE27040E7E /* CalBroStateTests.swift in Sources */,
+				FFB44E1F0B142A518D2C4084 /* CalBroStateTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		B8173321D0B97ACCE2426643 /* Sources */ = {
+		7ED4922E82C8BDAB2D66DD26 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				81765B44BBC19A0FBBE75F41 /* ARMeasurementService.swift in Sources */,
-				19B497BDA1AC831C11BA0E77 /* AppChromeComponents.swift in Sources */,
-				586270989EBC0D6BD37803BA /* AppNavigationViewModel.swift in Sources */,
-				BE24F0798EEABDFD1FFB2279 /* AppStateStore.swift in Sources */,
-				C177B0B33068A5B98954C018 /* CBColors.swift in Sources */,
-				5E8C6F75C4D9F4FBB61DBBCF /* CBComponents.swift in Sources */,
-				1339A7710BD6C8293C6726AF /* CBGlass.swift in Sources */,
-				90FEB27BDD7744CBF461F994 /* CBSpacing.swift in Sources */,
-				6C81ACD99F56C11C7A7889BB /* CBTypography.swift in Sources */,
-				2EEFB61B761139488E2866B2 /* CalBroApp.swift in Sources */,
-				EB47B1FF280E26DA6CCF460A /* CalendarMonthView.swift in Sources */,
-				2E1F2970132EA39A4E066627 /* CalendarViewModel.swift in Sources */,
-				2211B4F99B39DDF3908CE5F7 /* CameraCaptureController.swift in Sources */,
-				2B68D31B3F67C09CF7545E29 /* CameraFlowView.swift in Sources */,
-				1B034B50F6D70686E0F7A2E4 /* CameraFlowViewModel.swift in Sources */,
-				1E9F04DDCCD70E34F0AAEE49 /* CameraModels.swift in Sources */,
-				79312819784EA4758E897C2A /* CameraPreviewView.swift in Sources */,
-				44CAB532402179D2D98D079B /* DashboardView.swift in Sources */,
-				A597436E0940318ED6264549 /* DashboardViewModel.swift in Sources */,
-				1A3D0E724C29BAB21AB4FB82 /* FoodRecognitionService.swift in Sources */,
-				DF953B605094355A82831969 /* GoalModels.swift in Sources */,
-				C05FB0136E83495F13114F08 /* GoalsViewModel.swift in Sources */,
-				AB89C0353316C79B0EF29F5A /* GoalsViews.swift in Sources */,
-				0EC7E7B62D85BEB65324CC3D /* HealthKitSyncService.swift in Sources */,
-				137A5E455E35374FE6BDCEA7 /* ImagePreprocessing.swift in Sources */,
-				020D87DD32F05D45E392CF95 /* IntegrationModels.swift in Sources */,
-				E390B4EDD29D0ABB4DC11127 /* IntegrationViewModel.swift in Sources */,
-				C149013CAE7664E6DF772298 /* IntegrationViews.swift in Sources */,
-				45D37C37801B48C82128C2FF /* LoggedMeal.swift in Sources */,
-				9B4EDC7929739FCDC463A0B0 /* MainTabView.swift in Sources */,
-				2660E372EF56DDC2367C61FB /* MealLogStore.swift in Sources */,
-				E163BBA86252FC0648BB5588 /* MealModels.swift in Sources */,
-				09E5C66C5E86F034F08E07E4 /* NutritionDetailView.swift in Sources */,
-				A89207019FC25072F33D0B6D /* NutritionModels.swift in Sources */,
-				615198AB79D0C14A8857954E /* NutritionPredictionModels.swift in Sources */,
-				82307300E41312004AF24DFB /* NutritionPredictionService.swift in Sources */,
-				14CFA924F6B4494A87BE1D5D /* NutritionViewModel.swift in Sources */,
-				39E668E6FB1788BF5875D93A /* OnboardingFlowView.swift in Sources */,
-				8049D03FF832E8189F9B2167 /* OnboardingViewModel.swift in Sources */,
-				F8D939DA02A384E57A49EC9B /* PredictionService.swift in Sources */,
-				B187CD0CEAA2698FEA55016B /* ReminderService.swift in Sources */,
-				0D90F0BDAE1E8CE86B10331D /* RootView.swift in Sources */,
-				917AAFFD3898C9F31815404D /* StatsModels.swift in Sources */,
-				4678B5EBC088C13BADC5BADB /* StatsViewModel.swift in Sources */,
-				8709D64E934E3CECE23F2FE9 /* StatsViews.swift in Sources */,
-				386ED210322B1955E5DD3DF7 /* UserProfile.swift in Sources */,
-				9534698D53F3A0BB1DD2F4E0 /* WidgetPreviewService.swift in Sources */,
-				AA0000000000000000000001 /* SharedNutrition.swift in Sources */,
+				07BDCEEEF375090AD1AE67BD /* AppChromeComponents.swift in Sources */,
+				E315B9F5F6403DCE6554AFC9 /* AppNavigationViewModel.swift in Sources */,
+				9FEE6C2A2ECA971EAF0F2A17 /* AppStateStore.swift in Sources */,
+				B7CA85DC90A235B7E713422B /* CBColors.swift in Sources */,
+				46A8E75CB741876A9E9C7012 /* CBComponents.swift in Sources */,
+				1BF3181F80B656CCF67BE0C6 /* CBGlass.swift in Sources */,
+				5D89720E527AA530D76B48DE /* CBSpacing.swift in Sources */,
+				C69AE92322E5BE54CAA0942D /* CBTypography.swift in Sources */,
+				E85129210BB96249FB64CF05 /* CalBroApp.swift in Sources */,
+				7F0ACD0B78EC76FA8DA9786D /* CalendarMonthView.swift in Sources */,
+				B530C1FD9DDA92AF070A2FE6 /* CalendarViewModel.swift in Sources */,
+				F626966770F18ECEF19A946D /* CameraCaptureController.swift in Sources */,
+				93B93400A3AEB167EDD1497D /* CameraFlowView.swift in Sources */,
+				21B4E63F5F1EC32962790077 /* CameraFlowViewModel.swift in Sources */,
+				8F2F6BC25BA4CA7C996DE8EC /* CameraModels.swift in Sources */,
+				BF59082C21E45ACDD1C56C79 /* CameraPreviewView.swift in Sources */,
+				B032C083EC278B382ED3CE94 /* DashboardView.swift in Sources */,
+				A7D878220883F4D8C443F677 /* DashboardViewModel.swift in Sources */,
+				3E4C97642DFD6FC63EC09DCB /* FoodRecognitionService.swift in Sources */,
+				8C7E8B8F0034FE00CF81A0EF /* GoalModels.swift in Sources */,
+				79518D394029620D98C5963D /* GoalsViewModel.swift in Sources */,
+				F3D2009D58B3658BF3C05651 /* GoalsViews.swift in Sources */,
+				C01918EF0C37551351B53663 /* HealthKitSyncService.swift in Sources */,
+				74652C23896FB1EED5E95BDF /* ImagePreprocessing.swift in Sources */,
+				EE573BEC6D53AB1C5FCA09C0 /* IntegrationModels.swift in Sources */,
+				710397093D8E91D073BE8733 /* IntegrationViewModel.swift in Sources */,
+				F796D36AF6E06C917A07B026 /* IntegrationViews.swift in Sources */,
+				F2428C5BC009A2DA412B836A /* LoggedMeal.swift in Sources */,
+				9B053DC1CDB43B6BDC51F3FD /* MainTabView.swift in Sources */,
+				700B2F0C0BBEA9E33AC0C7DD /* MealLogStore.swift in Sources */,
+				8AE29B35E2DC4865D18CF6A0 /* NutritionDetailView.swift in Sources */,
+				B0E2AD090ED81EE2412C4705 /* NutritionFormat.swift in Sources */,
+				481F91C81574E9E1ABDDAA94 /* NutritionModels.swift in Sources */,
+				D0DE00F4BDC91D20D5560930 /* NutritionPredictionModels.swift in Sources */,
+				B84176DD32F80180FD89D51C /* NutritionPredictionService.swift in Sources */,
+				9DB18A6D06A7CE940F03A94C /* NutritionWidgetFace.swift in Sources */,
+				011CF5C7F659B0138A4AF123 /* OnboardingFlowView.swift in Sources */,
+				18D72F9B6947D22620E95FC7 /* OnboardingViewModel.swift in Sources */,
+				C9AF99D507B5513FCD64CD6F /* ProfileStore.swift in Sources */,
+				987F5CD363128D555D7C5F21 /* ReminderService.swift in Sources */,
+				09366C073054E07809ABF173 /* RootView.swift in Sources */,
+				A663916FC2CC88A72E3F7A80 /* SharedNutrition.swift in Sources */,
+				D7E8ADF6CCA09484F7BA2991 /* StatsModels.swift in Sources */,
+				319A668CB9FEE57D26BF0BD2 /* StatsViewModel.swift in Sources */,
+				8CD595C8597254C821656E2C /* StatsViews.swift in Sources */,
+				AF1E08F16F85A6FCCC5EBB69 /* UserProfile.swift in Sources */,
+				B2C201278CA6ED509A5D4648 /* WeightModels.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		AA000000000000000000000E /* Sources */ = {
+		BC772AAECFC40808C3D5EFD8 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				AA0000000000000000000003 /* CalBroWidget.swift in Sources */,
-				AA0000000000000000000002 /* SharedNutrition.swift in Sources */,
+				C4A6B5EBB4054E0455793BCE /* CalBroWidget.swift in Sources */,
+				D7561616919558F0FFF59398 /* NutritionFormat.swift in Sources */,
+				A4FA5161A20F112CE995194D /* NutritionWidgetFace.swift in Sources */,
+				D321E5F14DC438C345D4C0C6 /* SharedNutrition.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
-		7A8EAF1DD44F9C595E1ED3A0 /* PBXTargetDependency */ = {
+		2558C09E18C084D76A97B738 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = BDE20EFB01D9D57DF7CC44DB /* CalBro */;
-			targetProxy = E5F81BE302AE8D32A7887850 /* PBXContainerItemProxy */;
+			target = 9F9C84ADD1180CB4135B61D1 /* CalBroWidgetExtension */;
+			targetProxy = A59A7CCEA2E032DD4345483D /* PBXContainerItemProxy */;
 		};
-		AA0000000000000000000014 /* PBXTargetDependency */ = {
+		AB175240B375AA2CD5C32D1D /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = AA000000000000000000000D /* CalBroWidgetExtension */;
-			targetProxy = AA0000000000000000000015 /* PBXContainerItemProxy */;
+			target = 3F607C8C5D713AE20AB332F1 /* CalBro */;
+			targetProxy = 4E0DBA167B2AAC8C78C2FAF6 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
-		0DA0CBA209FD7A6DC9CED104 /* Release */ = {
+		0E095CF885149E5D64243F73 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				BUNDLE_LOADER = "$(TEST_HOST)";
-				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = A9J5Z9ZASH;
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = CalBro/CalBro.entitlements;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				INFOPLIST_KEY_CFBundleDisplayName = CalBro;
+				INFOPLIST_KEY_NSCameraUsageDescription = "CalBro uses the camera to photograph your meal and estimate its nutrition on your device.";
+				INFOPLIST_KEY_NSHealthShareUsageDescription = "CalBro reads your weight, height, age, sex and active energy from Apple Health to personalize your calorie target.";
+				INFOPLIST_KEY_NSHealthUpdateUsageDescription = "CalBro saves the calories and macronutrients of meals you log to Apple Health.";
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
-					"@loader_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.wydfcc.calbro.tests;
+				PRODUCT_BUNDLE_IDENTIFIER = com.wydfcc.calbro;
 				SDKROOT = iphoneos;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = YES;
 				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = YES;
 				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/CalBro.app/CalBro";
 			};
 			name = Release;
 		};
-		2717F52F43AEFBDC508ABFED /* Debug */ = {
+		190AE987BA053C2418C9CBA6 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = CalBro/CalBro.entitlements;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				INFOPLIST_KEY_CFBundleDisplayName = CalBro;
+				INFOPLIST_KEY_NSCameraUsageDescription = "CalBro uses the camera to photograph your meal and estimate its nutrition on your device.";
+				INFOPLIST_KEY_NSHealthShareUsageDescription = "CalBro reads your weight, height, age, sex and active energy from Apple Health to personalize your calorie target.";
+				INFOPLIST_KEY_NSHealthUpdateUsageDescription = "CalBro saves the calories and macronutrients of meals you log to Apple Health.";
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.wydfcc.calbro;
+				SDKROOT = iphoneos;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = YES;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = YES;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		207CF24CEC13BEDB6D086C64 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = CalBroWidget/CalBroWidget.entitlements;
+				INFOPLIST_FILE = CalBroWidget/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = CalBro;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = com.wydfcc.calbro.CalBroWidget;
+				PRODUCT_NAME = CalBroWidgetExtension;
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = YES;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = YES;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		6DCE13A3A35B6708DDF31513 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
@@ -653,9 +728,116 @@
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_STYLE = Automatic;
+				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = A9J5Z9ZASH;
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MARKETING_VERSION = 1.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Release;
+		};
+		6DDFD9F9C078182FBBE07546 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.wydfcc.calbro.tests;
+				SDKROOT = iphoneos;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = YES;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = YES;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/CalBro.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/CalBro";
+			};
+			name = Release;
+		};
+		80766CD65748FFDAB88348D0 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = CalBroWidget/CalBroWidget.entitlements;
+				INFOPLIST_FILE = CalBroWidget/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = CalBro;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = com.wydfcc.calbro.CalBroWidget;
+				PRODUCT_NAME = CalBroWidgetExtension;
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = YES;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = YES;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		9EE0509A8604CD97F80F630F /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_STYLE = Automatic;
 				COPY_PHASE_STRIP = NO;
 				CURRENT_PROJECT_VERSION = 1;
 				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_TEAM = A9J5Z9ZASH;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
@@ -674,6 +856,7 @@
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
 				MARKETING_VERSION = 1.0;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
@@ -682,48 +865,17 @@
 				SDKROOT = iphoneos;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 6.0;
 				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Debug;
 		};
-		2D4975A1A1ABFD0977D2E61D /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CODE_SIGN_IDENTITY = "Apple Development";
-				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = A9J5Z9ZASH;
-				INFOPLIST_KEY_NSCameraUsageDescription = "CalBro uses the camera to capture meal photos for nutrition logging.";
-				CODE_SIGN_ENTITLEMENTS = CalBro/CalBro.entitlements;
-				INFOPLIST_KEY_NSHealthShareUsageDescription = "CalBro reads your active energy and steps to refine your daily calorie budget.";
-				INFOPLIST_KEY_NSHealthUpdateUsageDescription = "CalBro can record nutrition data to Apple Health.";
-				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
-				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
-				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.wydfcc.calbro;
-				PROVISIONING_PROFILE_SPECIFIER = "";
-				SDKROOT = iphoneos;
-				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
-				SUPPORTS_MACCATALYST = NO;
-				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = YES;
-				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = YES;
-				TARGETED_DEVICE_FAMILY = 1;
-			};
-			name = Debug;
-		};
-		7BB964647A71F3623E79D7CD /* Debug */ = {
+		A56F955E115BC8947116AF61 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
-				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = A9J5Z9ZASH;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -736,203 +888,50 @@
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = YES;
 				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = YES;
 				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/CalBro.app/CalBro";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/CalBro.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/CalBro";
 			};
 			name = Debug;
-		};
-		92FD2A63AADFF578BF3F1FD7 /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CODE_SIGN_IDENTITY = "Apple Development";
-				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = A9J5Z9ZASH;
-				INFOPLIST_KEY_NSCameraUsageDescription = "CalBro uses the camera to capture meal photos for nutrition logging.";
-				CODE_SIGN_ENTITLEMENTS = CalBro/CalBro.entitlements;
-				INFOPLIST_KEY_NSHealthShareUsageDescription = "CalBro reads your active energy and steps to refine your daily calorie budget.";
-				INFOPLIST_KEY_NSHealthUpdateUsageDescription = "CalBro can record nutrition data to Apple Health.";
-				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
-				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
-				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.wydfcc.calbro;
-				PROVISIONING_PROFILE_SPECIFIER = "";
-				SDKROOT = iphoneos;
-				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
-				SUPPORTS_MACCATALYST = NO;
-				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = YES;
-				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = YES;
-				TARGETED_DEVICE_FAMILY = 1;
-			};
-			name = Release;
-		};
-		BF29A6BD027A780503F8820C /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = NO;
-				CLANG_ANALYZER_NONNULL = YES;
-				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
-				CLANG_CXX_LIBRARY = "libc++";
-				CLANG_ENABLE_MODULES = YES;
-				CLANG_ENABLE_OBJC_ARC = YES;
-				CLANG_ENABLE_OBJC_WEAK = YES;
-				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
-				CLANG_WARN_BOOL_CONVERSION = YES;
-				CLANG_WARN_COMMA = YES;
-				CLANG_WARN_CONSTANT_CONVERSION = YES;
-				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
-				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
-				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
-				CLANG_WARN_EMPTY_BODY = YES;
-				CLANG_WARN_ENUM_CONVERSION = YES;
-				CLANG_WARN_INFINITE_RECURSION = YES;
-				CLANG_WARN_INT_CONVERSION = YES;
-				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
-				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
-				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
-				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
-				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
-				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
-				CLANG_WARN_STRICT_PROTOTYPES = YES;
-				CLANG_WARN_SUSPICIOUS_MOVE = YES;
-				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
-				CLANG_WARN_UNREACHABLE_CODE = YES;
-				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
-				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 1;
-				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
-				ENABLE_NS_ASSERTIONS = NO;
-				ENABLE_STRICT_OBJC_MSGSEND = YES;
-				GCC_C_LANGUAGE_STANDARD = gnu11;
-				GCC_NO_COMMON_BLOCKS = YES;
-				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
-				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
-				GCC_WARN_UNDECLARED_SELECTOR = YES;
-				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
-				GCC_WARN_UNUSED_FUNCTION = YES;
-				GCC_WARN_UNUSED_VARIABLE = YES;
-				GENERATE_INFOPLIST_FILE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
-				MARKETING_VERSION = 1.0;
-				MTL_ENABLE_DEBUG_INFO = NO;
-				MTL_FAST_MATH = YES;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SDKROOT = iphoneos;
-				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
-				SWIFT_COMPILATION_MODE = wholemodule;
-				SWIFT_OPTIMIZATION_LEVEL = "-O";
-				SWIFT_VERSION = 6.0;
-				TARGETED_DEVICE_FAMILY = 1;
-			};
-			name = Release;
-		};
-		AA0000000000000000000011 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CODE_SIGN_ENTITLEMENTS = CalBroWidget/CalBroWidget.entitlements;
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = A9J5Z9ZASH;
-				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = CalBroWidget/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = CalBro;
-				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-					"@executable_path/../../Frameworks",
-				);
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.wydfcc.calbro.CalBroWidget;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SDKROOT = iphoneos;
-				SKIP_INSTALL = YES;
-				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
-				SWIFT_EMIT_LOC_STRINGS = YES;
-				SWIFT_VERSION = 6.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
-				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
-				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
-			};
-			name = Debug;
-		};
-		AA0000000000000000000012 /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CODE_SIGN_ENTITLEMENTS = CalBroWidget/CalBroWidget.entitlements;
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = A9J5Z9ZASH;
-				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = CalBroWidget/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = CalBro;
-				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-					"@executable_path/../../Frameworks",
-				);
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.wydfcc.calbro.CalBroWidget;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SDKROOT = iphoneos;
-				SKIP_INSTALL = YES;
-				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
-				SWIFT_EMIT_LOC_STRINGS = YES;
-				SWIFT_VERSION = 6.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
-				SWIFT_COMPILATION_MODE = wholemodule;
-				SWIFT_OPTIMIZATION_LEVEL = "-O";
-			};
-			name = Release;
 		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		3C74D2D0BDA754508F364EFD /* Build configuration list for PBXNativeTarget "CalBro" */ = {
+		4DC523A3EA247FE3CD5D0F0B /* Build configuration list for PBXNativeTarget "CalBroTests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				2D4975A1A1ABFD0977D2E61D /* Debug */,
-				92FD2A63AADFF578BF3F1FD7 /* Release */,
+				A56F955E115BC8947116AF61 /* Debug */,
+				6DDFD9F9C078182FBBE07546 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Debug;
 		};
-		515AE0EB880AEFF32902E77B /* Build configuration list for PBXProject "CalBro" */ = {
+		A4E84FC13234E63FB118FE2A /* Build configuration list for PBXNativeTarget "CalBro" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				2717F52F43AEFBDC508ABFED /* Debug */,
-				BF29A6BD027A780503F8820C /* Release */,
+				190AE987BA053C2418C9CBA6 /* Debug */,
+				0E095CF885149E5D64243F73 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Debug;
 		};
-		A86FC140F7384E13A9429DEE /* Build configuration list for PBXNativeTarget "CalBroTests" */ = {
+		B48AD10B6CB4E415C8300456 /* Build configuration list for PBXNativeTarget "CalBroWidgetExtension" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				7BB964647A71F3623E79D7CD /* Debug */,
-				0DA0CBA209FD7A6DC9CED104 /* Release */,
+				207CF24CEC13BEDB6D086C64 /* Debug */,
+				80766CD65748FFDAB88348D0 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Debug;
 		};
-		AA0000000000000000000013 /* Build configuration list for PBXNativeTarget "CalBroWidgetExtension" */ = {
+		EE8AFB18E5B4FF67DD1D7956 /* Build configuration list for PBXProject "CalBro" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				AA0000000000000000000011 /* Debug */,
-				AA0000000000000000000012 /* Release */,
+				9EE0509A8604CD97F80F630F /* Debug */,
+				6DCE13A3A35B6708DDF31513 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
+			defaultConfigurationName = Debug;
 		};
 /* End XCConfigurationList section */
 	};
-	rootObject = 8C3A5A80619CA54CF69B2EDE /* Project object */;
+	rootObject = D4DB5577380E7C3FDF5FAF5E /* Project object */;
 }

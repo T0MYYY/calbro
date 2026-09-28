@@ -3,8 +3,12 @@ import CoreML
 import Accelerate
 
 extension UIImage {
+    /// Resizes to exactly `size` pixels (scale 1), applying the photo's orientation.
     func resized(to size: CGSize) -> UIImage? {
-        UIGraphicsImageRenderer(size: size).image { _ in
+        let format = UIGraphicsImageRendererFormat()
+        format.scale = 1
+        format.opaque = true
+        return UIGraphicsImageRenderer(size: size, format: format).image { _ in
             draw(in: CGRect(origin: .zero, size: size))
         }
     }
@@ -67,6 +71,8 @@ extension UIImage {
 // normalised MLMultiArray [1, 1, H, W] float32.
 // Uses BGRA render target because CIContext reliably converts any grayscale
 // format (including GRAYSCALE_FLOAT16) to BGRA on iOS.
+private let sharedCIContext = CIContext()
+
 func depthBufferToMLArray(_ buf: CVPixelBuffer, height: Int, width: Int) throws -> MLMultiArray {
     let ci = CIImage(cvPixelBuffer: buf)
     let srcW = CVPixelBufferGetWidth(buf)
@@ -86,7 +92,7 @@ func depthBufferToMLArray(_ buf: CVPixelBuffer, height: Int, width: Int) throws 
                               attrs as CFDictionary, &out) == kCVReturnSuccess,
           let outBuf = out else { throw CocoaError(.fileReadUnknown) }
 
-    CIContext().render(scaled, to: outBuf)
+    sharedCIContext.render(scaled, to: outBuf)
 
     CVPixelBufferLockBaseAddress(outBuf, .readOnly)
     defer { CVPixelBufferUnlockBaseAddress(outBuf, .readOnly) }
@@ -96,7 +102,7 @@ func depthBufferToMLArray(_ buf: CVPixelBuffer, height: Int, width: Int) throws 
         dataType: .float32
     )
     let ptr = array.dataPointer.bindMemory(to: Float32.self, capacity: height * width)
-    let base = CVPixelBufferGetBaseAddress(outBuf)!
+    guard let base = CVPixelBufferGetBaseAddress(outBuf) else { throw CocoaError(.fileReadUnknown) }
     let bpr  = CVPixelBufferGetBytesPerRow(outBuf)
 
     // Extract R channel (= G = B for grayscale) and find range for normalisation

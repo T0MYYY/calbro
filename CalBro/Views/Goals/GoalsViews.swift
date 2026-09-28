@@ -1,56 +1,54 @@
 import SwiftUI
+import Charts
 
 // MARK: - Profile Hub
 
 struct ProfileHubView: View {
     @Bindable var navigation: AppNavigationViewModel
-    @Bindable var goals: GoalsViewModel
+    let goals: GoalsViewModel
+    let stats: StatsViewModel
     @State private var showEditProfile = false
-    private let mealStore = MealLogStore.shared
+    private let profileStore = ProfileStore.shared
 
     var body: some View {
+        let profile = profileStore.profile
         ScrollView {
             VStack(spacing: 14) {
-                // Header card
-                profileHeaderCard
+                profileHeaderCard(profile)
 
-                // TDEE / calorie breakdown
                 CBCard {
                     TDEEBreakdownCard(items: goals.tdeeItems)
                 }
 
-                // Macro targets
                 CBCard {
                     VStack(alignment: .leading, spacing: 10) {
                         Text("Daily macro targets")
                             .font(CBTypography.body(15, weight: .semibold))
                             .foregroundStyle(CBColors.ink)
                         HStack(spacing: 8) {
-                            MacroTarget(label: "Protein", grams: goals.profile.proteinTargetG, color: CBColors.plum)
-                            MacroTarget(label: "Carbs",   grams: goals.profile.carbTargetG,    color: CBColors.ocean)
-                            MacroTarget(label: "Fat",     grams: goals.profile.fatTargetG,     color: CBColors.gold)
+                            MacroTarget(label: "Protein", grams: profile.proteinTargetG, color: CBColors.plum)
+                            MacroTarget(label: "Carbs",   grams: profile.carbTargetG,    color: CBColors.ocean)
+                            MacroTarget(label: "Fat",     grams: profile.fatTargetG,     color: CBColors.gold)
                         }
                     }
                 }
 
-                // Weekly progress
                 CBCard {
                     VStack(alignment: .leading, spacing: 10) {
-                        Text("This week")
+                        Text("Last 7 days")
                             .font(CBTypography.body(15, weight: .semibold))
                             .foregroundStyle(CBColors.ink)
                         HStack(spacing: 12) {
-                            weekStat(value: "\(loggedDaysThisWeek)", label: "days logged", color: CBColors.sage)
-                            weekStat(value: "\(weekAvgCalories) kcal", label: "daily avg", color: CBColors.terra)
-                            weekStat(value: "\(streak)", label: "day streak", color: CBColors.plum)
+                            weekStat(value: stats.loggedDays.formatted(), label: "days logged", color: CBColors.sage)
+                            weekStat(value: stats.averageCalories > 0 ? NutritionFormat.kcal(stats.averageCalories) : "—",
+                                     label: "daily average", color: CBColors.terra)
+                            weekStat(value: stats.streak.formatted(), label: "day streak", color: CBColors.plum)
                         }
                     }
                 }
 
-                // Divider
                 Rectangle().fill(CBColors.inkFaint).frame(height: 1).padding(.horizontal)
 
-                // Navigation rows
                 navRows
             }
             .padding(.horizontal, CBSpacing.page)
@@ -60,36 +58,29 @@ struct ProfileHubView: View {
         .navigationTitle("Profile")
         .navigationBarTitleDisplayMode(.inline)
         .sheet(isPresented: $showEditProfile) {
-            ProfileEditView(profile: goals.profile) { updated in
-                saveProfile(updated)
-                goals.refreshFromDefaults()
-            }
+            ProfileEditView(profile: profile) { profileStore.update($0) }
         }
     }
 
-    // MARK: Header
-
-    private var profileHeaderCard: some View {
+    private func profileHeaderCard(_ profile: UserProfile) -> some View {
         CBCard(background: CBColors.terra.opacity(0.04), border: CBColors.terra.opacity(0.25)) {
             HStack(spacing: 16) {
-                // Initials avatar
-                ZStack {
-                    Circle().fill(CBColors.terra)
-                        .frame(width: 56, height: 56)
-                    Text(initials)
-                        .font(CBTypography.body(20, weight: .bold))
-                        .foregroundStyle(.white)
-                }
+                Image(systemName: "person.fill")
+                    .font(.system(size: 24, weight: .semibold))
+                    .foregroundStyle(.white)
+                    .frame(width: 56, height: 56)
+                    .background(CBColors.terra, in: Circle())
+                    .accessibilityHidden(true)
 
                 VStack(alignment: .leading, spacing: 4) {
-                    PillTag(text: goals.profile.goal.title, color: CBColors.terra, filled: true)
-                    Text("\(goals.profile.weightDisplay) · \(goals.profile.heightDisplay) · \(goals.profile.age) yrs")
+                    PillTag(profile.goal.title, color: CBColors.terra, filled: true)
+                    Text("\(profile.weightDisplay) · \(profile.heightDisplay) · \(profile.age) yrs",
+                         comment: "Weight · height · age in years")
                         .font(CBTypography.body(14))
                         .foregroundStyle(CBColors.inkMid)
-                    if goals.profile.weeklyWeightChangeKg != 0 {
-                        let kgPerWeek = abs(goals.profile.weeklyWeightChangeKg)
-                        let dir = goals.profile.weeklyWeightChangeKg < 0 ? "Lose" : "Gain"
-                        Text("\(dir) ~\(goals.profile.weightRateDisplay(kgPerWeek: kgPerWeek))")
+                    if profile.weeklyWeightChangeKg != 0 {
+                        let rate = profile.weightRateDisplay(kgPerWeek: abs(profile.weeklyWeightChangeKg))
+                        Text(profile.weeklyWeightChangeKg < 0 ? String(localized: "Lose ~\(rate)") : String(localized: "Gain ~\(rate)"))
                             .font(CBTypography.body(13, weight: .medium))
                             .foregroundStyle(CBColors.sage)
                     }
@@ -101,34 +92,39 @@ struct ProfileHubView: View {
                     .font(CBTypography.body(15, weight: .semibold))
                     .foregroundStyle(CBColors.terra)
                     .buttonStyle(.plain)
+                    .accessibilityLabel(Text("Edit profile"))
+                    .accessibilityIdentifier("editProfile")
             }
         }
     }
-
-    // MARK: Nav rows
 
     private var navRows: some View {
         VStack(spacing: 0) {
-            navRow(title: "Weight prediction", subtitle: "Scenario simulator and target dates",
+            navRow(title: "Weight prediction", subtitle: "When you'll reach your target weight",
                    icon: "chart.line.uptrend.xyaxis", color: CBColors.sage) {
                 navigation.navigate(.prediction, in: .profile)
             }
-            navRow(title: "Plateau detection", subtitle: "Strategy cards for when progress stalls",
-                   icon: "waveform.path.ecg", color: CBColors.gold) {
-                navigation.navigate(.plateau, in: .profile)
+            .accessibilityIdentifier("row.prediction")
+            navRow(title: "Weight trend", subtitle: "Weigh-ins, plateau check and calibration",
+                   icon: "scalemass", color: CBColors.gold) {
+                navigation.navigate(.weightTrend, in: .profile)
             }
-            navRow(title: "Apple Health & Reminders", subtitle: "Sync activity and meal logging alerts",
+            .accessibilityIdentifier("row.weightTrend")
+            navRow(title: "Apple Health & reminders", subtitle: "Body data, activity and meal alerts",
                    icon: "heart.fill", color: CBColors.ocean) {
                 navigation.navigate(.integrations, in: .profile)
             }
-            navRow(title: "Widget previews", subtitle: "Lock screen and home screen widgets",
+            .accessibilityIdentifier("row.integrations")
+            navRow(title: "Widgets", subtitle: "Home Screen and Lock Screen",
                    icon: "squares.below.rectangle", color: CBColors.plum) {
                 navigation.navigate(.widgets, in: .profile)
             }
+            .accessibilityIdentifier("row.widgets")
         }
     }
 
-    private func navRow(title: String, subtitle: String, icon: String, color: Color, action: @escaping () -> Void) -> some View {
+    private func navRow(title: LocalizedStringKey, subtitle: LocalizedStringKey, icon: String, color: Color,
+                        action: @escaping () -> Void) -> some View {
         Button(action: action) {
             HStack(spacing: 14) {
                 Image(systemName: icon)
@@ -137,83 +133,49 @@ struct ProfileHubView: View {
                     .frame(width: 32, height: 32)
                     .background(color.opacity(0.12))
                     .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+                    .accessibilityHidden(true)
                 VStack(alignment: .leading, spacing: 2) {
                     Text(title).font(CBTypography.body(15, weight: .medium)).foregroundStyle(CBColors.ink)
                     Text(subtitle).font(CBTypography.body(13)).foregroundStyle(CBColors.inkMid)
                 }
                 Spacer()
                 Image(systemName: "chevron.right").foregroundStyle(CBColors.inkMid).font(.system(size: 13))
+                    .accessibilityHidden(true)
             }
             .padding(.vertical, 12)
+            .contentShape(Rectangle())
             .overlay(alignment: .bottom) { Rectangle().fill(CBColors.inkLine).frame(height: 1) }
         }
         .buttonStyle(.plain)
     }
 
-    // MARK: Stats helpers
-
-    private var initials: String { "CB" }  // No name in profile — use app initials
-
-    private var loggedDaysThisWeek: Int {
-        let cal = Calendar.current, today = cal.startOfDay(for: Date())
-        return (0..<7).filter { i in
-            let d = cal.date(byAdding: .day, value: i - 6, to: today)!
-            return mealStore.meals.contains { cal.isDate($0.timestamp, inSameDayAs: d) }
-        }.count
-    }
-
-    private var weekAvgCalories: Int {
-        let cal = Calendar.current, today = cal.startOfDay(for: Date())
-        var total = 0, days = 0
-        for i in 0..<7 {
-            let d = cal.date(byAdding: .day, value: i - 6, to: today)!
-            let consumed = mealStore.meals
-                .filter { cal.isDate($0.timestamp, inSameDayAs: d) }
-                .reduce(0) { $0 + $1.adjustedCalories }
-            if consumed > 0 { total += consumed; days += 1 }
-        }
-        return days > 0 ? total / days : 0
-    }
-
-    private var streak: Int {
-        let cal = Calendar.current
-        var day = cal.startOfDay(for: Date()), count = 0
-        while mealStore.meals.contains(where: { cal.isDate($0.timestamp, inSameDayAs: day) }) {
-            count += 1
-            day = cal.date(byAdding: .day, value: -1, to: day)!
-        }
-        return count
-    }
-
-    private func weekStat(value: String, label: String, color: Color) -> some View {
+    private func weekStat(value: String, label: LocalizedStringKey, color: Color) -> some View {
         VStack(spacing: 3) {
             Text(value).font(CBTypography.body(16, weight: .bold)).foregroundStyle(color)
+                .lineLimit(1).minimumScaleFactor(0.7)
             Text(label).font(CBTypography.body(11)).foregroundStyle(CBColors.inkMid)
+                .lineLimit(1).minimumScaleFactor(0.7)
         }
         .frame(maxWidth: .infinity).padding(.vertical, 10)
         .background(color.opacity(0.07))
         .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
-    }
-
-    // MARK: Save profile
-
-    private func saveProfile(_ profile: UserProfile) {
-        let snap = AppStateSnapshot(onboardingComplete: true, profile: profile)
-        if let data = try? JSONEncoder().encode(snap) {
-            UserDefaults.standard.set(data, forKey: "calBuddy.appState.v1")
-        }
+        .accessibilityElement(children: .combine)
     }
 }
 
 private struct MacroTarget: View {
-    let label: String; let grams: Int; let color: Color
+    let label: LocalizedStringKey
+    let grams: Int
+    let color: Color
+
     var body: some View {
         VStack(spacing: 3) {
-            Text("\(grams)g").font(CBTypography.body(17, weight: .bold)).foregroundStyle(color)
+            Text(NutritionFormat.grams(grams)).font(CBTypography.body(17, weight: .bold)).foregroundStyle(color)
             Text(label).font(CBTypography.body(11)).foregroundStyle(CBColors.inkMid)
         }
         .frame(maxWidth: .infinity).padding(.vertical, 10)
         .background(color.opacity(0.07), in: RoundedRectangle(cornerRadius: 10, style: .continuous))
+        .accessibilityElement(children: .combine)
     }
 }
 
@@ -222,7 +184,6 @@ private struct MacroTarget: View {
 struct ProfileEditView: View {
     let onSave: (UserProfile) -> Void
     @Environment(\.dismiss) private var dismiss
-
     @State private var profile: UserProfile
 
     init(profile: UserProfile, onSave: @escaping (UserProfile) -> Void) {
@@ -230,46 +191,84 @@ struct ProfileEditView: View {
         self.onSave = onSave
     }
 
+    private var imperial: Bool { profile.units == .imperial }
+
+    /// Height stepper in cm, or whole inches for imperial.
+    private var heightBinding: Binding<Int> {
+        Binding(
+            get: { imperial ? Int((Double(profile.heightCentimeters) / WeightMath.cmPerInch).rounded()) : profile.heightCentimeters },
+            set: { profile.heightCentimeters = imperial ? Int((Double($0) * WeightMath.cmPerInch).rounded()) : $0 }
+        )
+    }
+
+    /// Weight stepper in whole kg or lb.
+    private var weightBinding: Binding<Int> {
+        Binding(
+            get: { profile.weightInDisplayUnit(profile.weightKilograms) },
+            set: { profile.weightKilograms = profile.kilograms(fromDisplayUnit: Double($0)) }
+        )
+    }
+
     var body: some View {
         NavigationStack {
             Form {
-                Section("Units") {
+                Section {
                     Picker("Units", selection: $profile.units) {
-                        ForEach(UnitSystem.allCases) { u in Text(u.rawValue).tag(u) }
+                        ForEach(UnitSystem.allCases) { u in Text(u.title).tag(u) }
                     }
                     .pickerStyle(.segmented)
-                    Text("Calories always shown in kcal. Switches height & weight display.")
-                        .font(CBTypography.body(12))
-                        .foregroundStyle(CBColors.inkMid)
+                } header: {
+                    Text("Units")
+                } footer: {
+                    Text("Calories are always shown in kcal.")
                 }
 
                 Section("Body") {
                     Picker("Sex", selection: $profile.sex) {
-                        ForEach(BiologicalSex.allCases) { s in Text(s.rawValue).tag(s) }
+                        ForEach(BiologicalSex.allCases) { s in Text(s.title).tag(s) }
                     }
-                    Stepper("Age: \(profile.age)", value: $profile.age, in: 13...99)
-                    Stepper("Height: \(profile.heightDisplay)", value: $profile.heightCentimeters, in: 100...240, step: 1)
-                    Stepper("Weight: \(profile.weightDisplay)", value: $profile.weightKilograms, in: 30...300, step: 1)
+                    Stepper(value: $profile.age, in: 13...99) {
+                        LabeledContent("Age", value: profile.age.formatted())
+                    }
+                    Stepper(value: heightBinding, in: imperial ? 40...94 : 100...240) {
+                        LabeledContent("Height", value: profile.heightDisplay)
+                    }
+                    Stepper(value: weightBinding, in: imperial ? 66...660 : 30...300) {
+                        LabeledContent("Weight", value: profile.weightDisplay)
+                    }
                 }
 
-                Section("Goal") {
+                Section {
                     Picker("Goal", selection: $profile.goal) {
                         ForEach(FitnessGoal.allCases) { g in Text(g.title).tag(g) }
                     }
                     .pickerStyle(.menu)
                     Picker("Activity", selection: $profile.activityLevel) {
-                        ForEach(ActivityLevel.allCases) { a in Text(a.rawValue).tag(a) }
+                        ForEach(ActivityLevel.allCases) { a in Text(a.title).tag(a) }
                     }
                     .pickerStyle(.menu)
+                } header: {
+                    Text("Goal")
+                } footer: {
+                    if profile.calibration != nil {
+                        Text("Your maintenance calories come from your own logs, so the activity level no longer changes your target.")
+                    }
                 }
 
                 Section("Diet") {
                     ForEach(DietPreference.allCases) { pref in
-                        Toggle(pref.displayLabel, isOn: Binding(
+                        Toggle(pref.title, isOn: Binding(
                             get: { profile.dietPreferences.contains(pref) },
                             set: { on in
-                                if on { profile.dietPreferences.insert(pref); profile.dietPreferences.remove(.noRestriction) }
-                                else  { profile.dietPreferences.remove(pref); if profile.dietPreferences.isEmpty { profile.dietPreferences.insert(.noRestriction) } }
+                                if pref == .noRestriction {
+                                    if on { profile.dietPreferences = [.noRestriction] }
+                                } else if on {
+                                    profile.dietPreferences.insert(pref)
+                                    profile.dietPreferences.remove(.noRestriction)
+                                } else {
+                                    profile.dietPreferences.remove(pref)
+                                    if profile.dietPreferences.isEmpty { profile.dietPreferences.insert(.noRestriction) }
+                                }
                             }
                         ))
                         .tint(CBColors.terra)
@@ -278,12 +277,12 @@ struct ProfileEditView: View {
 
                 Section("Preview") {
                     let p = computedProfile
-                    LabeledContent("BMR", value: "\(p.bmr.formatted()) kcal")
-                    LabeledContent("TDEE", value: "\(p.tdee.formatted()) kcal")
-                    LabeledContent("Daily target", value: "\(p.calorieTarget.formatted()) kcal")
+                    LabeledContent("BMR", value: NutritionFormat.kcal(p.bmr))
+                    LabeledContent("TDEE", value: NutritionFormat.kcal(p.tdee))
+                    LabeledContent("Daily target", value: NutritionFormat.kcal(p.calorieTarget))
                 }
             }
-            .navigationTitle("Edit Profile")
+            .navigationTitle("Edit profile")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
@@ -291,9 +290,7 @@ struct ProfileEditView: View {
                 }
                 ToolbarItem(placement: .confirmationAction) {
                     Button("Save") {
-                        var p = profile
-                        p.recalculateTargets()
-                        onSave(p)
+                        onSave(profile)
                         dismiss()
                     }
                     .font(.body.bold())
@@ -310,218 +307,365 @@ struct ProfileEditView: View {
     }
 }
 
-// MARK: - Goals Overview
-
-struct GoalsOverviewView: View {
-    @Bindable var viewModel: GoalsViewModel
-
-    var body: some View {
-        VStack(spacing: 0) {
-            NavHeader(title: "My Goal", showsBack: true)
-            ScrollView {
-                VStack(spacing: 14) {
-                    GoalSummaryCard(profile: viewModel.profile)
-                    CBCard { TDEEBreakdownCard(items: viewModel.tdeeItems) }
-                    if let p = viewModel.prediction {
-                        CBCard(background: CBColors.sage.opacity(0.04), border: CBColors.sage.opacity(0.35)) {
-                            VStack(alignment: .leading, spacing: 4) {
-                                Text("Prediction").font(CBTypography.body(14, weight: .semibold))
-                                Text(p.summary).font(CBTypography.body(15, weight: .bold)).foregroundStyle(CBColors.ink)
-                                Text("Avg deficit: \(p.averageDeficit) kcal/day")
-                                    .font(CBTypography.body(13)).foregroundStyle(CBColors.inkMid)
-                            }
-                            .frame(maxWidth: .infinity, alignment: .leading)
-                        }
-                    }
-                }
-                .padding(.horizontal, CBSpacing.page).padding(.bottom, 96)
-            }
-        }
-        .background(CBColors.bg)
-        .navigationBarBackButtonHidden()
-        .edgeSwipeBackEnabled()
-    }
-}
-
 // MARK: - Weight Prediction
 
 struct WeightPredictionView: View {
     @Bindable var viewModel: GoalsViewModel
 
+    private var profile: UserProfile { viewModel.profile }
+
+    private var targetBinding: Binding<Int> {
+        Binding(
+            get: { profile.weightInDisplayUnit(viewModel.targetWeightKilograms) },
+            set: { viewModel.setTargetWeight(displayValue: $0) }
+        )
+    }
+
     var body: some View {
+        let projection = viewModel.projection
         VStack(spacing: 0) {
-            NavHeader(title: "Predict", subtitle: "Based on your profile data", showsBack: true)
+            NavHeader("Weight prediction", subtitle: String(localized: "From your profile and plan"), showsBack: true)
             ScrollView {
                 VStack(alignment: .leading, spacing: 14) {
                     CBCard(background: CBColors.sage.opacity(0.04), border: CBColors.sage.opacity(0.35)) {
                         VStack(alignment: .leading, spacing: 4) {
-                            Text("At current pace").font(CBTypography.body(14)).foregroundStyle(CBColors.inkMid)
-                            Text(viewModel.prediction?.summary ?? "Calculating…")
+                            Text("At this pace").font(CBTypography.body(14)).foregroundStyle(CBColors.inkMid)
+                            Text(headline(projection))
                                 .font(CBTypography.body(20, weight: .bold)).foregroundStyle(CBColors.ink)
-                            Text("Daily deficit · \(viewModel.prediction?.averageDeficit ?? Int(viewModel.deficit)) kcal")
-                                .font(CBTypography.body(14)).foregroundStyle(CBColors.inkMid)
+                            if case .eta(_, let weeks) = projection.outcome {
+                                Text("About \(Int(weeks.rounded())) weeks")
+                                    .font(CBTypography.body(14)).foregroundStyle(CBColors.inkMid)
+                            }
                         }
                         .frame(maxWidth: .infinity, alignment: .leading)
                     }
 
-                    VStack(alignment: .leading, spacing: 10) {
-                        Text("Scenario simulator").font(CBTypography.body(14, weight: .semibold))
-                        HStack(spacing: 8) {
-                            ForEach(PredictionScenario.allCases) { scenario in
-                                ScenarioButton(scenario: scenario, selected: viewModel.selectedScenario == scenario) {
-                                    Task { await viewModel.selectScenario(scenario) }
+                    CBCard {
+                        Stepper(value: targetBinding, in: targetRange) {
+                            LabeledContent("Target weight",
+                                           value: UserProfile.weightString(kilograms: viewModel.targetWeightKilograms,
+                                                                           units: profile.units))
+                        }
+                        .font(CBTypography.body(15))
+                    }
+
+                    if projection.outcome != .reached {
+                        VStack(alignment: .leading, spacing: 10) {
+                            Text("Scenario").font(CBTypography.body(14, weight: .semibold))
+                            HStack(spacing: 8) {
+                                ForEach(PredictionScenario.allCases) { scenario in
+                                    ScenarioButton(title: scenario.title,
+                                                   detail: NutritionFormat.kcal(scenario.dailyBalance(for: profile)),
+                                                   selected: viewModel.selectedScenario == scenario) {
+                                        viewModel.selectScenario(scenario)
+                                    }
                                 }
                             }
-                        }
-                        CBCard {
-                            VStack(spacing: 8) {
-                                HStack {
-                                    Text("Daily deficit").font(CBTypography.body(14)).foregroundStyle(CBColors.inkMid)
-                                    Spacer()
-                                    Text("-\(Int(viewModel.deficit)) kcal").font(CBTypography.body(15, weight: .bold))
+                            CBCard {
+                                VStack(spacing: 8) {
+                                    HStack {
+                                        (viewModel.isGain ? Text("Daily surplus") : Text("Daily deficit"))
+                                            .font(CBTypography.body(14)).foregroundStyle(CBColors.inkMid)
+                                        Spacer()
+                                        Text(NutritionFormat.kcal(viewModel.dailyBalance)).font(CBTypography.body(15, weight: .bold))
+                                    }
+                                    Slider(value: Binding(get: { Double(viewModel.dailyBalance) },
+                                                          set: { viewModel.updateBalance($0) }),
+                                           in: 100...1000, step: 50) {
+                                        (viewModel.isGain ? Text("Daily surplus") : Text("Daily deficit"))
+                                    }
+                                    .tint(CBColors.terra)
+                                    .accessibilityValue(Text(NutritionFormat.kcal(viewModel.dailyBalance)))
+                                    HStack {
+                                        Text(NutritionFormat.kcal(100))
+                                        Spacer()
+                                        Text(NutritionFormat.kcal(1000))
+                                    }
+                                    .font(CBTypography.mono(10))
+                                    .foregroundStyle(CBColors.inkMid)
+                                    .accessibilityHidden(true)
                                 }
-                                Slider(value: $viewModel.deficit, in: 100...1000, step: 50) { _ in
-                                    Task { await viewModel.updateDeficit(viewModel.deficit) }
-                                }
-                                .tint(CBColors.terra)
-                                HStack {
-                                    Text("-100").foregroundStyle(CBColors.inkMid)
-                                    Spacer()
-                                    Text("-1,000 kcal").foregroundStyle(CBColors.inkMid)
-                                }
-                                .font(CBTypography.mono(10))
                             }
                         }
                     }
-                    Text("Metabolic model recalibrates every 2 weeks using real weight data")
+
+                    Text(calibrationNote)
                         .font(CBTypography.body(13)).foregroundStyle(CBColors.inkMid)
+                    Text("Projections assume 7,700 kcal per kg, slowed slightly for metabolic adaptation. Real progress is rarely linear.")
+                        .font(CBTypography.body(12)).foregroundStyle(CBColors.inkMid)
                 }
                 .padding(.horizontal, CBSpacing.page).padding(.bottom, 96)
             }
         }
         .background(CBColors.bg).navigationBarBackButtonHidden().edgeSwipeBackEnabled()
-        .task { if viewModel.prediction == nil { await viewModel.selectScenario(.current) } }
+    }
+
+    private var targetRange: ClosedRange<Int> {
+        profile.units == .metric ? 30...250 : 66...550
+    }
+
+    private func headline(_ p: WeightProjection) -> String {
+        let target = UserProfile.weightString(kilograms: p.targetKilograms, units: profile.units)
+        switch p.outcome {
+        case .reached:
+            return String(localized: "You're at your target weight")
+        case .eta(let date, _):
+            let when = date.formatted(.dateTime.month(.wide).year())
+            return String(localized: "Reach \(target) around \(when)")
+        case .tooSlow:
+            return String(localized: "More than two years to \(target) at this pace")
+        }
+    }
+
+    private var calibrationNote: String {
+        if let c = profile.calibration {
+            return String(localized: "Maintenance calories calibrated from your logs on \(c.date.formatted(date: .abbreviated, time: .omitted)). They refresh every two weeks while you keep logging.")
+        }
+        return String(localized: "Maintenance calories are a formula estimate. Log meals and weigh in for two weeks to calibrate them on the Weight trend screen.")
     }
 }
 
-// MARK: - Plateau Alert
+// MARK: - Weight Trend
 
-struct PlateauAlertView: View {
-    @State private var selectedStrategy: String?
-    private let profile: UserProfile = {
-        guard let data = UserDefaults.standard.data(forKey: "calBuddy.appState.v1"),
-              let snap = try? JSONDecoder().decode(AppStateSnapshot.self, from: data)
-        else { return UserProfile() }
-        return snap.profile
-    }()
+struct WeightTrendView: View {
+    @Bindable var viewModel: GoalsViewModel
+    @State private var entryValue: Double?
+    @FocusState private var entryFocused: Bool
+
+    private var profile: UserProfile { viewModel.profile }
+
+    private func display(_ kg: Double) -> Double {
+        profile.units == .metric ? kg : kg * WeightMath.poundsPerKg
+    }
 
     var body: some View {
         VStack(spacing: 0) {
-            NavHeader(title: "Plateau Detected", showsBack: true)
+            NavHeader("Weight trend", showsBack: true)
             ScrollView {
-                VStack(spacing: 14) {
-                    CBCard(background: CBColors.gold.opacity(0.05), border: CBColors.gold.opacity(0.4)) {
-                        HStack(alignment: .top) {
-                            VStack(alignment: .leading, spacing: 8) {
-                                PillTag(text: "Plateau", color: CBColors.gold, filled: true)
-                                Text("\(profile.weightDisplay) · 14+ days")
-                                    .font(CBTypography.body(19, weight: .bold)).foregroundStyle(CBColors.ink)
-                                Text("Metabolism may have adapted.\nTime to adjust strategy.")
-                                    .font(CBTypography.body(14)).foregroundStyle(CBColors.inkMid)
-                            }
-                            Spacer()
-                            CalorieRing(progress: 0, label: "14d", subtitle: "flat", size: 58, stroke: 6, color: CBColors.gold, display: false)
-                        }
-                    }
-                    VStack(alignment: .leading, spacing: 8) {
-                        Text("What to try").font(CBTypography.body(15, weight: .semibold))
-                        StrategyRow(title: "Refeed day", subtitle: "Eat at TDEE to reset leptin levels",
-                                    selected: selectedStrategy == "Refeed day") { selectedStrategy = "Refeed day" }
-                        StrategyRow(title: "Add light cardio", subtitle: "A 20-min walk can break adaptation",
-                                    selected: selectedStrategy == "Add light cardio") { selectedStrategy = "Add light cardio" }
-                        StrategyRow(title: "Improve sleep", subtitle: "Poor sleep raises cortisol and hunger",
-                                    selected: selectedStrategy == "Improve sleep") { selectedStrategy = "Improve sleep" }
-                        StrategyRow(title: "Recalibrate TDEE", subtitle: "Update your target weight to continue",
-                                    cta: true, selected: selectedStrategy == "Recalibrate TDEE") { selectedStrategy = "Recalibrate TDEE" }
-                    }
-                    CBCard(background: CBColors.bgSoft) {
-                        VStack(alignment: .leading, spacing: 4) {
-                            Label("Weight History Coming Soon", systemImage: "chart.line.uptrend.xyaxis")
-                                .font(CBTypography.body(14, weight: .semibold))
-                                .foregroundStyle(CBColors.inkMid)
-                            Text("Log your daily weight to enable automatic plateau detection.")
-                                .font(CBTypography.body(13)).foregroundStyle(CBColors.inkMid)
-                        }
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                    }
+                VStack(alignment: .leading, spacing: 14) {
+                    statusCard
+                    chart
+                    logCard
+                    calibrationCard
+                    if case .plateau = viewModel.plateau { strategies }
+                    history
                 }
                 .padding(.horizontal, CBSpacing.page).padding(.bottom, 96)
             }
+            .scrollDismissesKeyboard(.interactively)
         }
         .background(CBColors.bg).navigationBarBackButtonHidden().edgeSwipeBackEnabled()
+    }
+
+    // MARK: Status
+
+    private var statusCard: some View {
+        let (tag, color, title, detail) = statusText
+        return CBCard(background: color.opacity(0.05), border: color.opacity(0.4)) {
+            VStack(alignment: .leading, spacing: 8) {
+                PillTag(tag, color: color, filled: true)
+                Text(title).font(CBTypography.body(18, weight: .bold)).foregroundStyle(CBColors.ink)
+                Text(detail).font(CBTypography.body(14)).foregroundStyle(CBColors.inkMid)
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+        }
+    }
+
+    private var statusText: (String, Color, String, String) {
+        switch viewModel.plateau {
+        case .notEnoughData:
+            return (String(localized: "Not enough data"), CBColors.inkMid,
+                    String(localized: "Weigh in a few times"),
+                    String(localized: "Log your weight at least three times over two weeks to see your trend."))
+        case .maintaining(let t):
+            return (String(localized: "Maintaining"), CBColors.sage, rate(t),
+                    String(localized: "Your goal is to hold steady; small swings are normal."))
+        case .progressing(let t):
+            return (String(localized: "On track"), CBColors.sage, rate(t),
+                    String(localized: "Your weight is moving in the direction of your goal."))
+        case .wrongDirection(let t):
+            return (String(localized: "Off track"), CBColors.terra, rate(t),
+                    String(localized: "Your weight is moving away from your goal. Check that every meal is logged."))
+        case .plateau(let t):
+            return (String(localized: "Plateau"), CBColors.gold, rate(t),
+                    String(localized: "Almost no change over the last \(t.spanDays) days."))
+        }
+    }
+
+    private func rate(_ t: WeightTrend) -> String {
+        let r = profile.weightRateDisplay(kgPerWeek: abs(t.kgPerWeek))
+        if abs(t.kgPerWeek) < 0.05 { return String(localized: "Stable") }
+        return t.kgPerWeek < 0 ? String(localized: "Losing \(r)") : String(localized: "Gaining \(r)")
+    }
+
+    // MARK: Chart
+
+    @ViewBuilder
+    private var chart: some View {
+        let cutoff = Date().adding(days: -90)
+        let points = viewModel.weights.filter { $0.date >= cutoff }
+        if points.count >= 2 {
+            Chart(points) { entry in
+                LineMark(x: .value("Date", entry.date), y: .value("Weight", display(entry.kilograms)))
+                    .foregroundStyle(CBColors.terra)
+                    .interpolationMethod(.monotone)
+                PointMark(x: .value("Date", entry.date), y: .value("Weight", display(entry.kilograms)))
+                    .foregroundStyle(CBColors.terra)
+                    .symbolSize(24)
+            }
+            .chartYScale(domain: .automatic(includesZero: false))
+            .frame(height: 180)
+            .accessibilityLabel(Text("Weight over the last 90 days"))
+        }
+    }
+
+    // MARK: Log
+
+    private var logCard: some View {
+        CBCard {
+            HStack(spacing: 10) {
+                Text("Today's weight").font(CBTypography.body(15, weight: .medium))
+                Spacer()
+                TextField(profile.weightInDisplayUnit(profile.weightKilograms).formatted(),
+                          value: $entryValue,
+                          format: .number.precision(.fractionLength(0...1)))
+                    .keyboardType(.decimalPad)
+                    .multilineTextAlignment(.trailing)
+                    .frame(width: 80)
+                    .focused($entryFocused)
+                    .accessibilityLabel(Text("Today's weight"))
+                    .accessibilityIdentifier("weightField")
+                Text(profile.weightUnitSymbol).foregroundStyle(CBColors.inkMid).accessibilityHidden(true)
+                Button("Log") {
+                    guard let v = entryValue, v > 0 else { return }
+                    viewModel.logWeight(displayValue: v)
+                    entryValue = nil
+                    entryFocused = false
+                }
+                .font(CBTypography.body(15, weight: .semibold))
+                .foregroundStyle(CBColors.terra)
+                .disabled((entryValue ?? 0) <= 0)
+                .accessibilityIdentifier("logWeight")
+            }
+        }
+    }
+
+    // MARK: Calibration
+
+    @ViewBuilder
+    private var calibrationCard: some View {
+        CBCard(background: CBColors.bgSoft) {
+            VStack(alignment: .leading, spacing: 8) {
+                Text("Maintenance calories").font(CBTypography.body(15, weight: .semibold))
+                if let c = profile.calibration {
+                    Text("Using \(NutritionFormat.kcal(c.tdee)) from your logs (formula: \(NutritionFormat.kcal(profile.formulaTDEE))).")
+                        .font(CBTypography.body(13)).foregroundStyle(CBColors.inkMid)
+                    Button("Go back to the formula", action: viewModel.clearCalibration)
+                        .font(CBTypography.body(14, weight: .semibold)).foregroundStyle(CBColors.terra)
+                } else if let estimate = viewModel.calibrationEstimate {
+                    Text("Your last \(estimate.spanDays) days suggest \(NutritionFormat.kcal(estimate.tdee)) a day (formula: \(NutritionFormat.kcal(profile.formulaTDEE))). This is only accurate if you logged everything you ate.")
+                        .font(CBTypography.body(13)).foregroundStyle(CBColors.inkMid)
+                    Button("Use this estimate", action: viewModel.applyCalibration)
+                        .font(CBTypography.body(14, weight: .semibold)).foregroundStyle(CBColors.terra)
+                } else {
+                    Text("Needs two weeks of weigh-ins and at least 10 logged days in the last four weeks.")
+                        .font(CBTypography.body(13)).foregroundStyle(CBColors.inkMid)
+                }
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+        }
+    }
+
+    // MARK: Strategies
+
+    private var strategies: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text("What to try").font(CBTypography.body(15, weight: .semibold))
+            StrategyRow(title: "Check your logging", subtitle: "Snacks, drinks and cooking oil are easy to miss")
+            StrategyRow(title: "Take a maintenance break", subtitle: "A week at maintenance can ease diet fatigue")
+            StrategyRow(title: "Move a little more", subtitle: "A daily 20-minute walk adds up")
+            StrategyRow(title: "Sleep", subtitle: "Short sleep tends to increase appetite")
+        }
+    }
+
+    // MARK: History
+
+    @ViewBuilder
+    private var history: some View {
+        if !viewModel.weights.isEmpty {
+            VStack(alignment: .leading, spacing: 0) {
+                Text("Weigh-ins").font(CBTypography.body(15, weight: .semibold)).padding(.bottom, 6)
+                ForEach(viewModel.weights.suffix(10).reversed()) { entry in
+                    HStack {
+                        Text(entry.date.formatted(date: .abbreviated, time: .omitted))
+                            .foregroundStyle(CBColors.inkMid)
+                        if entry.source == .health {
+                            Image(systemName: "heart.fill").foregroundStyle(CBColors.terra).imageScale(.small)
+                                .accessibilityLabel(Text("From Apple Health"))
+                        }
+                        Spacer()
+                        Text(UserProfile.weightString(kilograms: entry.kilograms, units: profile.units, fractionDigits: 1))
+                            .fontWeight(.medium)
+                        if entry.source == .manual {
+                            Menu {
+                                Button(role: .destructive) { viewModel.deleteWeight(id: entry.id) } label: {
+                                    Label("Delete", systemImage: "trash")
+                                }
+                            } label: {
+                                Image(systemName: "ellipsis").frame(width: 32, height: 36).contentShape(Rectangle())
+                            }
+                            .foregroundStyle(CBColors.inkMid)
+                            .accessibilityLabel(Text("Weigh-in actions"))
+                        }
+                    }
+                    .font(CBTypography.body(14))
+                    .padding(.vertical, 6)
+                    .overlay(alignment: .bottom) { Rectangle().fill(CBColors.inkLine).frame(height: 1) }
+                }
+            }
+        }
     }
 }
 
 // MARK: - Shared subviews
 
-private struct GoalSummaryCard: View {
-    let profile: UserProfile
-    var body: some View {
-        CBCard(background: CBColors.terra.opacity(0.03), border: CBColors.terra.opacity(0.33)) {
-            HStack {
-                VStack(alignment: .leading, spacing: 5) {
-                    PillTag(text: "Active goal", color: CBColors.terra)
-                    Text(profile.goal.title).font(CBTypography.body(18, weight: .bold)).foregroundStyle(CBColors.ink)
-                    Text("\(profile.weightDisplay) · \(profile.age) yrs · \(profile.heightDisplay)")
-                        .font(CBTypography.body(14)).foregroundStyle(CBColors.inkMid)
-                    Text(profile.activityLevel.rawValue)
-                        .font(CBTypography.body(12)).foregroundStyle(CBColors.inkMid)
-                }
-                Spacer()
-                VStack(alignment: .trailing, spacing: 2) {
-                    Text("\(profile.calorieTarget.formatted())").font(CBTypography.display(24)).foregroundStyle(CBColors.terra)
-                    Text("kcal/day").font(CBTypography.body(11)).foregroundStyle(CBColors.inkMid)
-                }
-            }
-        }
-    }
-}
-
 private struct ScenarioButton: View {
-    let scenario: PredictionScenario; let selected: Bool; let action: () -> Void
+    let title: String
+    let detail: String
+    let selected: Bool
+    let action: () -> Void
+
     var body: some View {
         Button(action: action) {
-            Text(scenario.label)
-                .font(CBTypography.body(13, weight: .semibold))
-                .foregroundStyle(selected ? CBColors.controlOnFill : CBColors.ink)
-                .frame(maxWidth: .infinity).padding(.vertical, 10)
-                .background(selected ? CBColors.controlFill : Color.clear)
-                .overlay(RoundedRectangle(cornerRadius: 12).stroke(selected ? CBColors.controlFill : CBColors.inkFaint, lineWidth: 1.5))
-                .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+            VStack(spacing: 2) {
+                Text(title).font(CBTypography.body(13, weight: .semibold))
+                Text(detail).font(CBTypography.body(11)).opacity(0.75)
+            }
+            .lineLimit(1)
+            .minimumScaleFactor(0.7)
+            .foregroundStyle(selected ? CBColors.controlOnFill : CBColors.ink)
+            .frame(maxWidth: .infinity).padding(.vertical, 8)
+            .background(selected ? CBColors.controlFill : Color.clear)
+            .overlay(RoundedRectangle(cornerRadius: 12).stroke(selected ? CBColors.controlFill : CBColors.inkFaint, lineWidth: 1.5))
+            .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
         }
         .buttonStyle(.plain)
+        .accessibilityAddTraits(selected ? .isSelected : [])
     }
 }
 
 private struct StrategyRow: View {
-    let title: String; let subtitle: String; var cta = false; var selected = false; let action: () -> Void
+    let title: LocalizedStringKey
+    let subtitle: LocalizedStringKey
+
     var body: some View {
-        Button(action: action) {
-            CBCard(background: background, border: border) {
-                HStack {
-                    VStack(alignment: .leading, spacing: 2) {
-                        Text(title).font(CBTypography.body(15, weight: cta || selected ? .bold : .medium))
-                            .foregroundStyle(cta ? CBColors.terra : CBColors.ink)
-                        Text(subtitle).font(CBTypography.body(13)).foregroundStyle(CBColors.inkMid)
-                    }
-                    Spacer()
-                    Image(systemName: selected ? "checkmark.circle.fill" : (cta ? "arrow.right" : "circle"))
-                        .foregroundStyle(selected ? CBColors.sage : (cta ? CBColors.terra : CBColors.inkFaint))
-                }
+        CBCard {
+            VStack(alignment: .leading, spacing: 2) {
+                Text(title).font(CBTypography.body(15, weight: .medium)).foregroundStyle(CBColors.ink)
+                Text(subtitle).font(CBTypography.body(13)).foregroundStyle(CBColors.inkMid)
             }
+            .frame(maxWidth: .infinity, alignment: .leading)
         }
-        .buttonStyle(.plain)
+        .accessibilityElement(children: .combine)
     }
-    private var background: Color { selected ? CBColors.sage.opacity(0.08) : (cta ? CBColors.terra.opacity(0.05) : CBColors.bg) }
-    private var border: Color { selected ? CBColors.sage.opacity(0.55) : (cta ? CBColors.terra : CBColors.inkFaint) }
 }
