@@ -88,10 +88,12 @@ struct ProfileHubView: View {
 
                 Spacer()
 
-                Button("Edit") { showEditProfile = true }
+                Button { showEditProfile = true } label: {
+                    Text("Edit").frame(minWidth: 44, minHeight: 44)
+                }
                     .font(CBTypography.body(15, weight: .semibold))
                     .foregroundStyle(CBColors.terra)
-                    .buttonStyle(.plain)
+                    .buttonStyle(.cbPressable)
                     .accessibilityLabel(Text("Edit profile"))
                     .accessibilityIdentifier("editProfile")
             }
@@ -146,7 +148,7 @@ struct ProfileHubView: View {
             .contentShape(Rectangle())
             .overlay(alignment: .bottom) { Rectangle().fill(CBColors.inkLine).frame(height: 1) }
         }
-        .buttonStyle(.plain)
+        .buttonStyle(.cbPressable)
     }
 
     private func weekStat(value: String, label: LocalizedStringKey, color: Color) -> some View {
@@ -453,6 +455,7 @@ struct WeightTrendView: View {
                 .padding(.horizontal, CBSpacing.page).padding(.bottom, 96)
             }
             .scrollDismissesKeyboard(.interactively)
+            .keyboardDoneButton()
         }
         .background(CBColors.bg).navigationBarBackButtonHidden().edgeSwipeBackEnabled()
     }
@@ -536,12 +539,15 @@ struct WeightTrendView: View {
                     .accessibilityLabel(Text("Today's weight"))
                     .accessibilityIdentifier("weightField")
                 Text(profile.weightUnitSymbol).foregroundStyle(CBColors.inkMid).accessibilityHidden(true)
-                Button("Log") {
+                Button {
                     guard let v = entryValue, v > 0 else { return }
                     viewModel.logWeight(displayValue: v)
                     entryValue = nil
                     entryFocused = false
+                } label: {
+                    Text("Log").frame(minWidth: 44, minHeight: 44)
                 }
+                .buttonStyle(.cbPressable)
                 .font(CBTypography.body(15, weight: .semibold))
                 .foregroundStyle(CBColors.terra)
                 .disabled((entryValue ?? 0) <= 0)
@@ -560,13 +566,19 @@ struct WeightTrendView: View {
                 if let c = profile.calibration {
                     Text("Using \(NutritionFormat.kcal(c.tdee)) from your logs (formula: \(NutritionFormat.kcal(profile.formulaTDEE))).")
                         .font(CBTypography.body(13)).foregroundStyle(CBColors.inkMid)
-                    Button("Go back to the formula", action: viewModel.clearCalibration)
-                        .font(CBTypography.body(14, weight: .semibold)).foregroundStyle(CBColors.terra)
+                    Button(action: viewModel.clearCalibration) {
+                        Text("Go back to the formula").frame(minHeight: 44)
+                    }
+                    .buttonStyle(.cbPressable)
+                    .font(CBTypography.body(14, weight: .semibold)).foregroundStyle(CBColors.terra)
                 } else if let estimate = viewModel.calibrationEstimate {
                     Text("Your last \(estimate.spanDays) days suggest \(NutritionFormat.kcal(estimate.tdee)) a day (formula: \(NutritionFormat.kcal(profile.formulaTDEE))). This is only accurate if you logged everything you ate.")
                         .font(CBTypography.body(13)).foregroundStyle(CBColors.inkMid)
-                    Button("Use this estimate", action: viewModel.applyCalibration)
-                        .font(CBTypography.body(14, weight: .semibold)).foregroundStyle(CBColors.terra)
+                    Button(action: viewModel.applyCalibration) {
+                        Text("Use this estimate").frame(minHeight: 44)
+                    }
+                    .buttonStyle(.cbPressable)
+                    .font(CBTypography.body(14, weight: .semibold)).foregroundStyle(CBColors.terra)
                 } else {
                     Text("Needs two weeks of weigh-ins and at least 10 logged days in the last four weeks.")
                         .font(CBTypography.body(13)).foregroundStyle(CBColors.inkMid)
@@ -612,7 +624,7 @@ struct WeightTrendView: View {
                                     Label("Delete", systemImage: "trash")
                                 }
                             } label: {
-                                Image(systemName: "ellipsis").frame(width: 32, height: 36).contentShape(Rectangle())
+                                Image(systemName: "ellipsis").frame(width: 44, height: 44).contentShape(Rectangle())
                             }
                             .foregroundStyle(CBColors.inkMid)
                             .accessibilityLabel(Text("Weigh-in actions"))
@@ -649,7 +661,7 @@ private struct ScenarioButton: View {
             .overlay(RoundedRectangle(cornerRadius: 12).stroke(selected ? CBColors.controlFill : CBColors.inkFaint, lineWidth: 1.5))
             .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
         }
-        .buttonStyle(.plain)
+        .buttonStyle(.cbPressable)
         .accessibilityAddTraits(selected ? .isSelected : [])
     }
 }

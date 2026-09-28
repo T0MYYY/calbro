@@ -11,8 +11,9 @@ struct StatsCaloriesView: View {
                     navigation.navigate(.weeklyReport, in: .stats)
                 } label: {
                     PillTag("Report", color: CBColors.inkMid)
+                        .frame(minHeight: 44)
                 }
-                .buttonStyle(.plain)
+                .buttonStyle(.cbPressable)
                 .accessibilityIdentifier("openReport")
             }
             ScrollView {

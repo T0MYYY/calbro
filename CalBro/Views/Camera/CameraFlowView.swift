@@ -81,7 +81,7 @@ struct CameraFlowView: View {
                         .frame(width: 44, height: 44)
                         .background(Color.black.opacity(0.5), in: Circle())
                 }
-                .buttonStyle(.plain)
+                .buttonStyle(.cbPressable)
                 .accessibilityLabel(Text("Close"))
                 .accessibilityIdentifier("closeCamera")
                 Spacer()
@@ -156,7 +156,7 @@ struct CameraFlowView: View {
                         Circle().fill(.white).frame(width: 44, height: 44)
                     }
                 }
-                .buttonStyle(.plain)
+                .buttonStyle(.cbPressable)
                 .accessibilityLabel(Text("Take photo"))
                 .accessibilityIdentifier("shutter")
             }
@@ -240,9 +240,9 @@ private struct ErrorBanner: View {
             }
             Spacer(minLength: 0)
             Button(action: onDismiss) {
-                Image(systemName: "xmark").frame(width: 32, height: 32)
+                Image(systemName: "xmark").frame(width: 44, height: 44)
             }
-            .buttonStyle(.plain)
+            .buttonStyle(.cbPressable)
             .accessibilityLabel(Text("Dismiss"))
         }
         .foregroundStyle(.white)
@@ -544,20 +544,22 @@ private struct ResultSheet: View {
             HStack {
                 Text("Serving").font(CBTypography.body(14)).foregroundStyle(.white.opacity(0.55))
                 Spacer()
-                HStack(spacing: 20) {
+                HStack(spacing: 8) {
                     Button { if multiplier > 0.5 { multiplier -= 0.5 } } label: {
                         Image(systemName: "minus").font(.system(size: 15, weight: .semibold))
-                            .foregroundStyle(.white).frame(width: 32, height: 32)
+                            .foregroundStyle(.white).frame(width: 36, height: 36)
                             .background(Color.white.opacity(0.12), in: Circle())
-                    }.buttonStyle(.plain)
+                            .frame(width: 48, height: 48)
+                    }.buttonStyle(.cbPressable)
                     .accessibilityLabel(Text("Smaller serving"))
                     Text(ServingFormat.multiplier(multiplier))
                         .font(CBTypography.body(17, weight: .bold)).foregroundStyle(.white).frame(minWidth: 44)
                     Button { if multiplier < 4 { multiplier += 0.5 } } label: {
                         Image(systemName: "plus").font(.system(size: 15, weight: .semibold))
-                            .foregroundStyle(.white).frame(width: 32, height: 32)
+                            .foregroundStyle(.white).frame(width: 36, height: 36)
                             .background(Color.white.opacity(0.12), in: Circle())
-                    }.buttonStyle(.plain)
+                            .frame(width: 48, height: 48)
+                    }.buttonStyle(.cbPressable)
                     .accessibilityLabel(Text("Larger serving"))
                 }
             }
@@ -575,13 +577,15 @@ private struct ResultSheet: View {
                     .background(CBColors.controlFill)
                     .clipShape(RoundedRectangle(cornerRadius: CBSpacing.buttonRadius, style: .continuous))
             }
-            .buttonStyle(.plain)
+            .buttonStyle(.cbPressable)
             .padding(.horizontal, CBSpacing.page)
             .accessibilityIdentifier("addToLog")
 
-            Button("Retake") { viewModel.dismissResult() }
-                .font(CBTypography.body(14)).foregroundStyle(.white.opacity(0.5))
-                .frame(maxWidth: .infinity).padding(.top, 12).buttonStyle(.plain)
+            Button { viewModel.dismissResult() } label: {
+                Text("Retake").frame(maxWidth: .infinity, minHeight: 44)
+            }
+            .font(CBTypography.body(14)).foregroundStyle(.white.opacity(0.6))
+            .padding(.top, 4).buttonStyle(.cbPressable)
 
             Color.clear.frame(height: 28)
         }

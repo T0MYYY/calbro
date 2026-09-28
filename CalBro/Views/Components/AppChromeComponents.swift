@@ -11,7 +11,7 @@ struct FloatingActionButton: View {
                 .frame(width: 58, height: 58)
                 .contentShape(Circle())
         }
-        .buttonStyle(.plain)
+        .buttonStyle(.cbPressable)
         .cbGlass(.regular, cornerRadius: 29, tint: CBColors.terra.opacity(0.22), interactive: true)
         .shadow(color: CBColors.ink.opacity(0.14), radius: 16, x: 0, y: 8)
         .accessibilityLabel(Text("Scan a meal"))
@@ -54,7 +54,7 @@ struct NavHeader<Trailing: View>: View {
                         .frame(width: 32, height: 44, alignment: .leading)
                         .contentShape(Rectangle())
                 }
-                .buttonStyle(.plain)
+                .buttonStyle(.cbPressable)
                 .accessibilityLabel(Text("Back"))
                 .accessibilityIdentifier("back")
             }
@@ -96,10 +96,11 @@ struct WeekStrip: View {
                         Text(monthLabel)
                         Image(systemName: "calendar").imageScale(.small)
                     }
+                    .frame(minHeight: 44)
                     .font(CBTypography.body(13, weight: .medium))
                     .foregroundStyle(CBColors.inkMid)
                 }
-                .buttonStyle(.plain)
+                .buttonStyle(.cbPressable)
                 .accessibilityHint(Text("Opens the monthly calendar"))
                 .accessibilityIdentifier("openCalendar")
                 Spacer()
@@ -144,7 +145,7 @@ struct WeekStrip: View {
             }
             .frame(maxWidth: .infinity)
         }
-        .buttonStyle(.plain)
+        .buttonStyle(.cbPressable)
         .disabled(day.isFuture)
         .accessibilityLabel(Text(day.date.formatted(date: .complete, time: .omitted)))
         .accessibilityValue(Text(day.isFuture ? "" : day.status.title))
@@ -181,7 +182,7 @@ struct CalendarDayCell: View {
             }
             .aspectRatio(1, contentMode: .fit)
         }
-        .buttonStyle(.plain)
+        .buttonStyle(.cbPressable)
         .disabled(day == nil)
         .accessibilityHidden(day == nil)
         .accessibilityLabel(Text(accessibilityLabel))

@@ -21,6 +21,8 @@ struct OnboardingFlowView: View {
                 }
             }
             .scrollBounceBehavior(.basedOnSize)
+            .scrollDismissesKeyboard(.interactively)
+            .keyboardDoneButton()
             .frame(maxWidth: 500)
             .background(CBColors.bg)
         }
@@ -39,7 +41,7 @@ private struct StepProgressHeader: View {
                     .frame(width: 32, height: 44, alignment: .leading)
                     .contentShape(Rectangle())
             }
-            .buttonStyle(.plain)
+            .buttonStyle(.cbPressable)
             .accessibilityLabel(Text("Back"))
             ProgressBar(progress: viewModel.progress, color: CBColors.ink, height: 5)
             Text(viewModel.progressText)
@@ -148,7 +150,7 @@ private struct GoalCard: View {
             .overlay(RoundedRectangle(cornerRadius: CBSpacing.cardRadius).stroke(selected ? color : CBColors.inkFaint, lineWidth: 1.5))
             .clipShape(RoundedRectangle(cornerRadius: CBSpacing.cardRadius, style: .continuous))
         }
-        .buttonStyle(.plain)
+        .buttonStyle(.cbPressable)
         .accessibilityAddTraits(selected ? .isSelected : [])
     }
 }
@@ -200,7 +202,7 @@ private struct BodyStatsStep: View {
                         }
                         .font(CBTypography.body(20))
                         .foregroundStyle(CBColors.ink)
-                        .buttonStyle(.plain)
+                        .buttonStyle(.cbPressable)
                     }
                 }
                 HStack(spacing: 10) {
@@ -265,7 +267,7 @@ private struct ActivityStep: View {
                         .overlay(RoundedRectangle(cornerRadius: CBSpacing.cardRadius).stroke(selected ? CBColors.controlFill : CBColors.inkFaint, lineWidth: 1.5))
                         .clipShape(RoundedRectangle(cornerRadius: CBSpacing.cardRadius, style: .continuous))
                     }
-                    .buttonStyle(.plain)
+                    .buttonStyle(.cbPressable)
                     .accessibilityAddTraits(viewModel.profile.activityLevel == level ? .isSelected : [])
                 }
                 PrimaryButton("Next", action: viewModel.next)
@@ -308,16 +310,17 @@ private struct DietPreferencesStep: View {
                                 .overlay(Capsule().stroke(selected ? CBColors.controlFill : CBColors.inkFaint, lineWidth: 1.5))
                                 .clipShape(Capsule())
                         }
-                        .buttonStyle(.plain)
+                        .buttonStyle(.cbPressable)
                         .accessibilityAddTraits(selected ? .isSelected : [])
                     }
                 }
                 PrimaryButton("See my targets", action: viewModel.next)
-                Button("Skip for now", action: viewModel.skipDiet)
+                Button(action: viewModel.skipDiet) {
+                    Text("Skip for now").frame(maxWidth: .infinity, minHeight: 44)
+                }
                     .font(CBTypography.body(14))
                     .foregroundStyle(CBColors.inkMid)
-                    .frame(maxWidth: .infinity)
-                    .buttonStyle(.plain)
+                    .buttonStyle(.cbPressable)
             }
             .padding(.horizontal, CBSpacing.page)
             .padding(.top, 18)
@@ -378,11 +381,12 @@ private struct TargetResultStep: View {
                 }
             }
             PrimaryButton("Start tracking", action: viewModel.next)
-            Button("Back", action: viewModel.back)
+            Button(action: viewModel.back) {
+                Text("Back").frame(maxWidth: .infinity, minHeight: 44)
+            }
                 .font(CBTypography.body(14))
                 .foregroundStyle(CBColors.inkMid)
-                .frame(maxWidth: .infinity)
-                .buttonStyle(.plain)
+                .buttonStyle(.cbPressable)
         }
         .padding(.horizontal, CBSpacing.page)
         .padding(.top, 20)
@@ -437,7 +441,7 @@ private struct SelectableCapsule: View {
                 .overlay(RoundedRectangle(cornerRadius: 12).stroke(selected ? CBColors.controlFill : CBColors.inkFaint, lineWidth: 1.5))
                 .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
         }
-        .buttonStyle(.plain)
+        .buttonStyle(.cbPressable)
         .accessibilityAddTraits(selected ? .isSelected : [])
     }
 }

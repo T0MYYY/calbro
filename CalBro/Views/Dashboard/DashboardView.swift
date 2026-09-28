@@ -28,7 +28,7 @@ struct DashboardView: View {
                                     .font(CBTypography.body(13, weight: .semibold))
                                     .foregroundStyle(CBColors.terra)
                             }
-                            .buttonStyle(.plain)
+                            .buttonStyle(.cbPressable)
                             .accessibilityHint(Text("Returns to today"))
                         }
 
@@ -51,7 +51,7 @@ struct DashboardView: View {
                             }
                             .frame(maxWidth: .infinity)
                         }
-                        .buttonStyle(.plain)
+                        .buttonStyle(.cbPressable)
                         .accessibilityHint(Text("Shows nutrition details"))
                         .accessibilityIdentifier("openNutrition")
 
@@ -132,7 +132,7 @@ struct DashboardView: View {
                         .background(CBColors.controlFill)
                         .clipShape(Capsule())
                 }
-                .buttonStyle(.plain)
+                .buttonStyle(.cbPressable)
             } else {
                 Text("Nothing logged on this day")
                     .font(CBTypography.body(16, weight: .semibold))
@@ -151,23 +151,29 @@ private struct LoggedMealRow: View {
     let onEdit: () -> Void
 
     var body: some View {
-        HStack {
-            HStack(spacing: 10) {
-                Circle().fill(CBColors.terra).frame(width: 8, height: 8)
-                VStack(alignment: .leading, spacing: 1) {
-                    Text(meal.name).font(CBTypography.body(15, weight: .semibold)).foregroundStyle(CBColors.ink)
-                    Text(meal.timeLabel).font(CBTypography.body(12)).foregroundStyle(CBColors.inkMid)
+        HStack(spacing: 4) {
+            Button(action: onEdit) {
+                HStack {
+                    HStack(spacing: 10) {
+                        Circle().fill(CBColors.terra).frame(width: 8, height: 8)
+                        VStack(alignment: .leading, spacing: 1) {
+                            Text(meal.name).font(CBTypography.body(15, weight: .semibold)).foregroundStyle(CBColors.ink)
+                            Text(meal.timeLabel).font(CBTypography.body(12)).foregroundStyle(CBColors.inkMid)
+                        }
+                    }
+                    Spacer()
+                    VStack(alignment: .trailing, spacing: 1) {
+                        Text(NutritionFormat.kcal(meal.adjustedCalories))
+                            .font(CBTypography.body(14, weight: .semibold)).foregroundStyle(CBColors.ink)
+                        if meal.servingMultiplier != 1.0 {
+                            Text(ServingFormat.multiplier(meal.servingMultiplier))
+                                .font(CBTypography.mono(11)).foregroundStyle(CBColors.inkMid)
+                        }
+                    }
                 }
+                .padding(.leading, 14).padding(.vertical, 10)
             }
-            Spacer()
-            VStack(alignment: .trailing, spacing: 1) {
-                Text(NutritionFormat.kcal(meal.adjustedCalories))
-                    .font(CBTypography.body(14, weight: .semibold)).foregroundStyle(CBColors.ink)
-                if meal.servingMultiplier != 1.0 {
-                    Text(ServingFormat.multiplier(meal.servingMultiplier))
-                        .font(CBTypography.mono(11)).foregroundStyle(CBColors.inkMid)
-                }
-            }
+            .buttonStyle(.cbPressable)
             // A menu, because swipeActions don't work inside ScrollView + VStack
             Menu {
                 Button { onEdit() } label: { Label("Edit", systemImage: "pencil") }
@@ -176,17 +182,16 @@ private struct LoggedMealRow: View {
                 Image(systemName: "ellipsis")
                     .font(.system(size: 16, weight: .semibold))
                     .foregroundStyle(CBColors.inkMid)
-                    .frame(width: 32, height: 44)
+                    .frame(width: 44, height: 52)
                     .contentShape(Rectangle())
             }
             .accessibilityLabel(Text("Meal actions"))
         }
-        .padding(.horizontal, 14).padding(.vertical, 10)
+        .padding(.trailing, 4)
         .background(CBColors.bg)
         .overlay(RoundedRectangle(cornerRadius: CBSpacing.cardRadius).stroke(CBColors.inkFaint, lineWidth: 1.5))
         .clipShape(RoundedRectangle(cornerRadius: CBSpacing.cardRadius, style: .continuous))
-        .contentShape(Rectangle())
-        .onTapGesture { onEdit() }
+        .contentShape(.contextMenuPreview, RoundedRectangle(cornerRadius: CBSpacing.cardRadius, style: .continuous))
         .contextMenu {
             Button { onEdit() } label: { Label("Edit", systemImage: "pencil") }
             Button(role: .destructive) { onDelete() } label: { Label("Delete", systemImage: "trash") }
@@ -278,7 +283,7 @@ struct MealEditSheet: View {
                                             .background(multiplier == v ? CBColors.controlFill : Color.clear)
                                             .clipShape(Capsule())
                                     }
-                                    .buttonStyle(.plain)
+                                    .buttonStyle(.cbPressable)
                                     .accessibilityAddTraits(multiplier == v ? .isSelected : [])
                                 }
                             }
@@ -310,7 +315,7 @@ struct MealEditSheet: View {
                         .background(CBColors.controlFill)
                         .clipShape(RoundedRectangle(cornerRadius: CBSpacing.buttonRadius, style: .continuous))
                 }
-                .buttonStyle(.plain)
+                .buttonStyle(.cbPressable)
                 .padding(.horizontal, CBSpacing.page)
                 .padding(.bottom, 12)
             }

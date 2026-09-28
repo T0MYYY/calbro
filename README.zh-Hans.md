@@ -6,7 +6,7 @@
 
 **一款原生 SwiftUI iPhone 应用，只需一张俯拍食物照片即可估算热量和宏量营养素，全程在设备端完成，基于 Depth-Anything-V2 → DPF-Nutrition 的 Core ML 流水线。**
 
-[![Platform](https://img.shields.io/badge/Platform-iOS%2026-000000?logo=apple)](https://www.apple.com/ios/)
+[![Platform](https://img.shields.io/badge/Platform-iOS%2027-000000?logo=apple)](https://www.apple.com/ios/)
 [![SwiftUI](https://img.shields.io/badge/SwiftUI-6.0-blue?logo=swift)](https://developer.apple.com/xcode/swiftui/)
 [![On-device ML](https://img.shields.io/badge/ML-Core%20ML%20(offline)-5B5BD6)](https://developer.apple.com/documentation/coreml)
 [![Research repo](https://img.shields.io/badge/Research-Nutrition5k-4285F4)](https://github.com/T0MYYY/nutrition5k-calorie-estimation)
@@ -32,7 +32,7 @@
 | 今天（深色） | 扫描结果 | 个人资料（深色） | 体重预测 |
 |:---:|:---:|:---:|:---:|
 | <img src="docs/screenshots/today-dark.jpg" width="200"> | <img src="docs/screenshots/scan-result.jpg" width="200"> | <img src="docs/screenshots/profile-dark.jpg" width="200"> | <img src="docs/screenshots/prediction.jpg" width="200"> |
-| 完整的浅色 / 深色主题 | 估算结果与份量调整（图为模拟器示例） | 热量预算、宏量营养素目标、每周汇总 | 根据你的计划推算达成日期 |
+| 完整的浅色 / 深色主题 | 估算结果与份量调整 | 热量预算、宏量营养素目标、每周汇总 | 根据你的计划推算达成日期 |
 
 ---
 
@@ -82,7 +82,7 @@ flowchart TD
 
 ## 架构
 
-- **SwiftUI + `@Observable` MVVM**，iOS 26，Swift 6 严格并发检查，三个标签页（今天 / 统计 / 个人资料）。相机是从“今天”页 **+** 按钮打开的全屏模态视图。
+- **SwiftUI + `@Observable` MVVM**，iOS 27，Swift 6 严格并发检查，三个标签页（今天 / 统计 / 个人资料）。相机是从“今天”页 **+** 按钮打开的全屏模态视图。
 - **单一数据源**：`ProfileStore`（个人资料 + 体重记录）和 `MealLogStore`（餐食 + 每日汇总）被所有页面直接观察，任何修改都会立即同步到各处。
 - **拍摄引导**（`CameraCaptureController`、`CameraFlowViewModel`）：选用 `.builtInLiDARDepthCamera` 获取真实深度；只有在俯拍倾角（< 28°）**且**高度处于 **27–34 cm** 区间时才自动拍摄，距离以不带单位的进度条显示。手动快门始终可用。
 - **持久化**：餐食（约 13 个月）、个人资料、体重记录和设置保存在 `UserDefaults` 中；当天的快照同步到 **App Group**（`group.com.wydfcc.calbro`）供小组件使用。
@@ -110,13 +110,13 @@ CalBroWidget/          WidgetKit extension
 
 1. 将 Core ML 模型（体积太大，未纳入 git）放入 `CalBro/Resources/Models/`，详见 [`MODELS.md`](CalBro/Resources/Models/MODELS.md)。缺少模型时，相机会提示模型未安装。
 2. Xcode 项目由 [XcodeGen](https://github.com/yonaskolb/XcodeGen) 根据 `project.yml` 生成（`xcodegen generate`）；生成的项目也已提交到仓库。
-3. 用 **Xcode 26+** 打开 `CalBro.xcodeproj`，选择 **CalBro** scheme。
-4. 在 iOS 26 设备上运行（推荐使用带 LiDAR 的 iPhone Pro 以获取深度）。
+3. 用 **Xcode 27+** 打开 `CalBro.xcodeproj`，选择 **CalBro** scheme。
+4. 在 iOS 27 设备上运行（推荐使用带 LiDAR 的 iPhone Pro 以获取深度）。
 
 ```bash
 # Simulator build
 xcodebuild -project CalBro.xcodeproj -scheme CalBro \
-  -destination 'platform=iOS Simulator,name=iPhone 17 Pro' -configuration Debug build
+  -destination 'platform=iOS Simulator,name=iPhone 18 Pro' -configuration Debug build
 
 # Device build (automatic signing registers App Group + HealthKit + widget)
 xcodebuild -project CalBro.xcodeproj -scheme CalBro \
@@ -126,7 +126,7 @@ xcodebuild -project CalBro.xcodeproj -scheme CalBro \
 ```bash
 # Unit tests
 xcodebuild -project CalBro.xcodeproj -scheme CalBro \
-  -destination 'platform=iOS Simulator,name=iPhone 17 Pro' test
+  -destination 'platform=iOS Simulator,name=iPhone 18 Pro' test
 ```
 
 使用的能力（Capabilities）：**App Groups**、**HealthKit**、**Camera**、**User Notifications**、**WidgetKit**。

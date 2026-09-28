@@ -50,7 +50,10 @@ struct HealthKitSyncView: View {
                     .disabled(viewModel.isWorking || !viewModel.isHealthAvailable)
 
                     if viewModel.health.readBody {
-                        Button("Import now") { Task { await viewModel.importBodyData() } }
+                        Button { Task { await viewModel.importBodyData() } } label: {
+                            Text("Import now").frame(minHeight: 44)
+                        }
+                            .buttonStyle(.cbPressable)
                             .font(CBTypography.body(14, weight: .semibold))
                             .foregroundStyle(CBColors.terra)
                     }
@@ -81,9 +84,12 @@ struct HealthKitSyncView: View {
                         VStack(alignment: .leading, spacing: 6) {
                             Text("Notifications are turned off for CalBro.")
                                 .font(CBTypography.body(13)).foregroundStyle(CBColors.terra)
-                            Button("Open Settings") {
+                            Button {
                                 if let url = URL(string: UIApplication.openSettingsURLString) { openURL(url) }
+                            } label: {
+                                Text("Open Settings").frame(minHeight: 44)
                             }
+                            .buttonStyle(.cbPressable)
                             .font(CBTypography.body(14, weight: .semibold))
                             .foregroundStyle(CBColors.terra)
                         }

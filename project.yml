@@ -2,13 +2,13 @@ name: CalBro
 options:
   bundleIdPrefix: com.wydfcc
   deploymentTarget:
-    iOS: "26.0"
+    iOS: "27.0"
   createIntermediateGroups: true
   developmentLanguage: en
 settings:
   base:
     SWIFT_VERSION: "6.0"
-    IPHONEOS_DEPLOYMENT_TARGET: "26.0"
+    IPHONEOS_DEPLOYMENT_TARGET: "27.0"
     GENERATE_INFOPLIST_FILE: YES
     MARKETING_VERSION: "1.0"
     CURRENT_PROJECT_VERSION: "1"

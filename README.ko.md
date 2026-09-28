@@ -6,7 +6,7 @@
 
 **위에서 내려다보고 찍은 음식 사진 한 장으로 칼로리와 다량 영양소를 추정하는 네이티브 SwiftUI iPhone 앱입니다. Depth-Anything-V2 → DPF-Nutrition Core ML 파이프라인을 사용하며, 모든 처리가 기기 내에서 이루어집니다.**
 
-[![Platform](https://img.shields.io/badge/Platform-iOS%2026-000000?logo=apple)](https://www.apple.com/ios/)
+[![Platform](https://img.shields.io/badge/Platform-iOS%2027-000000?logo=apple)](https://www.apple.com/ios/)
 [![SwiftUI](https://img.shields.io/badge/SwiftUI-6.0-blue?logo=swift)](https://developer.apple.com/xcode/swiftui/)
 [![On-device ML](https://img.shields.io/badge/ML-Core%20ML%20(offline)-5B5BD6)](https://developer.apple.com/documentation/coreml)
 [![Research repo](https://img.shields.io/badge/Research-Nutrition5k-4285F4)](https://github.com/T0MYYY/nutrition5k-calorie-estimation)
@@ -32,7 +32,7 @@
 | 오늘(다크) | 스캔 결과 | 프로필(다크) | 체중 예측 |
 |:---:|:---:|:---:|:---:|
 | <img src="docs/screenshots/today-dark.jpg" width="200"> | <img src="docs/screenshots/scan-result.jpg" width="200"> | <img src="docs/screenshots/profile-dark.jpg" width="200"> | <img src="docs/screenshots/prediction.jpg" width="200"> |
-| 라이트/다크 테마 완벽 지원 | 분량 조정이 가능한 추정 결과(시뮬레이터 샘플 화면) | 칼로리 예산, 매크로 목표, 주간 요약 | 플랜 기준 목표 달성일 |
+| 라이트/다크 테마 완벽 지원 | 분량 조정이 가능한 추정 결과 | 칼로리 예산, 매크로 목표, 주간 요약 | 플랜 기준 목표 달성일 |
 
 ---
 
@@ -82,7 +82,7 @@ flowchart TD
 
 ## 아키텍처
 
-- **SwiftUI + `@Observable` MVVM**, iOS 26, Swift 6 strict concurrency, 3탭 구조(오늘 / 통계 / 프로필). 카메라는 오늘 화면의 **+** 버튼으로 여는 전체 화면 모달입니다.
+- **SwiftUI + `@Observable` MVVM**, iOS 27, Swift 6 strict concurrency, 3탭 구조(오늘 / 통계 / 프로필). 카메라는 오늘 화면의 **+** 버튼으로 여는 전체 화면 모달입니다.
 - **단일 진실 공급원(single source of truth)**: 모든 화면이 `ProfileStore`(프로필 + 체중 기록)와 `MealLogStore`(식사 + 일별 합계)를 직접 관찰하므로, 수정 사항이 모든 화면에 즉시 반영됩니다.
 - **촬영 가이드**(`CameraCaptureController`, `CameraFlowViewModel`): 실제 깊이를 얻기 위해 `.builtInLiDARDepthCamera`를 선택하고, 위에서 내려다보는 기울기(28° 미만) **및** **27~34 cm** 높이 범위를 모두 만족할 때만 자동 촬영합니다. 거리는 단위 없는 거리 막대로 표시됩니다. 수동 셔터는 언제든 사용할 수 있습니다.
 - **데이터 저장**: 식사(약 13개월분), 프로필, 체중 기록, 설정을 `UserDefaults`에 저장하고, 위젯을 위해 오늘의 스냅샷을 **App Group**(`group.com.wydfcc.calbro`)에 미러링합니다.
@@ -110,13 +110,13 @@ CalBroWidget/          WidgetKit extension
 
 1. Core ML 모델(용량이 커서 git에는 포함하지 않음)을 `CalBro/Resources/Models/`에 넣습니다. 자세한 내용은 [`MODELS.md`](CalBro/Resources/Models/MODELS.md)를 참고하세요. 모델이 없으면 카메라 화면에 모델이 설치되지 않았다는 메시지가 표시됩니다.
 2. Xcode 프로젝트는 [XcodeGen](https://github.com/yonaskolb/XcodeGen)으로 `project.yml`에서 생성합니다(`xcodegen generate`). 생성된 프로젝트도 함께 커밋되어 있습니다.
-3. **Xcode 26 이상**에서 `CalBro.xcodeproj`를 열고 **CalBro** 스킴을 선택합니다.
-4. iOS 26 기기에서 실행합니다(깊이 기능에는 LiDAR가 탑재된 iPhone Pro 권장).
+3. **Xcode 27 이상**에서 `CalBro.xcodeproj`를 열고 **CalBro** 스킴을 선택합니다.
+4. iOS 27 기기에서 실행합니다(깊이 기능에는 LiDAR가 탑재된 iPhone Pro 권장).
 
 ```bash
 # Simulator build
 xcodebuild -project CalBro.xcodeproj -scheme CalBro \
-  -destination 'platform=iOS Simulator,name=iPhone 17 Pro' -configuration Debug build
+  -destination 'platform=iOS Simulator,name=iPhone 18 Pro' -configuration Debug build
 
 # Device build (automatic signing registers App Group + HealthKit + widget)
 xcodebuild -project CalBro.xcodeproj -scheme CalBro \
@@ -126,7 +126,7 @@ xcodebuild -project CalBro.xcodeproj -scheme CalBro \
 ```bash
 # Unit tests
 xcodebuild -project CalBro.xcodeproj -scheme CalBro \
-  -destination 'platform=iOS Simulator,name=iPhone 17 Pro' test
+  -destination 'platform=iOS Simulator,name=iPhone 18 Pro' test
 ```
 
 사용하는 Capability: **App Groups**, **HealthKit**, **Camera**, **User Notifications**, **WidgetKit**.

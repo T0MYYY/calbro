@@ -37,8 +37,7 @@ struct CalendarMonthView: View {
                 }
             }
             .padding(.horizontal, 10)
-            .contentShape(Rectangle())
-            .gesture(
+            .simultaneousGesture(
                 DragGesture(minimumDistance: 24)
                     .onEnded { value in
                         viewModel.handleMonthSwipe(
@@ -88,7 +87,7 @@ struct CalendarMonthView: View {
                                 }
                             }
                         }
-                        .buttonStyle(.plain)
+                        .buttonStyle(.cbPressable)
                         .accessibilityHint(Text("Shows that day's meals"))
                     }
                 }
@@ -114,7 +113,7 @@ struct CalendarMonthView: View {
         }
         .font(.system(size: 18, weight: .semibold))
         .foregroundStyle(CBColors.inkMid)
-        .buttonStyle(.plain)
+        .buttonStyle(.cbPressable)
     }
 }
 

@@ -6,7 +6,7 @@
 
 **Um app nativo em SwiftUI para iPhone que estima calorias e macronutrientes a partir de uma única foto do prato tirada de cima, totalmente no dispositivo, usando um pipeline Core ML Depth-Anything-V2 → DPF-Nutrition.**
 
-[![Platform](https://img.shields.io/badge/Platform-iOS%2026-000000?logo=apple)](https://www.apple.com/ios/)
+[![Platform](https://img.shields.io/badge/Platform-iOS%2027-000000?logo=apple)](https://www.apple.com/ios/)
 [![SwiftUI](https://img.shields.io/badge/SwiftUI-6.0-blue?logo=swift)](https://developer.apple.com/xcode/swiftui/)
 [![On-device ML](https://img.shields.io/badge/ML-Core%20ML%20(offline)-5B5BD6)](https://developer.apple.com/documentation/coreml)
 [![Research repo](https://img.shields.io/badge/Research-Nutrition5k-4285F4)](https://github.com/T0MYYY/nutrition5k-calorie-estimation)
@@ -32,7 +32,7 @@ Este é o **complemento aplicado / de implantação** do nosso repositório de p
 | Hoje (escuro) | Resultado do escaneamento | Perfil (escuro) | Previsão de peso |
 |:---:|:---:|:---:|:---:|
 | <img src="docs/screenshots/today-dark.jpg" width="200"> | <img src="docs/screenshots/scan-result.jpg" width="200"> | <img src="docs/screenshots/profile-dark.jpg" width="200"> | <img src="docs/screenshots/prediction.jpg" width="200"> |
-| Tema claro/escuro completo | Estimativa com ajuste de porção (exemplo do simulador) | Orçamento calórico, metas de macros, resumo semanal | Data prevista com base no seu plano |
+| Tema claro/escuro completo | Estimativa com ajuste de porção | Orçamento calórico, metas de macros, resumo semanal | Data prevista com base no seu plano |
 
 ---
 
@@ -82,7 +82,7 @@ Implementação: `CalBro/Services/NutritionPredictionService.swift`, `ImagePrepr
 
 ## Arquitetura
 
-- **SwiftUI + MVVM com `@Observable`**, iOS 26, concorrência estrita do Swift 6, estrutura com três abas (Hoje / Estatísticas / Perfil). A câmera é um modal em tela cheia aberto pelo botão **+** em Hoje.
+- **SwiftUI + MVVM com `@Observable`**, iOS 27, concorrência estrita do Swift 6, estrutura com três abas (Hoje / Estatísticas / Perfil). A câmera é um modal em tela cheia aberto pelo botão **+** em Hoje.
 - **Fonte única da verdade**: `ProfileStore` (perfil + registro de peso) e `MealLogStore` (refeições + totais por dia) são observados diretamente por todas as telas, então qualquer edição aparece em todo lugar na hora.
 - **Orientação de captura** (`CameraCaptureController`, `CameraFlowViewModel`): seleciona `.builtInLiDARDepthCamera` para obter profundidade real e só libera a captura automática com inclinação de cima para baixo (< 28°) **e** altura na faixa de **27–34 cm**, exibida como uma barra de distância sem unidades. O disparador manual está sempre disponível.
 - **Persistência**: refeições (≈13 meses), perfil, registro de peso e ajustes em `UserDefaults`; o resumo do dia é espelhado em um **App Group** (`group.com.wydfcc.calbro`) para o widget.
@@ -110,13 +110,13 @@ CalBroWidget/          WidgetKit extension
 
 1. Coloque os modelos Core ML (não estão no git — são grandes demais) em `CalBro/Resources/Models/` — veja [`MODELS.md`](CalBro/Resources/Models/MODELS.md). Sem eles, a câmera informa que o modelo não está instalado.
 2. O projeto do Xcode é gerado a partir de `project.yml` com o [XcodeGen](https://github.com/yonaskolb/XcodeGen) (`xcodegen generate`); o projeto gerado também está versionado.
-3. Abra `CalBro.xcodeproj` no **Xcode 26+** e selecione o scheme **CalBro**.
-4. Execute em um dispositivo com iOS 26 (recomenda-se um iPhone Pro com LiDAR para a profundidade).
+3. Abra `CalBro.xcodeproj` no **Xcode 27+** e selecione o scheme **CalBro**.
+4. Execute em um dispositivo com iOS 27 (recomenda-se um iPhone Pro com LiDAR para a profundidade).
 
 ```bash
 # Simulator build
 xcodebuild -project CalBro.xcodeproj -scheme CalBro \
-  -destination 'platform=iOS Simulator,name=iPhone 17 Pro' -configuration Debug build
+  -destination 'platform=iOS Simulator,name=iPhone 18 Pro' -configuration Debug build
 
 # Device build (automatic signing registers App Group + HealthKit + widget)
 xcodebuild -project CalBro.xcodeproj -scheme CalBro \
@@ -126,7 +126,7 @@ xcodebuild -project CalBro.xcodeproj -scheme CalBro \
 ```bash
 # Unit tests
 xcodebuild -project CalBro.xcodeproj -scheme CalBro \
-  -destination 'platform=iOS Simulator,name=iPhone 17 Pro' test
+  -destination 'platform=iOS Simulator,name=iPhone 18 Pro' test
 ```
 
 Capabilities utilizadas: **App Groups**, **HealthKit**, **Câmera**, **Notificações do usuário**, **WidgetKit**.

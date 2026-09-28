@@ -1,4 +1,5 @@
 import SwiftUI
+import UIKit
 
 struct CBCard<Content: View>: View {
     var background = CBColors.bg
@@ -33,7 +34,7 @@ struct PrimaryButton: View {
                 .background(CBColors.controlFill)
                 .clipShape(RoundedRectangle(cornerRadius: CBSpacing.buttonRadius, style: .continuous))
         }
-        .buttonStyle(.plain)
+        .buttonStyle(.cbPressable)
         .accessibilityIdentifier("primaryButton")
     }
 }
@@ -209,28 +210,84 @@ struct MetricCard: View {
     }
 }
 
-struct EdgeSwipeBackModifier: ViewModifier {
-    @Environment(\.dismiss) private var dismiss
-
-    func body(content: Content) -> some View {
-        content
+/// Plain-looking button whose whole frame is tappable (including clear backgrounds)
+/// and that dims while pressed, so taps register and feel immediate.
+struct CBPressableButtonStyle: ButtonStyle {
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
             .contentShape(Rectangle())
-            .simultaneousGesture(
-                DragGesture(minimumDistance: 20, coordinateSpace: .global)
-                    .onEnded { value in
-                        let startsAtEdge = value.startLocation.x < 28
-                        let movesRight = value.translation.width > 72
-                        let mostlyHorizontal = abs(value.translation.height) < 48
-                        if startsAtEdge && movesRight && mostlyHorizontal {
-                            dismiss()
-                        }
-                    }
-            )
+            .opacity(configuration.isPressed ? 0.55 : 1)
+            .scaleEffect(configuration.isPressed ? 0.97 : 1)
+            .animation(.easeOut(duration: 0.12), value: configuration.isPressed)
+    }
+}
+
+extension ButtonStyle where Self == CBPressableButtonStyle {
+    static var cbPressable: CBPressableButtonStyle { CBPressableButtonStyle() }
+}
+
+/// Screens hide the system back button to draw their own header, which also disables
+/// the interactive swipe-back. This re-enables the native gesture on the hosting stack.
+private struct InteractivePopEnabler: UIViewControllerRepresentable {
+    func makeUIViewController(context: Context) -> Controller { Controller() }
+    func updateUIViewController(_ controller: Controller, context: Context) {}
+
+    final class Controller: UIViewController {
+        override func didMove(toParent parent: UIViewController?) {
+            super.didMove(toParent: parent)
+            enable()
+        }
+
+        override func viewDidAppear(_ animated: Bool) {
+            super.viewDidAppear(animated)
+            enable()
+        }
+
+        private func enable() {
+            guard let nav = navigationController, let pop = nav.interactivePopGestureRecognizer else { return }
+            pop.isEnabled = true
+            PopGestureDelegate.shared.attach(to: nav)
+        }
+    }
+}
+
+/// Allows the swipe only when there is a screen to go back to; swiping on a
+/// stack's root would otherwise leave the navigation controller stuck.
+@MainActor
+private final class PopGestureDelegate: NSObject, UIGestureRecognizerDelegate {
+    static let shared = PopGestureDelegate()
+    private let controllers = NSHashTable<UINavigationController>.weakObjects()
+
+    func attach(to nav: UINavigationController) {
+        controllers.add(nav)
+        nav.interactivePopGestureRecognizer?.delegate = self
+    }
+
+    nonisolated func gestureRecognizerShouldBegin(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
+        MainActor.assumeIsolated {
+            controllers.allObjects.first { $0.interactivePopGestureRecognizer === gestureRecognizer }
+                .map { $0.viewControllers.count > 1 } ?? false
+        }
     }
 }
 
 extension View {
     func edgeSwipeBackEnabled() -> some View {
-        modifier(EdgeSwipeBackModifier())
+        background(InteractivePopEnabler().frame(width: 0, height: 0))
+    }
+}
+
+extension View {
+    /// Number pads have no return key; adds a Done button above the keyboard.
+    func keyboardDoneButton() -> some View {
+        toolbar {
+            ToolbarItemGroup(placement: .keyboard) {
+                Spacer()
+                Button("Done") {
+                    UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
+                }
+                .fontWeight(.semibold)
+            }
+        }
     }
 }

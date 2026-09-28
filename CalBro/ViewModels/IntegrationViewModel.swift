@@ -125,15 +125,19 @@ final class IntegrationViewModel {
         lastHealthImport = Date()
     }
 
+    /// Applies the change right away so the switch moves on tap; reverts if authorization fails.
     private func changeHealth(_ edit: (inout HealthSettings) -> Void) async {
+        let previous = health
         var next = health
         edit(&next)
         healthError = nil
-        let turningOn = next.readBody && !health.readBody
-            || next.useActiveEnergy && !health.useActiveEnergy
-            || next.writeMeals && !health.writeMeals
+        let turningOn = next.readBody && !previous.readBody
+            || next.useActiveEnergy && !previous.useActiveEnergy
+            || next.writeMeals && !previous.writeMeals
+        health = next
         if turningOn {
             guard healthProvider.isAvailable else {
+                health = previous
                 healthError = String(localized: "Apple Health isn't available on this device.")
                 return
             }
@@ -142,23 +146,24 @@ final class IntegrationViewModel {
             do {
                 try await healthProvider.requestAuthorization(for: next)
             } catch {
+                health = previous
                 healthError = String(localized: "Apple Health access wasn't granted.")
                 return
             }
         }
-        health = next
         persist()
     }
 
     // MARK: - Reminders
 
     func setMealReminder(_ on: Bool) async {
+        reminders.mealReminderEnabled = on
         if on, !(await notifications.requestPermission()) {
+            reminders.mealReminderEnabled = false
             notificationPermission = .denied
             return
         }
         notificationPermission = await notifications.permission()
-        reminders.mealReminderEnabled = on
         persist()
         await rescheduleMealReminders()
     }
@@ -177,12 +182,13 @@ final class IntegrationViewModel {
     }
 
     func setCalorieWarning(_ on: Bool) async {
+        reminders.calorieWarningEnabled = on
         if on, !(await notifications.requestPermission()) {
+            reminders.calorieWarningEnabled = false
             notificationPermission = .denied
             return
         }
         notificationPermission = await notifications.permission()
-        reminders.calorieWarningEnabled = on
         persist()
     }
 

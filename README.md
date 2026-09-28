@@ -6,7 +6,7 @@
 
 **A native SwiftUI iPhone app that estimates calories and macronutrients from a single overhead food photo, fully on-device, using a Depth-Anything-V2 → DPF-Nutrition Core ML pipeline.**
 
-[![Platform](https://img.shields.io/badge/Platform-iOS%2026-000000?logo=apple)](https://www.apple.com/ios/)
+[![Platform](https://img.shields.io/badge/Platform-iOS%2027-000000?logo=apple)](https://www.apple.com/ios/)
 [![SwiftUI](https://img.shields.io/badge/SwiftUI-6.0-blue?logo=swift)](https://developer.apple.com/xcode/swiftui/)
 [![On-device ML](https://img.shields.io/badge/ML-Core%20ML%20(offline)-5B5BD6)](https://developer.apple.com/documentation/coreml)
 [![Research repo](https://img.shields.io/badge/Research-Nutrition5k-4285F4)](https://github.com/T0MYYY/nutrition5k-calorie-estimation)
@@ -32,7 +32,7 @@ This is the **applied / deployment companion** to our research repository [**Nut
 | Today (dark) | Scan result | Profile (dark) | Weight prediction |
 |:---:|:---:|:---:|:---:|
 | <img src="docs/screenshots/today-dark.jpg" width="200"> | <img src="docs/screenshots/scan-result.jpg" width="200"> | <img src="docs/screenshots/profile-dark.jpg" width="200"> | <img src="docs/screenshots/prediction.jpg" width="200"> |
-| Full light/dark theming | Estimate with serving adjustment (simulator sample shown) | Calorie budget, macro targets, weekly summary | Target date from your plan |
+| Full light/dark theming | Estimate with serving adjustment | Calorie budget, macro targets, weekly summary | Target date from your plan |
 
 ---
 
@@ -82,7 +82,7 @@ Implementation: `CalBro/Services/NutritionPredictionService.swift`, `ImagePrepro
 
 ## Architecture
 
-- **SwiftUI + `@Observable` MVVM**, iOS 26, Swift 6 strict concurrency, three-tab shell (Today / Stats / Profile). Camera is a full-screen modal launched from the Today **+** button.
+- **SwiftUI + `@Observable` MVVM**, iOS 27, Swift 6 strict concurrency, three-tab shell (Today / Stats / Profile). Camera is a full-screen modal launched from the Today **+** button.
 - **Single source of truth**: `ProfileStore` (profile + weight log) and `MealLogStore` (meals + per-day totals) are observed directly by every screen, so an edit shows up everywhere immediately.
 - **Capture guidance** (`CameraCaptureController`, `CameraFlowViewModel`): selects `.builtInLiDARDepthCamera` for true depth, gates auto-capture on overhead tilt (< 28°) **and** a **27–34 cm** height band, shown as a unit-less distance bar. The manual shutter is always available.
 - **Persistence**: meals (≈13 months), profile, weight log and settings in `UserDefaults`; today's snapshot mirrored into an **App Group** (`group.com.wydfcc.calbro`) for the widget.
@@ -110,13 +110,13 @@ CalBroWidget/          WidgetKit extension
 
 1. Place the Core ML models (not in git — too large) into `CalBro/Resources/Models/` — see [`MODELS.md`](CalBro/Resources/Models/MODELS.md). Without them the camera reports that the model isn't installed.
 2. The Xcode project is generated from `project.yml` with [XcodeGen](https://github.com/yonaskolb/XcodeGen) (`xcodegen generate`); the generated project is committed too.
-3. Open `CalBro.xcodeproj` in **Xcode 26+** and select the **CalBro** scheme.
-4. Run on an iOS 26 device (LiDAR iPhone Pro recommended for depth).
+3. Open `CalBro.xcodeproj` in **Xcode 27+** and select the **CalBro** scheme.
+4. Run on an iOS 27 device (LiDAR iPhone Pro recommended for depth).
 
 ```bash
 # Simulator build
 xcodebuild -project CalBro.xcodeproj -scheme CalBro \
-  -destination 'platform=iOS Simulator,name=iPhone 17 Pro' -configuration Debug build
+  -destination 'platform=iOS Simulator,name=iPhone 18 Pro' -configuration Debug build
 
 # Device build (automatic signing registers App Group + HealthKit + widget)
 xcodebuild -project CalBro.xcodeproj -scheme CalBro \
@@ -126,7 +126,7 @@ xcodebuild -project CalBro.xcodeproj -scheme CalBro \
 ```bash
 # Unit tests
 xcodebuild -project CalBro.xcodeproj -scheme CalBro \
-  -destination 'platform=iOS Simulator,name=iPhone 17 Pro' test
+  -destination 'platform=iOS Simulator,name=iPhone 18 Pro' test
 ```
 
 Capabilities used: **App Groups**, **HealthKit**, **Camera**, **User Notifications**, **WidgetKit**.

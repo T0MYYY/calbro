@@ -3,7 +3,7 @@ import XCTest
 
 @MainActor
 final class CalBroStateTests: XCTestCase {
-    private var suiteNames: [String] = []
+    nonisolated(unsafe) private var suiteNames: [String] = []
 
     override func tearDown() {
         for name in suiteNames { UserDefaults.standard.removePersistentDomain(forName: name) }
