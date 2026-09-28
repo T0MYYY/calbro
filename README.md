@@ -40,7 +40,6 @@ This is the **applied / deployment companion** to our research repository [**Nut
 
 - **Scan a meal.** Point the phone straight down at the plate. An on-device guidance system (CoreMotion tilt + LiDAR/depth distance) tells you when the angle and height are right, then auto-captures.
 - **Estimate nutrition on-device.** The captured RGB frame plus a depth map are fed through a two-stage Core ML pipeline to predict **calories, mass, fat, carbs, protein** — no network, no account, no data leaves the phone.
-- **Never invent numbers.** If the photo or the model fails, the app says so and nothing is logged — there is no fallback estimate.
 - **Track the day.** A calorie ring, macro rings, an editable meal log, a month calendar, weekly stats, a weight-prediction simulator, and a weight trend with plateau detection.
 - **Calibrate to you.** After two weeks of weigh-ins and meal logs, CalBro can replace the Mifflin-St Jeor maintenance estimate with one derived from your own intake and weight change, and refreshes it every two weeks.
 - **Integrate with the system.** Apple Health (import body measurements and weight history, use measured active energy in the daily budget, save logged meals), local-notification reminders, and Home/Lock Screen widgets via WidgetKit + App Group.
@@ -76,7 +75,6 @@ flowchart TD
 - **Stage 1 — Depth.** [Depth Anything V2 Small](https://github.com/DepthAnything/Depth-Anything-V2) converted to Core ML estimates a dense depth map from the single RGB frame (fixed **518×392** input). On LiDAR-equipped iPhones the hardware depth stream is used to guide the camera to the right height; it is not yet fed to the model.
 - **Stage 2 — Nutrition.** Our **DPF-Nutrition** RGB-D regressor (trained in the [research repo](https://github.com/T0MYYY/nutrition5k-calorie-estimation)) consumes ImageNet-normalized RGB + the depth map and regresses the five nutrition scalars.
 - Both models are bundled in the app, compiled on first use (30–60 s), cached as `.mlmodelc`, and loaded once per launch. Loading starts when the camera opens.
-- A zero or missing prediction is reported as an error rather than shown.
 
 Implementation: `CalBro/Services/NutritionPredictionService.swift`, `ImagePreprocessing.swift`, `CameraCaptureController.swift`.
 
@@ -113,7 +111,7 @@ CalBroWidget/          WidgetKit extension
 1. Place the Core ML models (not in git — too large) into `CalBro/Resources/Models/` — see [`MODELS.md`](CalBro/Resources/Models/MODELS.md). Without them the camera reports that the model isn't installed.
 2. The Xcode project is generated from `project.yml` with [XcodeGen](https://github.com/yonaskolb/XcodeGen) (`xcodegen generate`); the generated project is committed too.
 3. Open `CalBro.xcodeproj` in **Xcode 26+** and select the **CalBro** scheme.
-4. Run on an iOS 26 device (LiDAR iPhone Pro recommended for depth). The simulator has no camera, so it returns a fixed result clearly labeled *Simulator sample*.
+4. Run on an iOS 26 device (LiDAR iPhone Pro recommended for depth).
 
 ```bash
 # Simulator build

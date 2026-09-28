@@ -40,7 +40,6 @@ Dies ist das **anwendungsseitige Gegenstück für das Deployment** zu unserem Fo
 
 - **Mahlzeit scannen.** Halten Sie das iPhone senkrecht über den Teller. Eine Aufnahmeführung auf dem Gerät (Neigung über CoreMotion + Abstand über LiDAR/Tiefe) zeigt an, wann Winkel und Höhe stimmen, und löst dann automatisch aus.
 - **Nährwerte auf dem Gerät schätzen.** Das aufgenommene RGB-Bild und eine Tiefenkarte durchlaufen eine zweistufige Core-ML-Pipeline, die **Kalorien, Masse, Fett, Kohlenhydrate und Protein** vorhersagt – ohne Netzwerk, ohne Konto, und keine Daten verlassen das Telefon.
-- **Niemals Zahlen erfinden.** Schlägt das Foto oder das Modell fehl, meldet die App das, und es wird nichts erfasst – eine Ersatzschätzung gibt es nicht.
 - **Den Tag verfolgen.** Ein Kalorienring, Makroringe, ein bearbeitbares Mahlzeitentagebuch, ein Monatskalender, Wochenstatistiken, ein Simulator für die Gewichtsprognose und ein Gewichtstrend mit Plateau-Erkennung.
 - **Auf Sie kalibriert.** Nach zwei Wochen mit Wiegungen und erfassten Mahlzeiten kann CalBro die Schätzung des Erhaltungsbedarfs nach Mifflin-St Jeor durch einen Wert ersetzen, der aus Ihrer tatsächlichen Nahrungsaufnahme und Gewichtsveränderung abgeleitet ist, und aktualisiert ihn alle zwei Wochen.
 - **Ins System integriert.** Health (Import von Körpermaßen und Gewichtsverlauf, gemessene aktive Energie im Tagesbudget, Sichern erfasster Mahlzeiten), Erinnerungen per lokaler Mitteilung sowie Widgets für Home- und Sperrbildschirm über WidgetKit + App Group.
@@ -76,7 +75,6 @@ flowchart TD
 - **Stufe 1 – Tiefe.** [Depth Anything V2 Small](https://github.com/DepthAnything/Depth-Anything-V2), nach Core ML konvertiert, schätzt aus dem einzelnen RGB-Bild eine dichte Tiefenkarte (feste Eingabegröße **518×392**). Auf iPhones mit LiDAR dient der Hardware-Tiefenstream dazu, die Kamera auf die richtige Höhe zu führen; ins Modell fließt er bisher nicht ein.
 - **Stufe 2 – Nährwerte.** Unser RGB-D-Regressor **DPF-Nutrition** (trainiert im [Forschungs-Repo](https://github.com/T0MYYY/nutrition5k-calorie-estimation)) verarbeitet das ImageNet-normalisierte RGB-Bild zusammen mit der Tiefenkarte und regressiert die fünf Nährwerte.
 - Beide Modelle sind in der App enthalten, werden bei der ersten Nutzung kompiliert (30–60 s), als `.mlmodelc` zwischengespeichert und einmal pro App-Start geladen. Das Laden beginnt, sobald sich die Kamera öffnet.
-- Eine Vorhersage von null oder eine fehlende Vorhersage wird als Fehler gemeldet statt angezeigt.
 
 Implementierung: `CalBro/Services/NutritionPredictionService.swift`, `ImagePreprocessing.swift`, `CameraCaptureController.swift`.
 
@@ -113,7 +111,7 @@ CalBroWidget/          WidgetKit extension
 1. Legen Sie die Core-ML-Modelle (nicht in Git – zu groß) in `CalBro/Resources/Models/` ab – siehe [`MODELS.md`](CalBro/Resources/Models/MODELS.md). Ohne sie meldet die Kamera, dass das Modell nicht installiert ist.
 2. Das Xcode-Projekt wird mit [XcodeGen](https://github.com/yonaskolb/XcodeGen) aus `project.yml` generiert (`xcodegen generate`); das generierte Projekt ist ebenfalls eingecheckt.
 3. Öffnen Sie `CalBro.xcodeproj` in **Xcode 26+** und wählen Sie das Scheme **CalBro**.
-4. Führen Sie die App auf einem Gerät mit iOS 26 aus (für die Tiefe wird ein iPhone Pro mit LiDAR empfohlen). Der Simulator hat keine Kamera und liefert daher ein festes Ergebnis, das deutlich als *Simulator-Beispiel* gekennzeichnet ist.
+4. Führen Sie die App auf einem Gerät mit iOS 26 aus (für die Tiefe wird ein iPhone Pro mit LiDAR empfohlen).
 
 ```bash
 # Simulator build

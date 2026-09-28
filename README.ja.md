@@ -40,7 +40,6 @@
 
 - **食事をスキャン。** スマートフォンを皿の真上に向けます。オンデバイスのガイダンス機能（CoreMotionによる傾き＋LiDAR／深度による距離）が角度と高さが適切になったタイミングを知らせ、自動で撮影します。
 - **栄養をデバイス上で推定。** 撮影したRGBフレームと深度マップを2段階のCore MLパイプラインに通し、**カロリー、質量、脂質、炭水化物、たんぱく質**を予測します。ネットワーク接続もアカウントも不要で、データがスマートフォンの外に出ることはありません。
-- **数値を捏造しない。** 写真やモデルの処理に失敗した場合はその旨を表示し、何も記録しません。代替の推定値は一切ありません。
 - **1日を記録。** カロリーリング、マクロリング、編集可能な食事記録、月間カレンダー、週間統計、体重予測シミュレータ、停滞期検出付きの体重の推移を備えています。
 - **あなたに合わせてキャリブレーション。** 2週間分の体重記録と食事記録がそろうと、CalBroはMifflin-St Jeor式による維持カロリーの推定値を、あなた自身の摂取量と体重変化から算出した値に置き換え、以降2週間ごとに更新します。
 - **システムと連携。** ヘルスケア（身体測定値と体重履歴の読み込み、実測したアクティブエネルギーを1日の予算に反映、記録した食事の保存）、ローカル通知によるリマインダー、WidgetKit＋App Groupによるホーム画面／ロック画面ウィジェットに対応しています。
@@ -76,7 +75,6 @@ flowchart TD
 - **ステージ1 — 深度。** Core MLに変換した[Depth Anything V2 Small](https://github.com/DepthAnything/Depth-Anything-V2)が、1枚のRGBフレームから密な深度マップを推定します（入力サイズは**518×392**固定）。LiDAR搭載のiPhoneでは、ハードウェアの深度ストリームをカメラを適切な高さへ誘導するために使っていますが、モデルへの入力にはまだ使っていません。
 - **ステージ2 — 栄養。** 自作の**DPF-Nutrition** RGB-D回帰モデル（[研究リポジトリ](https://github.com/T0MYYY/nutrition5k-calorie-estimation)で学習）が、ImageNet正規化したRGBと深度マップを入力として、5つの栄養値を回帰します。
 - 両モデルともアプリにバンドルされており、初回使用時にコンパイル（30〜60秒）されて `.mlmodelc` としてキャッシュされ、起動ごとに1回だけ読み込まれます。読み込みはカメラを開いた時点で始まります。
-- 予測値がゼロまたは欠損している場合は、表示せずにエラーとして扱います。
 
 実装：`CalBro/Services/NutritionPredictionService.swift`、`ImagePreprocessing.swift`、`CameraCaptureController.swift`。
 
@@ -113,7 +111,7 @@ CalBroWidget/          WidgetKit extension
 1. Core MLモデル（サイズが大きいためgitには含めていません）を `CalBro/Resources/Models/` に配置します。詳細は[`MODELS.md`](CalBro/Resources/Models/MODELS.md)を参照してください。モデルがない場合、カメラ画面にモデルがインストールされていない旨が表示されます。
 2. Xcodeプロジェクトは[XcodeGen](https://github.com/yonaskolb/XcodeGen)で `project.yml` から生成しています（`xcodegen generate`）。生成済みのプロジェクトもコミットしてあります。
 3. **Xcode 26以降**で `CalBro.xcodeproj` を開き、**CalBro**スキームを選択します。
-4. iOS 26のデバイスで実行します（深度を使うにはLiDAR搭載のiPhone Proを推奨）。シミュレータにはカメラがないため、*シミュレータのサンプル*と明示された固定の結果を返します。
+4. iOS 26のデバイスで実行します（深度を使うにはLiDAR搭載のiPhone Proを推奨）。
 
 ```bash
 # Simulator build
